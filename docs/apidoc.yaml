@@ -1,0 +1,141 @@
+swagger: "2.0"
+info:
+  description: "REST API for the Quizzy multiplatform application"
+  version: "1.0.0"
+  title: "Quizzy REST API"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "795306@unizar.es"
+  license:
+    name: "MIT License"
+    url: "https://opensource.org/licenses/MITl"
+host: "quizzy.io"
+basePath: "/v1"
+tags:
+- name: "user"
+  description: "User and account management operations"
+  externalDocs:
+    description: "Find out more about our store"
+    url: "http://swagger.io"
+schemes:
+- "https"
+- "http"
+paths:
+  /user:
+    post:
+      tags:
+      - "user"
+      summary: "Register a new user"
+      description: "If there is any user with the same nickname, this operation will fail. Otherwise, a new entry in the user database will be created."
+      operationId: "registerUser"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "credentials"
+        in: "body"
+        description: "The new user's nickname"
+        required: true
+        schema:
+          $ref: "#/components/schemas/UserCredentials"
+      responses:
+        "201":
+          description: "user registered successfully"
+          schema:
+            type: "string"
+        "409":
+          description: "conflict: user already exists"
+  /user/login:
+    get:
+      tags:
+        - "user"
+      summary: "Logs user into the system."
+      description: "If the provided credentials were right, a new session will be opened for this user. Otherwise, this operation will fail."
+      parameters:
+      - name: "credentials"
+        in: "body"
+        description: "The new user's nickname"
+        required: true
+        schema:
+          $ref: "#/components/schemas/UserCredentials"
+      produces:
+      - "application/json"
+      responses:
+        "201":
+          description: "user logged in successfully"
+          schema:
+            type: "string"
+        "409":
+          description: "unauthorized: credentials do not match"
+          
+  /user/{nickname}:
+    get:
+      tags:
+      - "user"
+      summary: "Find user by nickname"
+      description: ""
+      operationId: "getUserByName"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "nickname"
+        in: "path"
+        description: "The nickname of the user that will be fetched."
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/User"
+        "400":
+          description: "bad request: Invalid username provided"
+        "404":
+          description: "User not found"
+definitions:
+  User:
+    type: "object"
+    properties:
+      user_id:
+        type: "integer"
+        format: "uint64"
+      nickname:
+        type: "string"
+        description: "Nickname"
+      email:
+        type: "string"
+        description: "Email"
+      password:
+        type: "string"
+        description: "Encrypted password"
+      wallet:
+        type: "integer"
+        format: "uint64"
+        description: "Coin amount in wallet"
+      public_wins:
+        type: "integer"
+        format: "uint64"
+      private_wins:
+        type: "integer"
+        format: "uint64"
+        
+components:
+  schemas:
+    UserCredentials:
+      type: "object"
+      properties:
+        nickname:
+          type: "string"
+          description: "Nickname"
+        email:
+          type: "string"
+          description: "Email"
+        password:
+          type: "string"
+          description: "Encrypted password"
+      required:
+      - "nickname"
+      - "password"
+          
+          
+          
+          
