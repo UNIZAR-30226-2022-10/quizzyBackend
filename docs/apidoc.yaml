@@ -14,9 +14,6 @@ basePath: "/v1"
 tags:
 - name: "user"
   description: "User and account management operations"
-  externalDocs:
-    description: "Find out more about our store"
-    url: "http://swagger.io"
 schemes:
 - "https"
 - "http"
@@ -36,7 +33,7 @@ paths:
         description: "The new user's nickname"
         required: true
         schema:
-          $ref: "#/components/schemas/UserCredentials"
+          $ref: "#/definitions/UserCredentials"
       responses:
         "201":
           description: "user registered successfully"
@@ -56,7 +53,28 @@ paths:
         description: "The new user's nickname"
         required: true
         schema:
-          $ref: "#/components/schemas/UserCredentials"
+          $ref: "#/definitions/UserCredentials"
+      produces:
+      - "application/json"
+      responses:
+        "201":
+          description: "user logged in successfully"
+          schema:
+            type: "string"
+        "409":
+          description: "unauthorized: credentials do not match"
+  /user/logout:
+    get:
+      tags:
+        - "user"
+      summary: "Logs out the current logged in user session"
+      parameters:
+      - name: "credentials"
+        in: "body"
+        description: "The new user's nickname"
+        required: true
+        schema:
+          $ref: "#/definitions/UserCredentials"
       produces:
       - "application/json"
       responses:
@@ -72,7 +90,9 @@ paths:
       tags:
       - "user"
       summary: "Find user by nickname"
-      description: ""
+      description: > 
+        Fetch a user by its nickname. If it exists, the operations returns an User
+        object with the desired user's information. Otherwise, the operation fails.
       operationId: "getUserByName"
       produces:
       - "application/json"
@@ -84,18 +104,218 @@ paths:
         type: "string"
       responses:
         "200":
-          description: "successful operation"
+          description: "Successful operation"
           schema:
             $ref: "#/definitions/User"
         "400":
           description: "bad request: Invalid username provided"
         "404":
           description: "User not found"
+    put:
+      tags:
+      - "user"
+      summary: "Modify user"
+      description: >
+        Modifies a user's information.
+        
+        **The user must be logged in, in order to modify its information.** If 
+        the user isn't logged in as the user which is going to be modified, 
+        the operation fails.
+        
+        If the user exists and the provided credentials 
+        are correct, the user information will be updated.
+      parameters:
+      - name: "nickname"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "userInfo"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/UserCredentials"
+        
+      responses:
+        "200":
+          description: "Successful operation"
+        "400":
+          description: "bad request: Invalid info provided"
+        "403":
+          description: "unauthorized: Not logged in"
+        "404":
+          description: "User not found"
+    delete:
+      tags:
+      - "user"
+      summary: "Delete user"
+      description: >
+        Modifies a user's information.
+        
+        **The user must be logged in, in order to delete its accound.** If 
+        the user isn't logged in as the user which is going to be deleted, 
+        the operation fails.
+        
+        If the user exists and the provided credentials 
+        are correct, the user account will be deleted from the database.
+      parameters:
+      - name: "nickname"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "userInfo"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/UserCredentials"
+      responses:
+        "200":
+          description: "Successful operation"
+  /user/{nickname}/friends:
+    get:
+      tags: 
+      - "user"
+      - "friends"
+      summary: "Get any user's friends"
+      description: >
+        Gather the user's friend list. If the user doesn't exist, the operation fails.
+        Otherwise, the operation will return a list with the user's friends' nicknames.
+      parameters:
+      - name: "nickname"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              type: "string"
+    put:
+      tags: 
+      - "user"
+      - "friends"
+      summary: "Add a new friend"
+      description: >
+        Adds a new user to the friend list by its nickname. The operation will fail if the user doesn't exist or if they are already friends with each other.
+      parameters:
+      - name: "nickname"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "friend"
+        in: "body"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            nickname:
+              type: "string"
+        description: "The nickname of the user that will be added to the friend list."
+      responses:
+        "200":
+          description: "Successful operation"
+        "404":
+          description: "not found: User not found"
+    delete:
+      tags: 
+      - "user"
+      - "friends"
+      summary: "Remove friend from the list"
+      description: >
+        Removes friend from the list. The operation will fail if 
+        the user doesn't exist or if they aren't friends with each other.
+        
+        **Note: ** The user who removed his friend will also be removed from its old friend's list.
+      parameters:
+      - name: "nickname"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Successful operation"
+        "404":
+          description: "not found: User not found"
+           
+  /questions:
+    get:
+      tags:
+      - "questions"
+      summary: "Get questions from database"
+      description: >
+        Get questions from the database.
+      parameters:
+      - name: "filters"
+        in: "body"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            number:
+              type: "integer"
+              format: "uint64"
+              description: "Number of questions to be retrieved"
+              default: 1
+            difficulty:
+              $ref: "#/definitions/Difficulty"
+            category:
+              $ref: "#/definitions/Category"
+          required:
+            - "number"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Question"
+        "400":
+          description: "bad request: Invalid query"
+    post:
+      tags:
+      - "questions"
+      summary: "Add new question to database"
+      description: >
+        Adds a new question to the database. This operation will only work if 
+        the user has administration privileges.
+      parameters:
+      - name: "question"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Question"
+      responses:
+        "201":
+          description: "created: Question added succesfully"
+    delete:
+      tags: 
+      - "questions"
+      summary: "Delete question from database"
+      description: >
+        Deletes a question from the database. This operation will only work if 
+        the user has administration privileges.
+      parameters:
+      - name: "id"
+        in: "body"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            id:
+              type: "integer"
+              format: "uint64"
+              description: "The id of the question to delete."
+      responses:
+        "201":
+          description: "created: Question deleted succesfully"
+        "404":
+          description: "not found: Question not found"
 definitions:
   User:
     type: "object"
     properties:
-      user_id:
+      userId:
         type: "integer"
         format: "uint64"
       nickname:
@@ -111,31 +331,58 @@ definitions:
         type: "integer"
         format: "uint64"
         description: "Coin amount in wallet"
-      public_wins:
+      publicWins:
         type: "integer"
         format: "uint64"
-      private_wins:
+      privateWins:
         type: "integer"
         format: "uint64"
+  UserCredentials:
+    type: "object"
+    properties:
+      nickname:
+        type: "string"
+        description: "Nickname"
+      email:
+        type: "string"
+        description: "Email"
+      password:
+        type: "string"
+        description: "Encrypted password"
+    required:
+    - "nickname"
+    - "password"
+  Question:
+    type: "object"
+    properties:
+      questionId: 
+        type: "integer"
+        format: "uint64"
+      category:
+        $ref: "#/definitions/Category"
+      statement:
+        type: "string"
+      correctAnswer:
+        type: "string"
+      wrongAnswer1:
+        type: "string"
+      wrongAnswer2:
+        type: "string"
+      wrongAnswer3:
+        type: "string"
+  Category:
+    type: "string"
+    enum:
+      - "Entertainment"
+      - "Geography"
+      - "History"
+      - "Sports"
+      - "Art and Literature"
+      - "Science and technology"
+  Difficulty:
+    type: "string"
+    enum:
+      - "Easy"
+      - "Medium"
+      - "Hard"
         
-components:
-  schemas:
-    UserCredentials:
-      type: "object"
-      properties:
-        nickname:
-          type: "string"
-          description: "Nickname"
-        email:
-          type: "string"
-          description: "Email"
-        password:
-          type: "string"
-          description: "Encrypted password"
-      required:
-      - "nickname"
-      - "password"
-          
-          
-          
-          
