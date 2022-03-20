@@ -21,11 +21,7 @@ paths:
       description: "If there is any user with the same nickname, this operation will fail. Otherwise, a new entry in the user database will be created."
       operationId: "registerUser"
       requestBody:
-        description: "The new user's nickname"
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/requestBodies/UserCredentials"
+        $ref: "#/components/requestBodies/UserCredentials"
         
       responses:
         "201":
@@ -119,10 +115,7 @@ paths:
         schema:
           type: "string"
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/requestBodies/UserCredentials"
+        $ref: "#/components/requestBodies/UserCredentials"
         
       responses:
         "200":
@@ -153,10 +146,7 @@ paths:
         schema:
           type: "string"
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/requestBodies/UserCredentials"
+        $ref: "#/components/requestBodies/UserCredentials"
       responses:
         "200":
           description: "Successful operation"
@@ -243,6 +233,12 @@ paths:
       description: >
         Get user's acquired achievements as an array of identifiers. 
         The user must be logged in, otherwise the operation will fail.
+      parameters: 
+      - name: "nickname"
+        in: "path"
+        required: true
+        schema: 
+          type: "string"
       responses:
         "200":
           description: "Successful operation"
@@ -266,6 +262,12 @@ paths:
       description: >
         Get user's acquired inventory. The user must be logged in, otherwise
         the operation will fail.
+      parameters: 
+      - name: "nickname"
+        in: "path"
+        required: true
+        schema: 
+          type: "string"
       responses:
         "200":
           description: "Successful operation"
@@ -352,7 +354,10 @@ paths:
         Sends a review to the moderation service in order to review
         the question. The user must be logged in in order to suggest questions.
       requestBody:
-        $ref: "#/components/schemas/Question"
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Question"
       responses:
         "201":
           description: "created: Question proposal sent succesfully"
@@ -434,7 +439,6 @@ paths:
                     type: "string"
         "400":
           $ref: "#/components/responses/400BadRequest"
-
 components:
   schemas:
     User:
