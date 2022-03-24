@@ -4,7 +4,10 @@ module.exports = (io, socket) => {
         const { msg, author, date } = payload;
 
         // Store message
-        console.log(`${author} (${date}): ${msg}`)
+        console.log(`${author} (${date}): ${msg}`);
+
+        // broadcast message to everyone (To do rooms)
+        io.emit('chat:send', msg);
     }
 
     // Handle each event separately

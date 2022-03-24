@@ -7,11 +7,10 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const { Server } = require("socket.io");
+
 // Router imports
 var usersRouter = require('./routes/users');
-
-// Websocket handling imports
-const registerChatHandlers = require("./handlers/chatHandler");
+const chatRouter = require('./routes/chat');
 
 // express instance
 var app = express();
@@ -28,23 +27,30 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Use routers
 app.use('/user', usersRouter);
+app.use('/chat', chatRouter);
 
 const io = new Server(server);
 
+// Websocket handling imports
+const registerChatHandlers = require("./handlers/chatHandler");
+
 const onConnection = (socket) => {
+    
+    console.log('User with ID' + socket.id + ' connected');
+    
     // Register handlers here
     registerChatHandlers(io, socket);
+
+    socket.on('disconnect', () => {
+        console.log('User with ID' + socket.id + ' disconnected');
+    })
 }
 
 io.on("connection", onConnection);
 
 
-app.listen(port, () => {
-    console.log(`REST API listening on port ${port}`)
-})
-
-server.listen(wsport, () => {
-    console.log(`WS API listening on ${wsport}`);
+server.listen(port, () => {
+    console.log(`WS API listening on ${port}`);
 });
 
 module.exports = app;
