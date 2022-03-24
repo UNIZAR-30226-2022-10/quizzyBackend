@@ -1,4 +1,5 @@
 var port = process.env.PORT || 5000;
+var wsport = process.env.WSPORT || 8000;
 
 var express = require('express');
 var http = require('http');
@@ -42,8 +43,8 @@ app.listen(port, () => {
     console.log(`REST API listening on port ${port}`)
 })
 
-server.listen(3000, () => {
-    console.log(`WS API listening on ${port}`);
+server.listen(wsport, () => {
+    console.log(`WS API listening on ${wsport}`);
 });
 
 module.exports = app;
