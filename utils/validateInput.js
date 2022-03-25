@@ -21,37 +21,6 @@ function validateNickname(nickname) {
     return regexNicknameValidation.test(nickname)
 }
 
-/**
- * 
- * @param {string} password The password to validate
- * @returns {Number} The strength of the passwordL
- *  - 0 for bad passwords
- *  - 1 for weak passwords
- *  - 2 for medium passwords
- *  - 3 for strong passwords
- */
-function validatePassword(password) {
-
-    // at least 8 characters
-    const regexPasswordWeak = /^.{8,}$/;
-
-    // At least one lowercase, one uppercase, one number. At least 8 characters
-    const regexPasswordMedium = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$/;
-
-    // At least one lowercase, one uppercase, one number and one special symbol. At least 8 characters
-    const regexPasswordStrong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[_\-!@#$&*])(?=.*[0-9]).{8,}$/;
-
-    if ( regexPasswordStrong.test(password) ) {
-        return 3;
-    } else if ( regexPasswordMedium.test(password) ) {
-        return 2;
-    } else if ( regexPasswordWeak.test(password) ) {
-        return 1;
-    } else {
-        return 0;
-    }
-}
-
 function validateEmail(email) {
 
     // RFC 5322 official regex for checking if an email is valid is too long
@@ -69,4 +38,3 @@ function validateEmail(email) {
 
 module.exports.validateNickname = validateNickname;
 module.exports.validateEmail    = validateEmail;
-module.exports.validatePassword = validatePassword;
