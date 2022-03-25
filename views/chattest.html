@@ -98,9 +98,9 @@
                 const msgData = {
                     msg: input.value,
                     author: socket.id,
-                    date: Date.now()
+                    date: Date.now(),
                 }
-                socket.emit('chat:send', msgData);
+                socket.emit('chat:send', msgData, 'room');
                 input.value = '';
             }
         });

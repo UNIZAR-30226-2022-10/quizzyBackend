@@ -1,13 +1,16 @@
 module.exports = (io, socket) => {
-    const sendMsg = (payload) => {
-        // Get payload fields
-        const { msg, author, date } = payload;
+    const sendMsg = ({ message, roomName }) => {
 
         // Store message
         console.log(`${author} (${date}): ${msg}`);
 
-        // broadcast message to everyone (To do rooms)
-        io.emit('chat:send', msg);
+
+        console.log("room: ", roomName)
+        // send socket to all in room except sender
+        socket.to(roomName).emit("message", message);
+        callback({
+            status: "ok"
+        });
     }
 
     // Handle each event separately

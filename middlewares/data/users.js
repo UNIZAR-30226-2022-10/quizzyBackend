@@ -6,12 +6,25 @@
  */
 const { PrismaClient } = require('@prisma/client');
 
+const { validateNickname, validatePassword, validateEmail } = require('../../utils/validateInput');
+
 const prisma = new PrismaClient();
 
 // Register user into the system
-
 async function registerUser(nickname, email, password) {
     
+    // Validate nickname 
+    if ( !validateNickname(nickname) )
+        throw new Error("Invalid nickname");
+
+    // Validate email
+    if ( !validateEmail(email) )
+        throw new Error("Invalid email");
+
+    // Validate password
+    if ( validatePassword(password) === 0 )
+        throw new Error("Password doesn't meet minimum requirements")
+
     return await prisma.users.create({
         data: {
             nickname: nickname,
@@ -25,5 +38,20 @@ async function registerUser(nickname, email, password) {
     })
 }
 
+async function deleteUser(nickname) {
+    return await prisma.users.delete({
+        where: {
+            nickname: nickname,
+        },
+    })
+}
+
+async function loginUser(nickname, email, password) {
+
+}
+
+
 // Exports
 module.exports.registerUser = registerUser;
+module.exports.deleteUser   = deleteUser;
+module.exports.loginUser    = loginUser;
