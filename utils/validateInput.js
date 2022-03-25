@@ -55,7 +55,7 @@ function validatePassword(password) {
 function validateEmail(email) {
 
     // RFC 5322 official regex for checking if an email is valid is too long
-    // and a pain to test (nevertheless, it can be found here: http://emailregex.com)
+    // (nevertheless, it can be found here: http://emailregex.com)
     // The regex used here is an adaptation of a version found at 
     // https://www.regular-expressions.info/email.html .
     //
