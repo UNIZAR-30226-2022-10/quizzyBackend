@@ -21,10 +21,6 @@ async function registerUser(nickname, email, password) {
     if ( !validateEmail(email) )
         throw new Error("Invalid email");
 
-    // Validate password
-    if ( validatePassword(password) === 0 )
-        throw new Error("Password doesn't meet minimum requirements")
-
     return await prisma.users.create({
         data: {
             nickname: nickname,

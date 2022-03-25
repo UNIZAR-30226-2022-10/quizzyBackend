@@ -17,7 +17,6 @@ const { PrismaClientKnownRequestError } = require('@prisma/client')
  */
 usersRouter.post('/', function (req, res, next) {
     const { nickname, email, password } = req.body;
-    console.log(nickname, email, password);
 
     // try to create entry in database
     registerUser(nickname, email, password).then(() => {
