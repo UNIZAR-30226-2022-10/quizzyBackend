@@ -1,5 +1,4 @@
 var port = process.env.PORT || 5000;
-var wsport = process.env.WSPORT || 8000;
 
 var express = require('express');
 var http = require('http');
@@ -7,6 +6,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const { Server } = require("socket.io");
+const jwt = require('jsonwebtoken');
 
 // Router imports
 var usersRouter = require('./routes/users');
@@ -48,9 +48,4 @@ const onConnection = (socket) => {
 
 io.on("connection", onConnection);
 
-
-server.listen(port, () => {
-    console.log(`WS API listening on ${port}`);
-});
-
-module.exports = app;
+module.exports = { app, server };
