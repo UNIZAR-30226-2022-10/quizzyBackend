@@ -14,12 +14,16 @@ const prisma = new PrismaClient();
 async function registerUser(nickname, email, password) {
     
     // Validate nickname 
-    if ( !validateNickname(nickname) )
+    if ( !nickname || !validateNickname(nickname) )
         throw new Error("Invalid nickname");
 
     // Validate email
-    if ( !validateEmail(email) )
+    if ( !email || !validateEmail(email) )
         throw new Error("Invalid email");
+
+    // Check if hash exists
+    if ( !password )
+        throw new Error("Invalid password hash");
 
     return await prisma.users.create({
         data: {

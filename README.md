@@ -42,6 +42,28 @@ After that, you can generate the Prisma client with the following command:
 npx prisma generate
 ```
 
+You can check the database's status in the browser with Prisma Studio by entering the following command:
+
+```
+npx prisma studio
+```
+
 Now you should be able to start the development server with the options provided by the `npm` scripts:
 
 - `npm run dev`: Start the server in development mode (hot reloading with `nodemon`)
+
+## Testing
+
+The testing framework used in this project is Jest (and Supertest for testing API requests).
+
+Each route should have its own unit test file. In order to execute tests, launch
+
+```
+npm run test
+```
+
+Or if you want to test individual routes and modules:
+
+```
+npm run test -- <filename>
+```
