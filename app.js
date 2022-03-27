@@ -7,7 +7,7 @@ var bodyParser = require('body-parser')
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const { Server } = require("socket.io");
-const jwt = require('jsonwebtoken');
+const cors = require('cors');
 
 // Router imports
 var usersRouter = require('./routes/users');
@@ -27,6 +27,11 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
+var corsOptions = {
+    origin: '*', // Reemplazar con dominio
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
+app.use(cors(corsOptions));
 
 // Use routers
 app.use('/user', usersRouter);

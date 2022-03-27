@@ -5,8 +5,15 @@
  * Description: Users router
  */
 var express = require('express');
-const { StatusCodes, getReasonPhrase } = require('http-status-codes');
-const { registerUser, deleteUser } = require('../middlewares/data/users');
+const { StatusCodes } = require('http-status-codes');
+const {
+    registerUser,
+    deleteUser,
+    checkUserCredentials
+} = require('../middlewares/users');
+
+const { signToken } = require('../middlewares/auth');
+
 var usersRouter = express.Router();
 
 const { PrismaClientKnownRequestError } = require('@prisma/client')
@@ -29,7 +36,7 @@ usersRouter.post('/', function (req, res, next) {
     }).catch((e) => {
 
         // Check type of error
-        if ( e instanceof PrismaClientKnownRequestError ) {
+        if (e instanceof PrismaClientKnownRequestError) {
             // database conflict error
             res.statusCode = StatusCodes.CONFLICT;
             // Send error response
@@ -47,17 +54,34 @@ usersRouter.post('/', function (req, res, next) {
             })
         }
     })
-    
+
 });
 
 /* GET users listing. */
 usersRouter.post('/login', function (req, res, next) {
-    const { nickname, email, password } = req.body;
-    console.log(nickname, email, password);
+    const { nickname, password } = req.body;
 
     // fetch user in database
+    checkUserCredentials(nickname, password).then(() => {
 
-    res.send({ ok: true });
+        // Sign token 
+        const token = signToken(nickname)
+
+        res.setHeader('Authorization', `Bearer ${token}`)
+        res.send({
+            ok: true,
+            token: token
+        })
+    }).catch((e) => {
+
+        // bad input error
+        res.statusCode = StatusCodes.BAD_REQUEST;
+        // Send error response
+        res.send({
+            msg: e.message,
+            ok: false,
+        })
+    })
 });
 
 usersRouter.delete('/:nickname', function (req, res, next) {
