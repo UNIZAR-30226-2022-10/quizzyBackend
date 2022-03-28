@@ -7,12 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model achievements {
-  achievement_id    Int                 @id @default(autoincrement())
-  description       String              @db.VarChar(500)
-  user_achievements user_achievements[]
-}
-
 model categories {
   category_name String      @id @db.VarChar(15)
   questions     questions[]
@@ -54,9 +48,10 @@ model private_game {
   game_id             Int                   @id @default(autoincrement())
   finished            Boolean               @default(false)
   winner              String?               @db.VarChar(20)
+  difficulty          String                @db.VarChar(6)
   wildcards_enable    Boolean               @default(true)
   answer_time         Int                   @default(15)
-  access_key          Int
+  pairing             Boolean               @default(true)
   users               users?                @relation(fields: [winner], references: [nickname], onDelete: Cascade, onUpdate: NoAction)
   private_games_state private_games_state[]
   user_private_games  user_private_games[]
@@ -64,16 +59,17 @@ model private_game {
 
 model private_games_state {
   game_id             Int
-  nickname            String       @db.VarChar(20)
-  position            Int          @default(0)
-  sports_token        Boolean      @default(false)
-  science_token       Boolean      @default(false)
-  entertainment_token Boolean      @default(false)
-  history_token       Boolean      @default(false)
-  art_token           Boolean      @default(false)
-  geography_token     Boolean      @default(false)
-  private_game        private_game @relation(fields: [game_id], references: [game_id], onDelete: Cascade, onUpdate: NoAction)
-  users               users        @relation(fields: [nickname], references: [nickname], onDelete: Cascade, onUpdate: NoAction)
+  nickname            String         @db.VarChar(20)
+  position            Int            @default(0)
+  sports_token        Boolean        @default(false)
+  science_token       Boolean        @default(false)
+  entertainment_token Boolean        @default(false)
+  history_token       Boolean        @default(false)
+  art_token           Boolean        @default(false)
+  geography_token     Boolean        @default(false)
+  private_game        private_game   @relation(fields: [game_id], references: [game_id], onDelete: Cascade, onUpdate: NoAction)
+  users               users          @relation(fields: [nickname], references: [nickname], onDelete: Cascade, onUpdate: NoAction)
+  private_chat        private_chat[]
 
   @@id([game_id, nickname])
 }
@@ -81,6 +77,7 @@ model private_games_state {
 model public_game {
   game_id            Int                  @id @default(autoincrement())
   finished           Boolean              @default(false)
+  pairing            Boolean              @default(true)
   winner             String?              @db.VarChar(20)
   users              users?               @relation(fields: [winner], references: [nickname], onDelete: Cascade, onUpdate: NoAction)
   public_games_state public_games_state[]
@@ -89,16 +86,17 @@ model public_game {
 
 model public_games_state {
   game_id             Int
-  nickname            String      @db.VarChar(20)
-  position            Int         @default(0)
-  sports_token        Boolean     @default(false)
-  science_token       Boolean     @default(false)
-  entertainment_token Boolean     @default(false)
-  history_token       Boolean     @default(false)
-  art_token           Boolean     @default(false)
-  geography_token     Boolean     @default(false)
-  public_game         public_game @relation(fields: [game_id], references: [game_id], onDelete: Cascade, onUpdate: NoAction)
-  users               users       @relation(fields: [nickname], references: [nickname], onDelete: Cascade, onUpdate: NoAction)
+  nickname            String        @db.VarChar(20)
+  position            Int           @default(0)
+  sports_token        Boolean       @default(false)
+  science_token       Boolean       @default(false)
+  entertainment_token Boolean       @default(false)
+  history_token       Boolean       @default(false)
+  art_token           Boolean       @default(false)
+  geography_token     Boolean       @default(false)
+  public_game         public_game   @relation(fields: [game_id], references: [game_id], onDelete: Cascade, onUpdate: NoAction)
+  users               users         @relation(fields: [nickname], references: [nickname], onDelete: Cascade, onUpdate: NoAction)
+  public_chat         public_chat[]
 
   @@id([game_id, nickname])
 }
@@ -107,24 +105,15 @@ model questions {
   question_id    Int        @id @default(autoincrement())
   category_name  String     @db.VarChar(15)
   question       String     @db.VarChar(200)
+  difficulty     String     @db.VarChar(6)
   correct_answer String     @db.VarChar(50)
   wrong_answer_1 String     @db.VarChar(50)
   wrong_answer_2 String     @db.VarChar(50)
   wrong_answer_3 String     @db.VarChar(50)
-  difficulty     String     @db.VarChar(6)
   accepted       Boolean
   nickname       String?    @db.VarChar(20)
   categories     categories @relation(fields: [category_name], references: [category_name], onDelete: Cascade, onUpdate: NoAction)
   users          users?     @relation(fields: [nickname], references: [nickname], onDelete: NoAction, onUpdate: NoAction)
-}
-
-model user_achievements {
-  achievement_id Int
-  nickname       String       @db.VarChar(20)
-  achievements   achievements @relation(fields: [achievement_id], references: [achievement_id], onDelete: Cascade, onUpdate: NoAction)
-  users          users        @relation(fields: [nickname], references: [nickname], onDelete: Cascade, onUpdate: NoAction)
-
-  @@id([achievement_id, nickname])
 }
 
 model user_cosmetics {
@@ -171,10 +160,8 @@ model user_wildcards {
 model users {
   nickname                          String                @id @db.VarChar(20)
   email                             String                @db.VarChar(50)
-  password                          String                @db.Char(64)
+  password                          String                @db.VarChar(64)
   wallet                            Int                   @default(300)
-  public_wins                       Int                   @default(0)
-  private_wins                      Int                   @default(0)
   actual_cosmetic                   Int                   @default(1)
   cosmetics                         cosmetics             @relation(fields: [actual_cosmetic], references: [cosmetic_id], onDelete: Cascade, onUpdate: NoAction)
   friends_friends_nickname_1Tousers friends[]             @relation("friends_nickname_1Tousers")
@@ -185,7 +172,6 @@ model users {
   public_game                       public_game[]
   public_games_state                public_games_state[]
   questions                         questions[]
-  user_achievements                 user_achievements[]
   user_cosmetics                    user_cosmetics[]
   user_private_games                user_private_games[]
   user_public_games                 user_public_games[]
@@ -197,4 +183,20 @@ model wildcards {
   price          Int
   description    String           @db.VarChar(500)
   user_wildcards user_wildcards[]
+}
+
+model private_chat {
+  message_id          Int                  @id @default(autoincrement())
+  game_id             Int?
+  nickname            String?              @db.VarChar(20)
+  message             String?              @db.VarChar(150)
+  private_games_state private_games_state? @relation(fields: [game_id, nickname], references: [game_id, nickname], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model public_chat {
+  message_id         Int                 @id @default(autoincrement())
+  game_id            Int?
+  nickname           String?             @db.VarChar(20)
+  message            String?             @db.VarChar(150)
+  public_games_state public_games_state? @relation(fields: [game_id, nickname], references: [game_id, nickname], onDelete: Cascade, onUpdate: NoAction)
 }

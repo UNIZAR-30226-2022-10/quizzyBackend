@@ -52,6 +52,9 @@ Now you should be able to start the development server with the options provided
 
 - `npm run dev`: Start the server in development mode (hot reloading with `nodemon`)
 
+**Important notes:**
+- Ensure all model constraints are satisfied, for example:
+    - Newly registered users start with a default value for the cosmetic, so don't forget to add that into the database for developing and testing.
 ## Testing
 
 The testing framework used in this project is Jest (and Supertest for testing API requests).

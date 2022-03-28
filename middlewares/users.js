@@ -7,22 +7,23 @@
 const { PrismaClient } = require('@prisma/client');
 
 const { validateNickname, validateEmail } = require('../utils/validateInput');
+const bcrypt = require("bcryptjs");
 
 const prisma = new PrismaClient();
 
 // Register user into the system
 async function registerUser(nickname, email, password) {
-    
+
     // Validate nickname 
-    if ( !nickname || !validateNickname(nickname) )
+    if (!nickname || !validateNickname(nickname))
         throw new Error("Invalid nickname");
 
     // Validate email
-    if ( !email || !validateEmail(email) )
+    if (!email || !validateEmail(email))
         throw new Error("Invalid email");
 
     // Check if hash exists
-    if ( !password )
+    if (!password)
         throw new Error("Invalid password hash");
 
     console.log(password)
@@ -31,9 +32,7 @@ async function registerUser(nickname, email, password) {
             nickname: nickname,
             email: email,
             password: password,
-            wallet: 0,
-            public_wins: 0,
-            private_wins: 0,
+            wallet: 300,
             actual_cosmetic: 1
         },
     })
@@ -42,7 +41,7 @@ async function registerUser(nickname, email, password) {
 async function deleteUser(nickname) {
 
     // Validate nickname 
-    if ( !nickname || !validateNickname(nickname) )
+    if (!nickname || !validateNickname(nickname))
         throw new Error("Invalid nickname");
 
     return await prisma.users.delete({
@@ -55,32 +54,38 @@ async function deleteUser(nickname) {
 async function checkUserCredentials(nickname, password) {
 
     // Validate nickname 
-    if ( !nickname || !validateNickname(nickname) )
+    if (!nickname || !validateNickname(nickname))
         throw new Error("Invalid nickname");
 
     // Check if hash exists
-    if ( !password )
+    if (!password)
         throw new Error("Invalid password hash");
-    
+
     // Find entry in database
     return await prisma.users.findFirst({
         where: {
             nickname: nickname
         }
-    }).then(info => {
-        // Check if user exists and hashes are equal
-        if ( info && info.password.trim() === password ) {
-            return true;
-        } else if ( !info ) {
-            throw new Error(`Can't find ${nickname}`)
-        } else {
+    }).then(async info => {
+        // Check if the user exists
+        if (info) {
+            // Check if user exists and hashes are equal
+            const validPassword = await bcrypt.compare(password, info.password);
+            
+            if (validPassword) {
+                // Valid credentials
+                return true;
+            }
+            // user exists but passwords do not match
             throw new Error("Passwords do not match")
         }
+        // User doesn't exist
+        throw new Error(`Can't find ${nickname}`)
     })
 }
 
 
 // Exports
-module.exports.registerUser         = registerUser;
-module.exports.deleteUser           = deleteUser;
+module.exports.registerUser = registerUser;
+module.exports.deleteUser = deleteUser;
 module.exports.checkUserCredentials = checkUserCredentials;
