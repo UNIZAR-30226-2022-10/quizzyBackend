@@ -67,7 +67,6 @@ usersRouter.post('/login', function (req, res, next) {
         // Sign token 
         const token = signToken(nickname)
 
-        res.setHeader('Authorization', `Bearer ${token}`)
         res.send({
             ok: true,
             token: token
