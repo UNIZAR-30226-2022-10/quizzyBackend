@@ -26,7 +26,6 @@ async function registerUser(nickname, email, password) {
     if (!password)
         throw new Error("Invalid password hash");
 
-    console.log(password)
     return await prisma.users.create({
         data: {
             nickname: nickname,

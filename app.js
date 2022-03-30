@@ -11,7 +11,8 @@ const cors = require('cors');
 
 // Router imports
 var usersRouter = require('./routes/users');
-const chatRouter = require('./routes/chat');
+var questionsRouter = require('./routes/questions');
+var chatRouter = require('./routes/chat');
 
 // express instance
 var app = express();
@@ -35,6 +36,7 @@ app.use(cors(corsOptions));
 
 // Use routers
 app.use('/user', usersRouter);
+app.use('/questions', questionsRouter);
 app.use('/chat', chatRouter);
 
 const io = new Server(server);

@@ -36,5 +36,10 @@ function validateEmail(email) {
     return regexMailValidation.test(email)
 }
 
+function validateNumber(number, constraint) {
+
+    return number && constraint(number);
+}
+
 module.exports.validateNickname = validateNickname;
 module.exports.validateEmail    = validateEmail;
