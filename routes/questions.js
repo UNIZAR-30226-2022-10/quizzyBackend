@@ -6,6 +6,7 @@
  */
 var express = require('express');
 const { StatusCodes } = require('http-status-codes');
+const { getQuestions } = require('../middlewares/questions');
 
 var questionsRouter = express.Router();
 
@@ -13,7 +14,7 @@ const { PrismaClientKnownRequestError, PrismaClient } = require('@prisma/client'
 
 // get questions
 questionsRouter.get('/', function(req, res, next) {
-    const { limit, difficulty, category } = req.params;
+    const { limit, difficulty, category } = req.query;
     
     getQuestions(limit, difficulty, category).then(questions => {
         res.statusCode = StatusCodes.OK;
@@ -24,6 +25,7 @@ questionsRouter.get('/', function(req, res, next) {
     }).catch(e => {
         res.statusCode = StatusCodes.BAD_REQUEST;
         res.send({
+            msg: e.message,
             ok : false
         })
     })

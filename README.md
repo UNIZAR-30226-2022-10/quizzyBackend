@@ -19,6 +19,12 @@ npm install
 This will install all the packages and development dependencies for the project
 in order to work properly.
 
+After that, initialize the PostgreSQL database (using the CLI `psql` client or with PgAdmin 4) with the following :
+
+```
+\i create
+```
+
 Now create a `.env` file in order for the [Prisma ORM](https://www.prisma.io/docs/getting-started/quickstart) to connect to the database properly. The template can be found here:
 
 ```bash
@@ -27,6 +33,7 @@ DB_PASSWORD="..."
 DB_HOST="..."
 DB_PORT="..."
 DB_DATABASE="..."
+TOKEN_SECRET="..."
 
 DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}?"
 ```
@@ -35,8 +42,13 @@ DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_D
 - `DB_HOST`: The host address of the machine in which the database runs (for example `localhost`).
 - `DB_PORT`: The port to which the database endpoint listens.
 - `DB_DATABASE`: The database name.
+- `TOKEN_SECRET`: The secret value for signing JWTs.
 
-After that, you can generate the Prisma client with the following command:
+Following that, generate the model if you haven't done that already:
+```
+npx prisma db pull
+```
+After generating the model, you can generate the Prisma client with the following command:
 
 ```
 npx prisma generate

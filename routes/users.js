@@ -10,9 +10,9 @@ const {
     registerUser,
     deleteUser,
     checkUserCredentials
-} = require('../model/users');
+} = require('../middlewares/users');
 
-const { signToken } = require('../model/auth');
+const { signToken } = require('../middlewares/auth');
 
 var usersRouter = express.Router();
 
