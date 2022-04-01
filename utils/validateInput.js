@@ -8,6 +8,9 @@
 // Constraints
 const NICKNAME_MAX_LENGTH = 20;
 
+const categories = ['Geography', 'Art', 'History', 'Science', 'Sports', 'Entertainment'];
+const difficulties = ['easy', 'medium', 'hard'];
+
 /**
  * 
  * @param {string} nickname The string to validate 
@@ -38,64 +41,12 @@ function validateEmail(email) {
 
 function validateCategory(category_name){
 
-    let returnValue = false;
-
-    switch (category_name) {
-
-        case 'Geography':
-            returnValue = true;
-            break;
-        
-        case 'History':
-            returnValue = true;
-            break;
-
-        case 'Art':
-            returnValue = true;
-            break;
-
-        case 'Sports':
-            returnValue = true;
-            break;
-
-        case 'Science':
-            returnValue = true;
-            break;
-
-        case 'Entertainment':
-            returnValue = true;
-            break;
-
-        default:
-            break;
-    }
-
-    return returnValue;
+    return categories.includes(category_name);
 }
 
 function validateDifficulty(difficulty_level){
 
-    let returnValue = false;
-
-    switch (difficulty_level) {
-
-        case 'easy':
-            returnValue = true;
-            break;
-        
-        case 'medium':
-            returnValue = true;
-            break;
-
-        case 'hard':
-            returnValue = true;
-            break;
-
-        default:
-            break;
-    }
-
-    return returnValue;
+    return difficulties.includes(difficulty_level);
 }
 
 module.exports.validateNickname = validateNickname;
