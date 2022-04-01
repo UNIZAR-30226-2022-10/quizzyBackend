@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
-const { pickRandom, validateCategory, validateDifficulty, validateNickname } = require('../utils/algorithm');
+const { pickRandom } = require('../utils/algorithm');
+const { validateCategory, validateDifficulty, validateNickname } = require('../utils/validateInput');
 const prisma = new PrismaClient();
 
 const { StatusCodes } = require('http-status-codes');
@@ -77,7 +78,8 @@ async function acceptQuestion(id) {
     })
 } 
 
-async function proposalQuestion(statement, category, difficulty, correctAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3, nickname) {
+async function proposalQuestion(statement, category, difficulty,
+    correctAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3, nickname) {
     
     if (!statement)
         throw new Error("Invalid question statement");
@@ -86,7 +88,7 @@ async function proposalQuestion(statement, category, difficulty, correctAnswer, 
         throw new Error("Invalid category name");
 
     if (!difficulty || !validateDifficulty(difficulty))
-        throw new Error("Invalid category name");
+        throw new Error("Invalid difficulty name");
 
     if (!correctAnswer)
         throw new Error("Invalid correct answer");
@@ -108,7 +110,7 @@ async function proposalQuestion(statement, category, difficulty, correctAnswer, 
             question: statement,
             category_name: category,
             difficulty: difficulty,
-            correct_answer: password,
+            correct_answer: correctAnswer,
             wrong_answer_1: wrongAnswer1,
             wrong_answer_2: wrongAnswer2,
             wrong_answer_3: wrongAnswer3,

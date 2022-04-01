@@ -86,7 +86,7 @@ questionsRouter.delete('/review', function(req, res, next) {
 // proposal
 questionsRouter.post('/proposal', function(req, res, next) {
     const {category, statement, difficulty, correctAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3, user} = req.body;
-
+    console.log(req.body)
     proposalQuestion(statement, category, difficulty, correctAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3, user).then(() => {
         res.statusCode = StatusCodes.OK;
         res.send({

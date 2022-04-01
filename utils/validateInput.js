@@ -8,9 +8,6 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// Constraints
-const NICKNAME_MAX_LENGTH = 20;
-
 const categories = ['Geography', 'Art', 'History', 'Science', 'Sports', 'Entertainment'];
 const difficulties = ['easy', 'medium', 'hard'];
 
