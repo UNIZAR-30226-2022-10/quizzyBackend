@@ -6,7 +6,7 @@
  */
 var express = require('express');
 const { StatusCodes } = require('http-status-codes');
-const { getQuestions } = require('../middlewares/questions');
+const { getQuestions, acceptQuestion } = require('../middlewares/questions');
 
 var questionsRouter = express.Router();
 
@@ -33,7 +33,21 @@ questionsRouter.get('/', function(req, res, next) {
 
 // get proposals
 questionsRouter.put('/review', function(req, res, next) {
+    const id = parseInt(req.query.id);
 
+    acceptQuestion(id).then(() => {
+        res.statusCode = StatusCodes.OK;
+        res.send({
+            msg: "Question reviewed",
+            ok: true
+        });
+    }).catch(e => {
+        res.statusCode = e.status;
+        res.send({
+            msg: e.message,
+            ok : false
+        })
+    })
 })
 
 questionsRouter.delete('/review', function(req, res, next) {

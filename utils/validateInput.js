@@ -5,6 +5,9 @@
  * Description: Input validation utilities
  */
 
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+
 // Constraints
 const NICKNAME_MAX_LENGTH = 20;
 
@@ -36,5 +39,24 @@ function validateEmail(email) {
     return regexMailValidation.test(email)
 }
 
-module.exports.validateNickname = validateNickname;
-module.exports.validateEmail    = validateEmail;
+async function validateCategory(category) {
+    
+    // fetch category from database if it exists
+    return await prisma.categories.findFirst({
+        where : {
+            category_name : category
+        }
+    })
+}
+
+function validateDifficulty(diff) {
+    
+    return diff === 'easy' ||
+           diff === 'medium' ||
+           diff === 'hard';
+}
+
+module.exports.validateNickname   = validateNickname;
+module.exports.validateEmail      = validateEmail;
+module.exports.validateCategory   = validateCategory;
+module.exports.validateDifficulty = validateDifficulty;
