@@ -1,5 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
-const { pickRandom } = require('../utils/algorithm');
+const { pickRandom, validateCategory, validateDifficulty, validateNickname } = require('../utils/algorithm');
 const prisma = new PrismaClient();
 
 function queryArgs(diff, cat) {
@@ -45,4 +45,60 @@ async function getQuestions(limit, difficulty, category) {
     return pickRandom(allQuestions, lim);
 }
 
+async function proposalQuestion(statement, category, difficulty, correctAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3, nickname) {
+    
+    if (!statement)
+        throw new Error("Invalid question statement");
+
+    if (!category || !validateCategory(category))
+        throw new Error("Invalid category name");
+
+    if (!difficulty || !validateDifficulty(difficulty))
+        throw new Error("Invalid category name");
+
+    if (!correctAnswer)
+        throw new Error("Invalid correct answer");
+
+    if (!wrongAnswer1)
+        throw new Error("Invalid wrong answer 1");
+
+    if (!wrongAnswer2)
+        throw new Error("Invalid wrong answer 2");
+
+    if (!wrongAnswer3)
+        throw new Error("Invalid wrong answer 3");
+    
+    if (!nickname || !validateNickname(nickname))
+        throw new Error("Invalid nickname");
+
+    return await prisma.questions.create({
+        data: {
+            question: statement,
+            category_name: category,
+            difficulty: difficulty,
+            correct_answer: password,
+            wrong_answer_1: wrongAnswer1,
+            wrong_answer_2: wrongAnswer2,
+            wrong_answer_3: wrongAnswer3,
+            accepted: false,
+            nickname: nickname
+        },
+    })
+}
+
+async function deleteQuestion(questionId){
+    
+    if ( questionId <= 0 ) {
+        throw new Error("Invalid question identifier");
+    }
+
+    return await prisma.questions.delete({
+        where: {
+            question_id: questionId
+        },
+    })
+}
+
 module.exports.getQuestions = getQuestions;
+module.exports.proposalQuestion = proposalQuestion;
+module.exports.deleteQuestion = deleteQuestion;

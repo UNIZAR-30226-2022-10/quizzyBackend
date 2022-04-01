@@ -36,5 +36,69 @@ function validateEmail(email) {
     return regexMailValidation.test(email)
 }
 
+function validateCategory(category_name){
+
+    let returnValue = false;
+
+    switch (category_name) {
+
+        case 'Geography':
+            returnValue = true;
+            break;
+        
+        case 'History':
+            returnValue = true;
+            break;
+
+        case 'Art':
+            returnValue = true;
+            break;
+
+        case 'Sports':
+            returnValue = true;
+            break;
+
+        case 'Science':
+            returnValue = true;
+            break;
+
+        case 'Entertainment':
+            returnValue = true;
+            break;
+
+        default:
+            break;
+    }
+
+    return returnValue;
+}
+
+function validateDifficulty(difficulty_level){
+
+    let returnValue = false;
+
+    switch (difficulty_level) {
+
+        case 'easy':
+            returnValue = true;
+            break;
+        
+        case 'medium':
+            returnValue = true;
+            break;
+
+        case 'hard':
+            returnValue = true;
+            break;
+
+        default:
+            break;
+    }
+
+    return returnValue;
+}
+
 module.exports.validateNickname = validateNickname;
 module.exports.validateEmail    = validateEmail;
+module.exports.validateCategory = validateCategory;
+module.exports.validateDifficulty = validateDifficulty;
