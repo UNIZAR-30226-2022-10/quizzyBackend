@@ -11,6 +11,9 @@ const prisma = new PrismaClient();
 // Constraints
 const NICKNAME_MAX_LENGTH = 20;
 
+const categories = ['Geography', 'Art', 'History', 'Science', 'Sports', 'Entertainment'];
+const difficulties = ['easy', 'medium', 'hard'];
+
 /**
  * 
  * @param {string} nickname The string to validate 
@@ -39,24 +42,17 @@ function validateEmail(email) {
     return regexMailValidation.test(email)
 }
 
-async function validateCategory(category) {
-    
-    // fetch category from database if it exists
-    return await prisma.categories.findFirst({
-        where : {
-            category_name : category
-        }
-    })
+function validateCategory(category_name){
+
+    return categories.includes(category_name);
 }
 
-function validateDifficulty(diff) {
-    
-    return diff === 'easy' ||
-           diff === 'medium' ||
-           diff === 'hard';
+function validateDifficulty(difficulty_level){
+
+    return difficulties.includes(difficulty_level);
 }
 
-module.exports.validateNickname   = validateNickname;
-module.exports.validateEmail      = validateEmail;
-module.exports.validateCategory   = validateCategory;
+module.exports.validateNickname = validateNickname;
+module.exports.validateEmail    = validateEmail;
+module.exports.validateCategory = validateCategory;
 module.exports.validateDifficulty = validateDifficulty;
