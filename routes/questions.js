@@ -6,11 +6,16 @@
  */
 var express = require('express');
 const { StatusCodes } = require('http-status-codes');
-const { getQuestions, acceptQuestion, proposalQuestion, deleteQuestion } = require('../middlewares/questions');
+const { 
+    getQuestions, 
+    acceptQuestion, 
+    proposalQuestion, 
+    deleteQuestion 
+} = require('../controllers/rest/questions');
 
 var questionsRouter = express.Router();
 
-const { PrismaClientKnownRequestError, PrismaClient } = require('@prisma/client');
+const { PrismaClientKnownRequestError } = require('@prisma/client');
 
 // get questions
 questionsRouter.get('/', function(req, res, next) {

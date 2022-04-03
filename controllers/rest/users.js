@@ -6,7 +6,7 @@
  */
 const { PrismaClient } = require('@prisma/client');
 
-const { validateNickname, validateEmail } = require('../utils/validateInput');
+const { validateNickname, validateEmail } = require('../../utils/validateInput');
 const bcrypt = require("bcryptjs");
 
 const prisma = new PrismaClient();

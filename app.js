@@ -42,7 +42,7 @@ app.use('/chat', chatRouter);
 const io = new Server(server);
 
 // Websocket handling imports
-const registerChatHandlers = require("./handlers/chatHandler");
+const registerChatHandlers = require("./controllers/ws/chatHandler");
 
 const onConnection = (socket) => {
     

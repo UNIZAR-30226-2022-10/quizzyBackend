@@ -1,5 +1,5 @@
 /*
- * Author: Darío Marcos Casalé (795306)
+ * Author: Darío Marcos Casalé (795306) & Jaime Martín Trullén
  * Filename: users.js
  * Module: utils
  * Description: Input validation utilities
@@ -24,6 +24,12 @@ function validateNickname(nickname) {
     return regexNicknameValidation.test(nickname)
 }
 
+/**
+ * 
+ * @param {string} email The email to validate 
+ * @returns {boolean} true if the email follows the email regex specification
+ *                    false otherwise
+ */
 function validateEmail(email) {
 
     // RFC 5322 official regex for checking if an email is valid is too long
@@ -39,11 +45,23 @@ function validateEmail(email) {
     return regexMailValidation.test(email)
 }
 
+/**
+ *  
+ * @param {string} category_name The category to validate
+ * @returns {boolean} true if category belongs to the set of question categories
+ *                    false otherwise
+ */
 function validateCategory(category_name){
 
     return categories.includes(category_name);
 }
 
+/**
+ *  
+ * @param {string} difficulty_level the difficulty level to validate
+ * @returns {boolean} true if difficulty belongs to the set of question categories
+ *                    false otherwise
+ */
 function validateDifficulty(difficulty_level){
 
     return difficulties.includes(difficulty_level);

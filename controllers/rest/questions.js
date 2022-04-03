@@ -1,11 +1,25 @@
+/*
+ * Author: Darío Marcos Casalé (795306) & Jaime Martín Trullén
+ * Filename: questions.js
+ * Module: controllers/rest
+ * Description: Input validation utilities
+ */
+
 const { PrismaClient } = require('@prisma/client');
-const { pickRandom } = require('../utils/algorithm');
-const { validateCategory, validateDifficulty, validateNickname } = require('../utils/validateInput');
+const { pickRandom } = require('../../utils/algorithm');
+const { validateCategory, validateDifficulty, validateNickname } = require('../../utils/validateInput');
 const prisma = new PrismaClient();
 
 const { StatusCodes } = require('http-status-codes');
 const createError = require('http-errors');
 
+/**
+ * Make an object containing the filters for the database query for fetching questions.
+ * If a filter parameter is null, it won't be included in the query.
+ * @param {*} diff the difficulty filter (can be null)
+ * @param {*} cat the category filter (can be null)
+ * @returns An object with the provided filters which are not null.
+ */
 function queryArgs(diff, cat) {
 
     var args = {}
@@ -32,6 +46,13 @@ function queryArgs(diff, cat) {
     return args;
 }
 
+/**
+ * 
+ * @param {BigInt} limit The number of questions to retrieve
+ * @param {*} difficulty The difficulty filter
+ * @param {*} category The category filter
+ * @returns {Array} An array with random filtered questions
+ */
 async function getQuestions(limit, difficulty, category) {
     
     // Set default values
@@ -42,7 +63,7 @@ async function getQuestions(limit, difficulty, category) {
         throw new Error("Invalid question limit");
     }
 
-    // Note: This might not be the best way to implement random fetching
+    // Note: This might not be the best way to implement random fetching.
     //       may be subject to changes in the future.
 
     // fetch all questions filtering by difficulty and category
@@ -52,6 +73,13 @@ async function getQuestions(limit, difficulty, category) {
     return pickRandom(allQuestions, lim);
 }
 
+/**
+ * 
+ * @param {BigInt} id The id of the question to accept
+ * @returns {Promise} A promise 
+ * @throws {HttpError} either when the id is invalid, the question doesn't existm 
+ *                     or if it exists, it has been already accepted
+ */
 async function acceptQuestion(id) {
 
     if ( !id ) {
@@ -62,12 +90,12 @@ async function acceptQuestion(id) {
         where : {
             question_id : id,
         }
-    }).then(r => {
+    }).then(async r => {
 
         if ( !r ) throw createError(StatusCodes.NOT_FOUND, "Can't find question");
         if ( r && r.accepted ) throw createError(StatusCodes.BAD_REQUEST, "Question is already accepted");
 
-        return prisma.questions.update({
+        return await prisma.questions.update({
             where : {
                 question_id : id
             },

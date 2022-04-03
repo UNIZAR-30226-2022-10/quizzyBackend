@@ -6,7 +6,7 @@
  */
 var express = require('express');
 const { StatusCodes, getReasonPhrase } = require('http-status-codes');
-const { registerUser } = require('../handlers/chatHandler');
+const { registerUser } = require('../controllers/ws/chatHandler');
 var chatRouter = express.Router();
 
 const path = require('path');
