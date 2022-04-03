@@ -14,6 +14,9 @@ var usersRouter = require('./routes/users');
 var questionsRouter = require('./routes/questions');
 var chatRouter = require('./routes/chat');
 
+// Middleware imports
+const { authWsToken, authRestToken } = require('./middleware/auth');
+
 // express instance
 var app = express();
 
@@ -39,23 +42,31 @@ app.use('/user', usersRouter);
 app.use('/questions', questionsRouter);
 app.use('/chat', chatRouter);
 
-const io = new Server(server);
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"],
+    }
+});
 
 // Websocket handling imports
 const registerChatHandlers = require("./controllers/ws/chatHandler");
 
 const onConnection = (socket) => {
-    
-    console.log('User with ID' + socket.id + ' connected');
-    
+
+    // join common room
+    socket.join('main');
+    console.log('User with ID ' + socket.id + ' connected');
+
+    socket.on('disconnect', () => {
+        console.log('User with ID ' + socket.id + ' disconnected');
+    })
     // Register handlers here
     registerChatHandlers(io, socket);
 
-    socket.on('disconnect', () => {
-        console.log('User with ID' + socket.id + ' disconnected');
-    })
 }
 
+io.use(authWsToken);
 io.on("connection", onConnection);
 
 module.exports = { app, server };
