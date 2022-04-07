@@ -65,8 +65,4 @@ const onConnection = (socket) => {
     registerChatHandlers(io, socket);
 
 }
-
-io.use(authWsToken);
-io.on("connection", onConnection);
-
-module.exports = { app, server };
+xports = { app, server };
