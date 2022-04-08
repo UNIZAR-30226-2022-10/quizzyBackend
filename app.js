@@ -57,9 +57,11 @@ const onConnection = (socket) => {
     // join common room
     socket.join('main');
     console.log('User with ID ' + socket.id + ' connected');
+    socket.to('main').emit("otherConnect", {name : socket.user.name, systemMsg : 'connection'});
 
     socket.on('disconnect', () => {
         console.log('User with ID ' + socket.id + ' disconnected');
+        socket.to('main').emit("otherDisconnect", {name : socket.user.name, systemMsg : 'disconnection'});
     })
     // Register handlers here
     registerChatHandlers(io, socket);

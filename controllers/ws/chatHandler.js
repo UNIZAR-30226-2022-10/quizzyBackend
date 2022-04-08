@@ -1,5 +1,5 @@
 module.exports = (io, socket) => {
-    const sendMsg = ({ message, roomName }) => {
+    const sendMsg = ({ message, roomName },callback) => {
 
         // generate data to send to receivers
         const outgoingMessage = {
