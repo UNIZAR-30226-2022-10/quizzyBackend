@@ -65,4 +65,4 @@ const onConnection = (socket) => {
     registerChatHandlers(io, socket);
 
 }
-xports = { app, server };
+module.exports = { app, server };
