@@ -5,13 +5,17 @@
  * Description: Input validation utilities
  */
 
-const { PrismaClient } = require('@prisma/client');
-const { pickRandom } = require('../../utils/algorithm');
-const { validateCategory, validateDifficulty, validateNickname } = require('../../utils/validateInput');
+const { PrismaClient } = require("@prisma/client");
+const { pickRandom } = require("../../utils/algorithm");
+const {
+    validateCategory,
+    validateDifficulty,
+    validateNickname
+} = require("../../utils/validateInput");
 const prisma = new PrismaClient();
 
-const { StatusCodes } = require('http-status-codes');
-const createError = require('http-errors');
+const { StatusCodes } = require("http-status-codes");
+const createError = require("http-errors");
 
 /**
  * Make an object containing the filters for the database query for fetching questions.
@@ -21,117 +25,131 @@ const createError = require('http-errors');
  * @returns An object with the provided filters which are not null.
  */
 function queryArgs(diff, cat) {
-
-    var args = {}
-    if ( diff ) {
-        // Filter by difficulty 
+    var args = {};
+    if (diff) {
+        // Filter by difficulty
         args = {
-            where : {
-                difficulty : diff
+            where: {
+                difficulty: diff
             }
-        }
+        };
     }
-    
-    if ( cat ) {
+
+    if (cat) {
         // add category filter
         args = {
             ...args,
             where: {
                 ...args.where,
-                category_name : cat
+                category_name: cat
             }
-        }
+        };
     }
 
     return args;
 }
 
 /**
- * 
+ *
  * @param {BigInt} limit The number of questions to retrieve
- * @param {*} difficulty The difficulty filter
- * @param {*} category The category filter
+ * @param {String} difficulty The difficulty filter
+ * @param {String} category The category filter
  * @returns {Array} An array with random filtered questions
  */
 async function getQuestions(limit, difficulty, category) {
-    
-    // Set default values
-    let lim = limit ? limit : 20;
+    // check if limit is correct
+    if (isNaN(limit) || (limit && limit <= 0))
+        throw createError(StatusCodes.BAD_REQUEST, "Invalid question limit");
 
-    // validate limit
-    if ( lim <= 0 ) {
-        throw new Error("Invalid question limit");
-    }
+    // Set default values if limit doesn't exist
+    let lim = limit ? limit : 20;
 
     // Note: This might not be the best way to implement random fetching.
     //       may be subject to changes in the future.
 
     // fetch all questions filtering by difficulty and category
-    const allQuestions = await prisma.questions.findMany(queryArgs(difficulty, category));
+    const allQuestions = await prisma.questions.findMany(
+        queryArgs(difficulty, category)
+    );
 
     // Get random number of questions
     return pickRandom(allQuestions, lim);
 }
 
 /**
- * 
+ *
  * @param {BigInt} id The id of the question to accept
- * @returns {Promise} A promise 
- * @throws {HttpError} either when the id is invalid, the question doesn't existm 
+ * @returns {Promise} A promise
+ * @throws {HttpError} either when the id is invalid, the question doesn't existm
  *                     or if it exists, it has been already accepted
  */
 async function acceptQuestion(id) {
-
-    if ( !id ) {
+    if (!id) {
         throw createError(StatusCodes.BAD_REQUEST, "Invalid id");
     }
 
-    return await prisma.questions.findFirst({
-        where : {
-            question_id : id,
-        }
-    }).then(async r => {
-
-        if ( !r ) throw createError(StatusCodes.NOT_FOUND, "Can't find question");
-        if ( r && r.accepted ) throw createError(StatusCodes.BAD_REQUEST, "Question is already accepted");
-
-        return await prisma.questions.update({
-            where : {
-                question_id : id
-            },
-            data : {
-                accepted : true
+    return await prisma.questions
+        .findFirst({
+            where: {
+                question_id: id
             }
         })
-    })
-} 
+        .then(async (r) => {
+            if (!r)
+                throw createError(StatusCodes.NOT_FOUND, "Can't find question");
+            if (r && r.accepted)
+                throw createError(
+                    StatusCodes.BAD_REQUEST,
+                    "Question is already accepted"
+                );
 
-async function proposalQuestion(statement, category, difficulty,
-    correctAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3, nickname) {
-    
+            return await prisma.questions.update({
+                where: {
+                    question_id: id
+                },
+                data: {
+                    accepted: true
+                }
+            });
+        });
+}
+
+async function proposalQuestion(
+    statement,
+    category,
+    difficulty,
+    correctAnswer,
+    wrongAnswer1,
+    wrongAnswer2,
+    wrongAnswer3,
+    nickname
+) {
     if (!statement)
-        throw new Error("Invalid question statement");
+        throw createError(
+            StatusCodes.BAD_REQUEST,
+            "Invalid question statement"
+        );
 
     if (!category || !validateCategory(category))
-        throw new Error("Invalid category name");
+        throw createError(StatusCodes.BAD_REQUEST, "Invalid category name");
 
     if (!difficulty || !validateDifficulty(difficulty))
-        throw new Error("Invalid difficulty name");
+        throw createError(StatusCodes.BAD_REQUEST, "Invalid difficulty name");
 
     if (!correctAnswer)
-        throw new Error("Invalid correct answer");
+        throw createError(StatusCodes.BAD_REQUEST, "Invalid correct answer");
 
     if (!wrongAnswer1)
-        throw new Error("Invalid wrong answer 1");
+        throw createError(StatusCodes.BAD_REQUEST, "Invalid wrong answer 1");
 
     if (!wrongAnswer2)
-        throw new Error("Invalid wrong answer 2");
+        throw createError(StatusCodes.BAD_REQUEST, "Invalid wrong answer 2");
 
     if (!wrongAnswer3)
-        throw new Error("Invalid wrong answer 3");
-    
+        throw createError(StatusCodes.BAD_REQUEST, "Invalid wrong answer 3");
+
     if (!nickname || !validateNickname(nickname))
-        throw new Error("Invalid nickname");
+        throw createError(StatusCodes.BAD_REQUEST, "Invalid nickname");
 
     return await prisma.questions.create({
         data: {
@@ -144,21 +162,23 @@ async function proposalQuestion(statement, category, difficulty,
             wrong_answer_3: wrongAnswer3,
             accepted: false,
             nickname: nickname
-        },
-    })
+        }
+    });
 }
 
-async function deleteQuestion(questionId){
-    
-    if ( questionId <= 0 ) {
-        throw new Error("Invalid question identifier");
+async function deleteQuestion(questionId) {
+    if (questionId <= 0) {
+        throw createError(
+            StatusCodes.BAD_REQUEST,
+            "Invalid question identifier"
+        );
     }
 
     return await prisma.questions.delete({
         where: {
             question_id: questionId
-        },
-    })
+        }
+    });
 }
 
 module.exports.getQuestions = getQuestions;

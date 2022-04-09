@@ -5,14 +5,15 @@
  * Description: Authentication middleware
  */
 
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 function signToken(nickname) {
-
-    return jwt.sign({
-        name: nickname
-    }, process.env.TOKEN_SECRET)
-
+    return jwt.sign(
+        {
+            name: nickname
+        },
+        process.env.TOKEN_SECRET
+    );
 }
 
 module.exports.signToken = signToken;
