@@ -1,10 +1,16 @@
+/*
+ * Author: Darío Marcos Casalé (795306) & Mathis Boston
+ * Filename: chatHandler.js
+ * Module: controllers/ws
+ * Description: Socket.io chat handlers
+ */
 module.exports = (io, socket) => {
-    const sendMsg = ({ message, roomName },callback) => {
+    const sendMsg = ({ username, message, roomName },callback) => {
 
         // generate data to send to receivers
         const outgoingMessage = {
-            name: socket.user.name,
-            id: socket.user.id,
+            name: username,
+            id: socket.id,
             message
         };
 
