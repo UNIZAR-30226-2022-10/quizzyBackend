@@ -6,17 +6,7 @@
  */
 
 const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
-
-const categories = [
-    "Geography",
-    "Art",
-    "History",
-    "Science",
-    "Sports",
-    "Entertainment"
-];
-const difficulties = ["easy", "medium", "hard"];
+const { categories, difficulties } = require('./misc');
 
 /**
  *
@@ -71,7 +61,4 @@ function validateDifficulty(difficulty_level) {
     return difficulties.includes(difficulty_level);
 }
 
-module.exports.validateNickname = validateNickname;
-module.exports.validateEmail = validateEmail;
-module.exports.validateCategory = validateCategory;
-module.exports.validateDifficulty = validateDifficulty;
+module.exports = {validateCategory, validateDifficulty, validateEmail, validateNickname};

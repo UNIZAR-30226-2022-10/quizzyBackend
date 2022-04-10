@@ -45,7 +45,7 @@ app.use("/chat", chatRouter);
 const io = new Server(server, {
     cors: {
         origin: "*",
-        methods: ["GET", "POST"]
+        methods: ["GET", "POST", "PUT", "DELETE"]
     }
 });
 
@@ -56,13 +56,15 @@ const onConnection = (socket) => {
     // join common room
     socket.join('main');
     console.log('User with ID ' + socket.id + ' connected');
-    socket.to('main').emit("otherConnect", {name : socket.user.name, systemMsg : 'connection'});
+    socket.to('main').emit("otherConnect", {name : socket.id, systemMsg : 'connection'});
 
     socket.on('disconnect', () => {
         console.log('User with ID ' + socket.id + ' disconnected');
-        socket.to('main').emit("otherDisconnect", {name : socket.user.name, systemMsg : 'disconnection'});
+        socket.to('main').emit("otherDisconnect", {name : socket.id, systemMsg : 'disconnection'});
     })
     // Register handlers here
     registerChatHandlers(io, socket);
 };
+
+io.on('connection', onConnection);
 module.exports = { app, server };
