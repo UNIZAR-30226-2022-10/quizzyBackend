@@ -9,16 +9,7 @@ const { User } = require('./userQueue');
 const Stats = require('./stats');
 
 class GameController {
-    /**
-     * 
-     * @param {Array<User>} users 
-     */
-    constructor(users) {
-        this.stats = {}
-        users.forEach(u => {
-            this.stats[u.nickname] = new Stats();
-        })
-    }
+    
 }
 
 module.exports = GameController;

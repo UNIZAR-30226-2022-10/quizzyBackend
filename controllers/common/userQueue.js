@@ -5,6 +5,7 @@
  * Description: matchmaking user queue
  */
 const { Socket } = require("socket.io");
+const Stats = require("./stats");
 
 class UserQueue {
 
@@ -72,6 +73,7 @@ class User {
     constructor(nickname, socket) {
         this.nickname = nickname;
         this.socket = socket;
+        this.stats = new Stats();
     }
 
     /**

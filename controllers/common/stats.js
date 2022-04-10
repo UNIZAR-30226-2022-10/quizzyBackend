@@ -17,8 +17,6 @@ class Stats {
         this.tokens = {};
         categories.forEach(c => this.tokens[c] = false);
     }
-
-
 }
 
 module.exports = Stats
