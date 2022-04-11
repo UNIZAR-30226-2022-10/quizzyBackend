@@ -20,8 +20,7 @@ const { PrismaClientKnownRequestError } = require("@prisma/client");
 // get questions
 questionsRouter.get("/", function (req, res, next) {
     const { difficulty, category } = req.query;
-    limit = parseInt(req.query.limit);
-
+    let limit = req.query.limit ? parseInt(req.query.limit) : 20;
     getQuestions(limit, difficulty, category)
         .then((questions) => {
             res.statusCode = StatusCodes.OK;
@@ -39,7 +38,7 @@ questionsRouter.get("/", function (req, res, next) {
         });
 });
 
-// get proposals
+// accept proposals
 questionsRouter.put("/review", function (req, res, next) {
     const id = parseInt(req.query.id);
 
@@ -60,6 +59,7 @@ questionsRouter.put("/review", function (req, res, next) {
         });
 });
 
+// deny proposals
 questionsRouter.delete("/review", function (req, res, next) {
     const { questionId } = req.body;
 
@@ -92,7 +92,7 @@ questionsRouter.delete("/review", function (req, res, next) {
         });
 });
 
-// proposal
+// add proposal
 questionsRouter.post("/proposal", function (req, res, next) {
     const {
         category,

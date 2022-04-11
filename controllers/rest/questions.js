@@ -50,19 +50,23 @@ function queryArgs(diff, cat) {
 }
 
 /**
- *
+ * Get questions from database
  * @param {BigInt} limit The number of questions to retrieve
  * @param {String} difficulty The difficulty filter
  * @param {String} category The category filter
  * @returns {Array} An array with random filtered questions
+ * @throws {HttpError} BAD_REQUEST when the input is invalid
  */
 async function getQuestions(limit, difficulty, category) {
     // check if limit is correct
-    if (isNaN(limit) || (limit && limit <= 0))
+    if (isNaN(limit) || (limit <= 0))
         throw createError(StatusCodes.BAD_REQUEST, "Invalid question limit");
 
-    // Set default values if limit doesn't exist
-    let lim = limit ? limit : 20;
+    if (category && !validateCategory(category))
+        throw createError(StatusCodes.BAD_REQUEST, "Invalid category name");
+
+    if (difficulty && !validateDifficulty(difficulty))
+        throw createError(StatusCodes.BAD_REQUEST, "Invalid difficulty name");
 
     // Note: This might not be the best way to implement random fetching.
     //       may be subject to changes in the future.
@@ -73,7 +77,7 @@ async function getQuestions(limit, difficulty, category) {
     );
 
     // Get random number of questions
-    return pickRandom(allQuestions, lim);
+    return pickRandom(allQuestions, limit);
 }
 
 /**
