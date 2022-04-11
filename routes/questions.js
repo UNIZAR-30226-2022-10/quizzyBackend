@@ -30,7 +30,7 @@ questionsRouter.get("/", function (req, res, next) {
             });
         })
         .catch((e) => {
-            res.statusCode = StatusCodes.BAD_REQUEST;
+            res.statusCode = e.status;
             res.send({
                 msg: e.message,
                 ok: false

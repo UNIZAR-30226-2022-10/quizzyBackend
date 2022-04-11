@@ -77,7 +77,11 @@ async function getQuestions(limit, difficulty, category) {
     );
 
     // Get random number of questions
-    return pickRandom(allQuestions, limit);
+    try {
+        return pickRandom(allQuestions, limit);
+    } catch {
+        throw createError(StatusCodes.BAD_REQUEST, "Too many questions")
+    }
 }
 
 /**
