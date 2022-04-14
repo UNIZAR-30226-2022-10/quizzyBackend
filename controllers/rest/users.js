@@ -37,6 +37,28 @@ async function registerUser(nickname, email, password) {
             wallet: 300,
             actual_cosmetic: 1
         }
+    }).then(async () => {
+        // create initial user info
+        var wildcards = await prisma.wildcards.findMany();
+
+        var records = wildcards.map(w => {
+            return { 
+                nickname, 
+                wildcard_id : w.wildcard_id, 
+                cuantity : 0 
+            } 
+        })
+
+        await prisma.user_wildcards.createMany({
+            data: records,
+        })
+
+        await prisma.user_cosmetics.create({
+            data : {
+                cosmetic_id : 1,
+                nickname : nickname
+            }
+        })
     });
 }
 
