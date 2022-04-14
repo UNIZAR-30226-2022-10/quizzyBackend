@@ -17,6 +17,8 @@ var questionsRouter = express.Router();
 
 const { PrismaClientKnownRequestError } = require("@prisma/client");
 
+const { authRestToken } = require('../middleware/auth');
+
 // get questions
 questionsRouter.get("/", function (req, res, next) {
     const { difficulty, category } = req.query;
@@ -40,7 +42,7 @@ questionsRouter.get("/", function (req, res, next) {
 });
 
 // get proposals
-questionsRouter.put("/review", function (req, res, next) {
+questionsRouter.put("/review", authRestToken, function (req, res, next) {
     const id = parseInt(req.query.id);
 
     acceptQuestion(id)
@@ -60,7 +62,7 @@ questionsRouter.put("/review", function (req, res, next) {
         });
 });
 
-questionsRouter.delete("/review", function (req, res, next) {
+questionsRouter.delete("/review", authRestToken, function (req, res, next) {
     const { questionId } = req.body;
 
     deleteQuestion(questionId)
@@ -93,7 +95,7 @@ questionsRouter.delete("/review", function (req, res, next) {
 });
 
 // proposal
-questionsRouter.post("/proposal", function (req, res, next) {
+questionsRouter.post("/proposal", authRestToken, function (req, res, next) {
     const {
         category,
         statement,

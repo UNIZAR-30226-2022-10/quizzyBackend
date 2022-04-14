@@ -13,6 +13,7 @@ const {
 } = require("../controllers/rest/users");
 
 const { signToken } = require("../utils/auth");
+const { authRestToken } = require('../middleware/auth');
 
 var usersRouter = express.Router();
 
@@ -83,7 +84,7 @@ usersRouter.post("/login", function (req, res, next) {
         });
 });
 
-usersRouter.delete("/:nickname", function (req, res, next) {
+usersRouter.delete("/:nickname", authRestToken, function (req, res, next) {
     const { nickname } = req.params;
 
     // delete user in database

@@ -9,13 +9,49 @@ const { StatusCodes } = require("http-status-codes");
 
 const { authRestToken } = require('../middleware/auth');
 const {
-    getShop
+    getCosmetics, getWildcards
 } = require('../controllers/rest/shop');
 
 var shopRouter = express.Router();
+shopRouter.use(authRestToken);
 
-shopRouter.get('/', function (req, res, next){
-    getShop().then(({cosmetics, wildcards}) => {
+shopRouter.get('/cosmetics', function (req, res, next){
+    getCosmetics().then((cosmetics) => {
+        res.statusCode = StatusCodes.OK;
+        res.send({
+            cosmetics,
+            ok: true
+        });
+    })
+    .catch((e) => {
+        res.statusCode = StatusCodes.BAD_REQUEST;
+        res.send({
+            msg: e.message,
+            ok: false
+        });
+    });
+});
+
+shopRouter.get('/wildcards', function (req, res, next){
+    getWildcards().then((wildcards) => {
+        res.statusCode = StatusCodes.OK;
+        res.send({
+            wildcards,
+            ok: true
+        });
+    })
+    .catch((e) => {
+        res.statusCode = StatusCodes.BAD_REQUEST;
+        res.send({
+            msg: e.message,
+            ok: false
+        });
+    });
+});
+
+shopRouter.post('/buy/cosmetic', function (req, res, next) {
+    const { nickname, id } = req.body;
+    buyItem('cosmetic', id).then(bought => {
         res.statusCode = StatusCodes.OK;
         res.send({
             cosmetics,
@@ -30,12 +66,6 @@ shopRouter.get('/', function (req, res, next){
             ok: false
         });
     });
-});
-
-shopRouter.post('/buy', authRestToken, function (req, res, next) {
-    console.log("jwt ok")
-    res.status(StatusCodes.OK);
-    res.send({ ok : true })
 })
 
 module.exports = shopRouter;

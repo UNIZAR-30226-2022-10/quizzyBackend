@@ -13,7 +13,6 @@ const {
 const bcrypt = require("bcryptjs");
 const { StatusCodes } = require("http-status-codes");
 const createError = require("http-errors");
-
 const prisma = new PrismaClient();
 
 // Register user into the system

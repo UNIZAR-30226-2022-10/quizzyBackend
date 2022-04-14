@@ -11,11 +11,16 @@ const prisma = new PrismaClient();
 const { StatusCodes } = require("http-status-codes");
 const createError = require("http-errors");
 
-async function getShop() {
-    return {
-        cosmetics : await prisma.cosmetics.findMany(),
-        wildcards : await prisma.wildcards.findMany()
-    };
+async function getCosmetics() {
+    return await prisma.cosmetics.findMany();
 }
 
-module.exports = { getShop };
+async function getWildcards() {
+    return await prisma.wildcards.findMany();
+}
+
+async function buyItem() {
+    
+}
+
+module.exports = { getCosmetics, getWildcards, buyItem };
