@@ -13,7 +13,6 @@ const {
 const bcrypt = require("bcryptjs");
 const { StatusCodes } = require("http-status-codes");
 const createError = require("http-errors");
-
 const prisma = new PrismaClient();
 
 // Register user into the system
@@ -38,6 +37,30 @@ async function registerUser(nickname, email, password) {
             wallet: 300,
             actual_cosmetic: 1
         }
+    }).then(async () => {
+        // create initial user info
+        var wildcards = await prisma.wildcards.findMany();
+
+        var records = wildcards.map(w => {
+            return { 
+                nickname, 
+                wildcard_id : w.wildcard_id, 
+                cuantity : 0 
+            } 
+        })
+
+        await prisma.user_wildcards.createMany({
+            data: records,
+        })
+
+        await prisma.user_cosmetics.create({
+            data : {
+                cosmetic_id : 1,
+                nickname : nickname
+            }
+        })
+    }).catch(e => {
+        throw createError(StatusCodes.CONFLICT, "User already exists")
     });
 }
 
@@ -50,6 +73,8 @@ async function deleteUser(nickname) {
         where: {
             nickname: nickname
         }
+    }).catch(e => {
+        throw createError(StatusCodes.NOT_FOUND);
     });
 }
 
@@ -87,10 +112,10 @@ async function checkUserCredentials(nickname, password) {
             }
             // User doesn't exist
             throw createError(StatusCodes.NOT_FOUND, `Can't find ${nickname}`);
-        });
+        })
 }
 
+
+
 // Exports
-module.exports.registerUser = registerUser;
-module.exports.deleteUser = deleteUser;
-module.exports.checkUserCredentials = checkUserCredentials;
+module.exports = { registerUser, deleteUser, checkUserCredentials }

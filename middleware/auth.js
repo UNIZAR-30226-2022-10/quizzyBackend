@@ -11,7 +11,6 @@ function authRestToken(req, res, next) {
     if (jwtToken == null) return res.sendStatus(StatusCodes.UNAUTHORIZED);
 
     jwt.verify(jwtToken, process.env.TOKEN_SECRET, (err, user) => {
-        console.log(err);
 
         if (err) return res.sendStatus(StatusCodes.FORBIDDEN);
 

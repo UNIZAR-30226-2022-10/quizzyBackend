@@ -13,6 +13,7 @@ const {
 } = require("../controllers/rest/users");
 
 const { signToken } = require("../utils/auth");
+const { authRestToken } = require('../middleware/auth');
 
 var usersRouter = express.Router();
 
@@ -36,24 +37,13 @@ usersRouter.post("/", function (req, res, next) {
             });
         })
         .catch((e) => {
-            // Check type of error
-            if (e instanceof PrismaClientKnownRequestError) {
-                // database conflict error
-                res.statusCode = StatusCodes.CONFLICT;
-                // Send error response
-                res.send({
-                    msg: "User already exists in the database",
-                    ok: false
-                });
-            } else {
-                // bad input error
-                res.statusCode = e.status;
-                // Send error response
-                res.send({
-                    msg: e.message,
-                    ok: false
-                });
-            }
+            // bad input error
+            res.statusCode = e.status;
+            // Send error response
+            res.send({
+                msg: e.message,
+                ok: false
+            });
         });
 });
 
@@ -83,7 +73,7 @@ usersRouter.post("/login", function (req, res, next) {
         });
 });
 
-usersRouter.delete("/:nickname", function (req, res, next) {
+usersRouter.delete("/:nickname", authRestToken, function (req, res, next) {
     const { nickname } = req.params;
 
     // delete user in database
@@ -99,7 +89,7 @@ usersRouter.delete("/:nickname", function (req, res, next) {
         })
         .catch((e) => {
             // bad input error
-            res.statusCode = StatusCodes.NOT_FOUND;
+            res.statusCode = e.status;
             // Send error response
             res.send({
                 msg: "user not found",
