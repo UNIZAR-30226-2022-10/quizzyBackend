@@ -31,9 +31,9 @@ describe("question get", () => {
             let cat = categories[Math.floor(Math.random() * 6)];
             let diff = difficulties[Math.floor(Math.random() * 3)];
             console.log("testing ", { cat, diff });
-            return questionGet(15, diff, cat, (response) => {
+            return questionGet(5, diff, cat, (response) => {
                 expect(response.statusCode).toBe(StatusCodes.OK);
-                expect(response.body.questions.length).toBe(15);
+                expect(response.body.questions.length).toBe(5);
                 response.body.questions.forEach(question => {
                     expect(question.category_name).toBe(cat)
                     expect(question.difficulty).toBe(diff)

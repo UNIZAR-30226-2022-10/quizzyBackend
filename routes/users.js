@@ -6,6 +6,8 @@
  */
 var express = require("express");
 const { StatusCodes } = require("http-status-codes");
+const jwt_decode = require("jwt-decode");
+
 const {
     registerUser,
     deleteUser,
@@ -16,8 +18,6 @@ const { signToken } = require("../utils/auth");
 const { authRestToken } = require('../middleware/auth');
 
 var usersRouter = express.Router();
-
-const { PrismaClientKnownRequestError } = require("@prisma/client");
 
 /**
  * This route will register a new user in the database if the information
@@ -73,17 +73,49 @@ usersRouter.post("/login", function (req, res, next) {
         });
 });
 
-usersRouter.delete("/:nickname", authRestToken, function (req, res, next) {
-    const { nickname } = req.params;
+usersRouter.get("/", authRestToken, function (req, res, next) {
+
+    // Get jwt ( must be a valid one )
+    const token = req.headers['authorization'].split(" ")[1]
+
+    // parse header
+    var { name } = jwt_decode(token, { payload: true });
 
     // delete user in database
-    // try to create entry in database
-    deleteUser(nickname)
+    getUser(name)
+        .then((user) => {
+            // Send response back
+            res.statusCode = StatusCodes.OK;
+            res.send({
+                ...user,
+                ok: true
+            });
+        })
+        .catch((e) => {
+            // bad input error
+            res.statusCode = e.status;
+            // Send error response
+            res.send({
+                msg: "user not found",
+                ok: false
+            });
+        });
+});
+
+usersRouter.delete("/", authRestToken, function (req, res, next) {
+
+    // Get jwt ( must be a valid one )
+    const token = req.headers['authorization'].split(" ")[1]
+
+    // parse header
+    var { name } = jwt_decode(token, { payload: true });
+
+    // delete user in database
+    deleteUser(name)
         .then(() => {
             // Send response back
             res.statusCode = StatusCodes.OK;
             res.send({
-                msg: "ok",
                 ok: true
             });
         })
