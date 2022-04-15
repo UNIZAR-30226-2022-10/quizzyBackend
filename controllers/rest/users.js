@@ -59,6 +59,8 @@ async function registerUser(nickname, email, password) {
                 nickname : nickname
             }
         })
+    }).catch(e => {
+        throw createError(StatusCodes.CONFLICT, "User already exists")
     });
 }
 
@@ -71,6 +73,8 @@ async function deleteUser(nickname) {
         where: {
             nickname: nickname
         }
+    }).catch(e => {
+        throw createError(StatusCodes.NOT_FOUND);
     });
 }
 
@@ -108,10 +112,10 @@ async function checkUserCredentials(nickname, password) {
             }
             // User doesn't exist
             throw createError(StatusCodes.NOT_FOUND, `Can't find ${nickname}`);
-        });
+        })
 }
 
+
+
 // Exports
-module.exports.registerUser = registerUser;
-module.exports.deleteUser = deleteUser;
-module.exports.checkUserCredentials = checkUserCredentials;
+module.exports = { registerUser, deleteUser, checkUserCredentials }
