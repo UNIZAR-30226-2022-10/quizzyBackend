@@ -178,34 +178,6 @@ async function checkUserCredentials(nickname, password) {
  * Note that this is an async function so it must be handled via async/await or
  * the promise API.
  * @param {String} nickname The user's nickname
- * @returns {Array} An array of objects with each wildcard id and amount
- */
-async function getUser(nickname) {
-    // Validate nickname
-    if (!nickname || !validateNickname(nickname))
-        throw createError(StatusCodes.BAD_REQUEST, "Invalid nickname");
-
-    // Find user by nickname
-    var user = await prisma.users.findFirst({
-        where: {
-            nickname: nickname
-        }
-    })
-
-    // throw if user doesn't exist
-    if ( !user ) {
-        throw createError(StatusCodes.NOT_FOUND, "User not found");
-    }
-
-    return user;
-}
-
-/**
- * Get user wildcard information.
- * 
- * Note that this is an async function so it must be handled via async/await or
- * the promise API.
- * @param {String} nickname The user's nickname
  * @returns {Array} An array with the wildcards that this user owns.
  */
 async function getUserWildcards(nickname) {
