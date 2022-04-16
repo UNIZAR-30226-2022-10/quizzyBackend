@@ -34,7 +34,7 @@ function questionPut(questionId, expected) {
         .put("/questions/review")
         .set({Accept: 'application/json',
             Authorization: `Bearer ${process.env.JWT_TEST}` })
-        .query({questionId})
+        .query({id : questionId})
         .then(async (response) => {
             await expected(response);
         });

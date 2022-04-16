@@ -87,7 +87,6 @@ async function getQuestions(limit, difficulty, category) {
 /**
  *
  * @param {BigInt} id The id of the question to accept
- * @returns {Promise} A promise
  * @throws {HttpError} either when the id is invalid, the question doesn't existm
  *                     or if it exists, it has been already accepted
  */
@@ -96,8 +95,7 @@ async function acceptQuestion(id) {
         throw createError(StatusCodes.BAD_REQUEST, "Invalid id " + id);
     }
 
-    return await prisma.questions
-        .findFirst({
+    await prisma.questions.findFirst({
             where: {
                 question_id: id
             }
@@ -111,7 +109,7 @@ async function acceptQuestion(id) {
                     "Question is already accepted"
                 );
 
-            return await prisma.questions.update({
+            await prisma.questions.update({
                 where: {
                     question_id: id
                 },
