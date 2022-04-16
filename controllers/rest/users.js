@@ -133,8 +133,8 @@ async function deleteUser(nickname) {
 
 /**
  * 
- * @param {*} nickname 
- * @param {*} password 
+ * @param {String} nickname The user's nickname
+ * @param {String} password The user's password (without hashing)
  * @returns 
  */
 async function checkUserCredentials(nickname, password) {
@@ -147,7 +147,7 @@ async function checkUserCredentials(nickname, password) {
         throw createError(StatusCodes.BAD_REQUEST, "Invalid password hash");
 
     // Find entry in database
-    return await prisma.users
+    await prisma.users
         .findFirst({
             where: {
                 nickname: nickname
@@ -162,19 +162,106 @@ async function checkUserCredentials(nickname, password) {
                     info.password
                 );
 
-                if (validPassword) {
-                    // Valid credentials
-                    return true;
-                }
                 // user exists but passwords do not match
-                throw createError(StatusCodes.UNAUTHORIZED, "Passwords do not match");
+                if ( !validPassword )
+                    throw createError(StatusCodes.UNAUTHORIZED, "Passwords do not match");
+            } else {
+                // User doesn't exist
+                throw createError(StatusCodes.NOT_FOUND, `Can't find ${nickname}`);
             }
-            // User doesn't exist
-            throw createError(StatusCodes.NOT_FOUND, `Can't find ${nickname}`);
         })
+}
+
+/**
+ * Get user wildcard information.
+ * 
+ * Note that this is an async function so it must be handled via async/await or
+ * the promise API.
+ * @param {String} nickname The user's nickname
+ * @returns {Array} An array with the wildcards that this user owns.
+ */
+async function getUserWildcards(nickname) {
+    // Validate nickname
+    if (!nickname || !validateNickname(nickname))
+        throw createError(StatusCodes.BAD_REQUEST, "Invalid nickname");
+
+    // Find user by nickname
+    var wildcards = await prisma.user_wildcards.findMany({
+        where: {
+            nickname: nickname
+        },
+        select : {
+            wildcard_id : true,
+            cuantity : true,
+            wildcards : {
+                select : {
+                    wname : true,
+                    description : true
+                }
+            }
+        }
+    })
+
+    // throw if user doesn't exist
+    if ( !wildcards ) {
+        throw createError(StatusCodes.NOT_FOUND, "User not found");
+    }
+
+    return wildcards.map(c => {
+        let { wildcard_id, cuantity, wildcards } = c;
+        
+        return { wildcard_id, cuantity, ...wildcards }
+    });
+}
+
+/**
+ * Get user cosmetics information.
+ * 
+ * Note that this is an async function so it must be handled via async/await or
+ * the promise API.
+ * @param {String} nickname The user's nickname
+ * @returns {Array} An array with the wildcards that this user owns.
+ */
+ async function getUserCosmetics(nickname) {
+    // Validate nickname
+    if (!nickname || !validateNickname(nickname))
+        throw createError(StatusCodes.BAD_REQUEST, "Invalid nickname");
+
+    // Find user by nickname
+    var cosmetics = await prisma.user_cosmetics.findMany({
+        where: {
+            nickname: nickname
+        },
+        select : {
+            cosmetic_id : true,
+            cosmetics : {
+                select : {
+                    cname : true,
+                }
+            }
+        }
+    })
+
+    // throw if user doesn't exist
+    if ( !cosmetics ) {
+        throw createError(StatusCodes.NOT_FOUND, "User not found");
+    }
+
+    return cosmetics.map(c => {
+        let { cosmetic_id, cosmetics } = c;
+
+        return { cosmetic_id, ...cosmetics }
+    });
 }
 
 
 
 // Exports
-module.exports = { registerUser, deleteUser, checkUserCredentials, getUser }
+module.exports = {
+    registerUser, 
+    deleteUser, 
+    checkUserCredentials, 
+    getUser, 
+    getUserWildcards, 
+    getUserCosmetics 
+}

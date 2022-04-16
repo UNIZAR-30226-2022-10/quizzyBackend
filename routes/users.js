@@ -11,7 +11,10 @@ const jwt_decode = require("jwt-decode");
 const {
     registerUser,
     deleteUser,
-    checkUserCredentials
+    checkUserCredentials,
+    getUser,
+    getUserWildcards,
+    getUserCosmetics
 } = require("../controllers/rest/users");
 
 const { signToken } = require("../utils/auth");
@@ -63,7 +66,6 @@ usersRouter.post("/login", function (req, res, next) {
             });
         })
         .catch((e) => {
-            // bad input error
             res.statusCode = e.status;
             // Send error response
             res.send({
@@ -96,7 +98,7 @@ usersRouter.get("/", authRestToken, function (req, res, next) {
             res.statusCode = e.status;
             // Send error response
             res.send({
-                msg: "user not found",
+                msg: e.message,
                 ok: false
             });
         });
@@ -124,7 +126,69 @@ usersRouter.delete("/", authRestToken, function (req, res, next) {
             res.statusCode = e.status;
             // Send error response
             res.send({
-                msg: "user not found",
+                msg: e.message,
+                ok: false
+            });
+        });
+});
+
+
+usersRouter.get("/wildcards", authRestToken, function (req, res, next) {
+
+    console.log("wildcards -------------------------")
+
+    // Get jwt ( must be a valid one )
+    const token = req.headers['authorization'].split(" ")[1]
+
+    // parse header
+    var { name } = jwt_decode(token, { payload: true });
+
+    // delete user in database
+    getUserWildcards(name)
+        .then((wildcards) => {
+            // Send response back
+            res.statusCode = StatusCodes.OK;
+            res.send({
+                wildcards,
+                ok: true
+            });
+        })
+        .catch((e) => {
+            // bad input error
+            res.statusCode = e.status;
+            // Send error response
+            res.send({
+                msg: e.message,
+                ok: false
+            });
+        });
+});
+
+usersRouter.get("/cosmetics", authRestToken, function (req, res, next) {
+
+    // Get jwt ( must be a valid one )
+    const token = req.headers['authorization'].split(" ")[1]
+
+    // parse header
+    var { name } = jwt_decode(token, { payload: true });
+
+    // delete user in database
+    getUserCosmetics(name)
+        .then((cosmetics) => {
+            // Send response back
+            res.statusCode = StatusCodes.OK;
+            res.send({
+                cosmetics,
+                ok: true
+            });
+        })
+        .catch((e) => {
+            console.log(e.message);
+            // bad input error
+            res.statusCode = e.status;
+            // Send error response
+            res.send({
+                msg: e.message,
                 ok: false
             });
         });

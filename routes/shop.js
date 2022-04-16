@@ -14,7 +14,6 @@ const {
 } = require('../controllers/rest/shop');
 
 var shopRouter = express.Router();
-shopRouter.use(authRestToken);
 
 shopRouter.get('/cosmetics', function (req, res, next){
     getCosmetics().then((cosmetics) => {
