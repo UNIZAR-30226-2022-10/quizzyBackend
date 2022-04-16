@@ -42,7 +42,7 @@ questionsRouter.get("/", function (req, res, next) {
 
 // get proposals
 questionsRouter.put("/review", authRestToken, function (req, res, next) {
-    const id = parseInt(req.query.id);
+    const {id} = req.query;
 
     acceptQuestion(id)
         .then(() => {

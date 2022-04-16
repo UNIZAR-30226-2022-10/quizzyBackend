@@ -92,8 +92,8 @@ async function getQuestions(limit, difficulty, category) {
  *                     or if it exists, it has been already accepted
  */
 async function acceptQuestion(id) {
-    if (!id) {
-        throw createError(StatusCodes.BAD_REQUEST, "Invalid id");
+    if (!id || id <= 0) {
+        throw createError(StatusCodes.BAD_REQUEST, "Invalid id " + id);
     }
 
     return await prisma.questions
