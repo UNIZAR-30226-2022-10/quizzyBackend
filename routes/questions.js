@@ -102,10 +102,9 @@ questionsRouter.post("/proposal", authRestToken, function (req, res, next) {
         correctAnswer,
         wrongAnswer1,
         wrongAnswer2,
-        wrongAnswer3,
-        user
+        wrongAnswer3
     } = req.body;
-    console.log(req.body);
+    
     proposalQuestion(
         statement,
         category,
@@ -114,7 +113,7 @@ questionsRouter.post("/proposal", authRestToken, function (req, res, next) {
         wrongAnswer1,
         wrongAnswer2,
         wrongAnswer3,
-        user
+        req.jwtUser
     )
         .then(() => {
             res.statusCode = StatusCodes.OK;

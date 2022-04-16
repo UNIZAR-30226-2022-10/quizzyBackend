@@ -15,7 +15,7 @@ function authRestToken(req, res, next) {
         if (err) return res.sendStatus(StatusCodes.FORBIDDEN);
 
         // add information to request
-        req.jwtUser = user;
+        req.jwtUser = user.name;
 
         next();
     });
