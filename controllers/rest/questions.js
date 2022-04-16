@@ -156,8 +156,11 @@ async function proposalQuestion(
     if (!wrongAnswer3)
         throw createError(StatusCodes.BAD_REQUEST, "Invalid wrong answer 3");
 
-    if (!nickname || !validateNickname(nickname))
+    if (!nickname || !validateNickname(nickname)){
+        console.log(nickname);
         throw createError(StatusCodes.BAD_REQUEST, "Invalid nickname");
+    }
+        
 
     return await prisma.questions.create({
         data: {
@@ -175,7 +178,7 @@ async function proposalQuestion(
 }
 
 async function deleteQuestion(questionId) {
-    if (questionId <= 0) {
+    if (!questionId || questionId <= 0) {
         throw createError(
             StatusCodes.BAD_REQUEST,
             "Invalid question identifier"
