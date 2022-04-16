@@ -1,5 +1,6 @@
 /*
  * Author: Darío Marcos Casalé (795306)
+ *      & Jaime Martín Trullén (801965)
  * Filename: questions.js
  * Module: routes
  * Description: Questions router

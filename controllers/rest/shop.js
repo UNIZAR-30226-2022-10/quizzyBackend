@@ -1,8 +1,8 @@
 /*
- * Author: Darío Marcos Casalé (795306) & Jaime Martín Trullén
- * Filename: questions.js
+ * Author: Darío Marcos Casalé (795306)
+ * Filename: shop.js
  * Module: controllers/rest
- * Description: Input validation utilities
+ * Description: Controller for shop route
  */
 
 const { PrismaClient } = require("@prisma/client");

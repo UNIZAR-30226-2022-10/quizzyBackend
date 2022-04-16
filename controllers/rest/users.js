@@ -1,8 +1,8 @@
 /*
  * Author: Darío Marcos Casalé (795306)
  * Filename: users.js
- * Module: middlewares
- * Description: User data access layer for managing user data.
+ * Module: controllers/rest
+ * Description: Controller for users route.
  */
 const { PrismaClient } = require("@prisma/client");
 
