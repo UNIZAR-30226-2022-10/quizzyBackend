@@ -1,17 +1,5 @@
 version: '3.8'
 services:
-  app:
-    build: .
-    depends_on:
-      - db
-    environment:
-      NODE_ENV: development
-    ports:
-      - "5000:5000"
-    command: npm run start
-    volumes:
-      - .:/src/
-      - /src/node_modules
   db:
     image: postgres:14.2-alpine
     restart: always
@@ -23,6 +11,18 @@ services:
       - db:/var/lib/postgresql/data
       - ./database/create.sql:/docker-entrypoint-initdb.d/create_tables.sql
       - ./database/insert.sql:/docker-entrypoint-initdb.d/fill_tables.sql
+  app:
+    build: .
+    depends_on:
+      - db
+    environment:
+      NODE_ENV: development
+    ports:
+      - "5000:5000"
+    command: npm run dev
+    volumes:
+      - .:/src/
+      - /src/node_modules
 volumes:
   db:
     driver: local

@@ -77,14 +77,8 @@ usersRouter.post("/login", function (req, res, next) {
 
 usersRouter.get("/", authRestToken, function (req, res, next) {
 
-    // Get jwt ( must be a valid one )
-    const token = req.headers['authorization'].split(" ")[1]
-
-    // parse header
-    var { name } = jwt_decode(token, { payload: true });
-
     // delete user in database
-    getUser(name)
+    getUser(req.jwtUser)
         .then((user) => {
             // Send response back
             res.statusCode = StatusCodes.OK;
@@ -106,14 +100,8 @@ usersRouter.get("/", authRestToken, function (req, res, next) {
 
 usersRouter.delete("/", authRestToken, function (req, res, next) {
 
-    // Get jwt ( must be a valid one )
-    const token = req.headers['authorization'].split(" ")[1]
-
-    // parse header
-    var { name } = jwt_decode(token, { payload: true });
-
     // delete user in database
-    deleteUser(name)
+    deleteUser(req.jwtUser)
         .then(() => {
             // Send response back
             res.statusCode = StatusCodes.OK;
@@ -135,16 +123,8 @@ usersRouter.delete("/", authRestToken, function (req, res, next) {
 
 usersRouter.get("/wildcards", authRestToken, function (req, res, next) {
 
-    console.log("wildcards -------------------------")
-
-    // Get jwt ( must be a valid one )
-    const token = req.headers['authorization'].split(" ")[1]
-
-    // parse header
-    var { name } = jwt_decode(token, { payload: true });
-
     // delete user in database
-    getUserWildcards(name)
+    getUserWildcards(req.jwtUser)
         .then((wildcards) => {
             // Send response back
             res.statusCode = StatusCodes.OK;
@@ -166,14 +146,8 @@ usersRouter.get("/wildcards", authRestToken, function (req, res, next) {
 
 usersRouter.get("/cosmetics", authRestToken, function (req, res, next) {
 
-    // Get jwt ( must be a valid one )
-    const token = req.headers['authorization'].split(" ")[1]
-
-    // parse header
-    var { name } = jwt_decode(token, { payload: true });
-
     // delete user in database
-    getUserCosmetics(name)
+    getUserCosmetics(req.jwtUser)
         .then((cosmetics) => {
             // Send response back
             res.statusCode = StatusCodes.OK;

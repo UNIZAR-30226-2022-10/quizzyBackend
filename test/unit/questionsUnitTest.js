@@ -150,12 +150,29 @@ const questionsTestSuite = () => describe("Test questions path", () => {
 
     describe("question delete", () => {
 
-        describe("Valid classes", () => {
+        let id = 1000000;
 
+        beforeAll(async () => {
+            await prisma.questions.create({
+                data : {
+                    question_id : id,
+                    category_name : "Art",
+                    question : "Am I a question?",
+                    difficulty : "hard",
+                    correct_answer : "Yes",
+                    wrong_answer_1 : "No",
+                    wrong_answer_2 : "No but twice",
+                    wrong_answer_3 : "Kittens",
+                    accepted : true
+                }
+            })
+        })
+
+        describe("Valid classes", () => {
             
             // questionId >= 1 && questionId != null
             test("EQ 1, 2", async () => {
-                return questionDelete(20, (response) => {
+                return questionDelete(id, (response) => {
                     expect(response.statusCode).toBe(StatusCodes.OK);
                 });
             });

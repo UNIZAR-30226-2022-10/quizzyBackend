@@ -222,12 +222,22 @@ async function getUserWildcards(nickname) {
  * @param {String} nickname The user's nickname
  * @returns {Array} An array with the wildcards that this user owns.
  */
- async function getUserCosmetics(nickname) {
+async function getUserCosmetics(nickname) {
     // Validate nickname
     if (!nickname || !validateNickname(nickname))
         throw createError(StatusCodes.BAD_REQUEST, "Invalid nickname");
 
     // Find user by nickname
+    var user = await prisma.users.findFirst({
+        where: {
+            nickname: nickname
+        }
+    })
+
+    if ( !user ) 
+        throw createError(StatusCodes.NOT_FOUND, "User not found");
+
+    // Get user's cosmetics
     var cosmetics = await prisma.user_cosmetics.findMany({
         where: {
             nickname: nickname
@@ -241,11 +251,6 @@ async function getUserWildcards(nickname) {
             }
         }
     })
-
-    // throw if user doesn't exist
-    if ( !cosmetics ) {
-        throw createError(StatusCodes.NOT_FOUND, "User not found");
-    }
 
     return cosmetics.map(c => {
         let { cosmetic_id, cosmetics } = c;
