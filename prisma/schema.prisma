@@ -115,7 +115,6 @@ model questions {
   accepted       Boolean
   nickname       String?    @db.VarChar(20)
   categories     categories @relation(fields: [category_name], references: [category_name], onDelete: Cascade, onUpdate: NoAction)
-  users          users?     @relation(fields: [nickname], references: [nickname], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model user_cosmetics {
@@ -173,7 +172,6 @@ model users {
   private_games_state               private_games_state[]
   public_game                       public_game[]
   public_games_state                public_games_state[]
-  questions                         questions[]
   user_cosmetics                    user_cosmetics[]
   user_private_games                user_private_games[]
   user_public_games                 user_public_games[]
