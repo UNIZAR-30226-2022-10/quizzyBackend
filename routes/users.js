@@ -6,17 +6,21 @@
  */
 var express = require("express");
 const { StatusCodes } = require("http-status-codes");
+const jwt_decode = require("jwt-decode");
+
 const {
     registerUser,
     deleteUser,
-    checkUserCredentials
+    checkUserCredentials,
+    getUser,
+    getUserWildcards,
+    getUserCosmetics
 } = require("../controllers/rest/users");
 
 const { signToken } = require("../utils/auth");
+const { authRestToken } = require('../middleware/auth');
 
 var usersRouter = express.Router();
-
-const { PrismaClientKnownRequestError } = require("@prisma/client");
 
 /**
  * This route will register a new user in the database if the information
@@ -36,24 +40,13 @@ usersRouter.post("/", function (req, res, next) {
             });
         })
         .catch((e) => {
-            // Check type of error
-            if (e instanceof PrismaClientKnownRequestError) {
-                // database conflict error
-                res.statusCode = StatusCodes.CONFLICT;
-                // Send error response
-                res.send({
-                    msg: "User already exists in the database",
-                    ok: false
-                });
-            } else {
-                // bad input error
-                res.statusCode = e.status;
-                // Send error response
-                res.send({
-                    msg: e.message,
-                    ok: false
-                });
-            }
+            // bad input error
+            res.statusCode = e.status;
+            // Send error response
+            res.send({
+                msg: e.message,
+                ok: false
+            });
         });
 });
 
@@ -73,6 +66,28 @@ usersRouter.post("/login", function (req, res, next) {
             });
         })
         .catch((e) => {
+            res.statusCode = e.status;
+            // Send error response
+            res.send({
+                msg: e.message,
+                ok: false
+            });
+        });
+});
+
+usersRouter.get("/", authRestToken, function (req, res, next) {
+
+    // delete user in database
+    getUser(req.jwtUser)
+        .then((user) => {
+            // Send response back
+            res.statusCode = StatusCodes.OK;
+            res.send({
+                ...user,
+                ok: true
+            });
+        })
+        .catch((e) => {
             // bad input error
             res.statusCode = e.status;
             // Send error response
@@ -83,26 +98,71 @@ usersRouter.post("/login", function (req, res, next) {
         });
 });
 
-usersRouter.delete("/:nickname", function (req, res, next) {
-    const { nickname } = req.params;
+usersRouter.delete("/", authRestToken, function (req, res, next) {
 
     // delete user in database
-    // try to create entry in database
-    deleteUser(nickname)
+    deleteUser(req.jwtUser)
         .then(() => {
             // Send response back
             res.statusCode = StatusCodes.OK;
             res.send({
-                msg: "ok",
                 ok: true
             });
         })
         .catch((e) => {
             // bad input error
-            res.statusCode = StatusCodes.NOT_FOUND;
+            res.statusCode = e.status;
             // Send error response
             res.send({
-                msg: "user not found",
+                msg: e.message,
+                ok: false
+            });
+        });
+});
+
+
+usersRouter.get("/wildcards", authRestToken, function (req, res, next) {
+
+    // delete user in database
+    getUserWildcards(req.jwtUser)
+        .then((wildcards) => {
+            // Send response back
+            res.statusCode = StatusCodes.OK;
+            res.send({
+                wildcards,
+                ok: true
+            });
+        })
+        .catch((e) => {
+            // bad input error
+            res.statusCode = e.status;
+            // Send error response
+            res.send({
+                msg: e.message,
+                ok: false
+            });
+        });
+});
+
+usersRouter.get("/cosmetics", authRestToken, function (req, res, next) {
+
+    // delete user in database
+    getUserCosmetics(req.jwtUser)
+        .then((cosmetics) => {
+            // Send response back
+            res.statusCode = StatusCodes.OK;
+            res.send({
+                cosmetics,
+                ok: true
+            });
+        })
+        .catch((e) => {
+            console.log(e.message);
+            // bad input error
+            res.statusCode = e.status;
+            // Send error response
+            res.send({
+                msg: e.message,
                 ok: false
             });
         });

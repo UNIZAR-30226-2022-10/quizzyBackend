@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
 datasource db {
@@ -14,6 +15,7 @@ model categories {
 
 model cosmetics {
   cosmetic_id    Int              @id @default(autoincrement())
+  cname          String           @db.VarChar(50)
   price          Int
   user_cosmetics user_cosmetics[]
   users          users[]
@@ -106,14 +108,13 @@ model questions {
   category_name  String     @db.VarChar(15)
   question       String     @db.VarChar(200)
   difficulty     String     @db.VarChar(6)
-  correct_answer String     @db.VarChar(50)
-  wrong_answer_1 String     @db.VarChar(50)
-  wrong_answer_2 String     @db.VarChar(50)
-  wrong_answer_3 String     @db.VarChar(50)
+  correct_answer String     @db.VarChar(100)
+  wrong_answer_1 String     @db.VarChar(100)
+  wrong_answer_2 String     @db.VarChar(100)
+  wrong_answer_3 String     @db.VarChar(100)
   accepted       Boolean
   nickname       String?    @db.VarChar(20)
   categories     categories @relation(fields: [category_name], references: [category_name], onDelete: Cascade, onUpdate: NoAction)
-  users          users?     @relation(fields: [nickname], references: [nickname], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model user_cosmetics {
@@ -160,7 +161,7 @@ model user_wildcards {
 model users {
   nickname                          String                @id @db.VarChar(20)
   email                             String                @db.VarChar(50)
-  password                          String                @db.VarChar(64)
+  password                          String                @db.VarChar(100)
   wallet                            Int                   @default(300)
   actual_cosmetic                   Int                   @default(1)
   cosmetics                         cosmetics             @relation(fields: [actual_cosmetic], references: [cosmetic_id], onDelete: Cascade, onUpdate: NoAction)
@@ -171,7 +172,6 @@ model users {
   private_games_state               private_games_state[]
   public_game                       public_game[]
   public_games_state                public_games_state[]
-  questions                         questions[]
   user_cosmetics                    user_cosmetics[]
   user_private_games                user_private_games[]
   user_public_games                 user_public_games[]
@@ -180,6 +180,7 @@ model users {
 
 model wildcards {
   wildcard_id    Int              @id @default(autoincrement())
+  wname          String           @db.VarChar(50)
   price          Int
   description    String           @db.VarChar(500)
   user_wildcards user_wildcards[]

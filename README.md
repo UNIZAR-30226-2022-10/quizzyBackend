@@ -10,6 +10,8 @@ backend repository
 
 ## Setup
 
+### Node.js server setup
+
 **NOTE:** Requires Node.js LTS version
 
 Go to the repository folder's root and enter this in the command line:
@@ -19,13 +21,42 @@ npm install
 This will install all the packages and development dependencies for the project
 in order to work properly.
 
-After that, initialize the PostgreSQL database (using the CLI `psql` client or with PgAdmin 4) with the following :
+### Database setup
+
+This project uses PostgreSQL 14.2 for storing the data. You can install the database in two ways:
+
+#### Dockerized database (recommended)
+
+You only need to have docker and docker-compose installed on your machine. 
+
+First of all, create a .env file in the `database` folder with the following variables:
 
 ```
-\i create
+POSTGRES_USER="..."
+POSTGRES_PASSWORD="..."
+POSTGRES_DB="..."
 ```
 
-Now create a `.env` file in order for the [Prisma ORM](https://www.prisma.io/docs/getting-started/quickstart) to connect to the database properly. The template can be found here:
+Now enter the following command on the console:
+
+```
+docker-compose up
+```
+
+And now you have the database ready for work!
+
+#### Standalone database
+This method is ideal if you already have a PostgreSQL instance on your machine. If you haven't, you will have to install a PostgreSQL 14.2 copy on your machine.
+
+After that, initialize the PostgreSQL database (using the CLI `psql` client or with PgAdmin 4) with the following command:
+
+```
+\i database/insert.sql
+```
+
+### Putting it together
+
+Once you have the database installed in your development environment, create a `.env` file in order for the [Prisma ORM](https://www.prisma.io/docs/getting-started/quickstart) to connect to the database properly. The template can be found here:
 
 ```bash
 DB_USER="..."
@@ -64,9 +95,6 @@ Now you should be able to start the development server with the options provided
 
 - `npm run dev`: Start the server in development mode (hot reloading with `nodemon`)
 
-**Important notes:**
-- Ensure all model constraints are satisfied, for example:
-    - Newly registered users start with a default value for the cosmetic, so don't forget to add that into the database for developing and testing.
 ## Testing
 
 The testing framework used in this project is Jest (and Supertest for testing API requests).

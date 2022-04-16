@@ -16,4 +16,4 @@ function signToken(nickname) {
     );
 }
 
-module.exports.signToken = signToken;
+module.exports = { signToken };

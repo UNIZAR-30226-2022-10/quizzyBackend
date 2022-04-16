@@ -50,19 +50,23 @@ function queryArgs(diff, cat) {
 }
 
 /**
- *
+ * Get questions from database
  * @param {BigInt} limit The number of questions to retrieve
  * @param {String} difficulty The difficulty filter
  * @param {String} category The category filter
  * @returns {Array} An array with random filtered questions
+ * @throws {HttpError} BAD_REQUEST when the input is invalid
  */
 async function getQuestions(limit, difficulty, category) {
     // check if limit is correct
-    if (isNaN(limit) || (limit && limit <= 0))
+    if (isNaN(limit) || (limit <= 0))
         throw createError(StatusCodes.BAD_REQUEST, "Invalid question limit");
 
-    // Set default values if limit doesn't exist
-    let lim = limit ? limit : 20;
+    if (category && !validateCategory(category))
+        throw createError(StatusCodes.BAD_REQUEST, "Invalid category name");
+
+    if (difficulty && !validateDifficulty(difficulty))
+        throw createError(StatusCodes.BAD_REQUEST, "Invalid difficulty name");
 
     // Note: This might not be the best way to implement random fetching.
     //       may be subject to changes in the future.
@@ -73,23 +77,25 @@ async function getQuestions(limit, difficulty, category) {
     );
 
     // Get random number of questions
-    return pickRandom(allQuestions, lim);
+    try {
+        return pickRandom(allQuestions, limit);
+    } catch {
+        throw createError(StatusCodes.BAD_REQUEST, "Too many questions")
+    }
 }
 
 /**
  *
  * @param {BigInt} id The id of the question to accept
- * @returns {Promise} A promise
  * @throws {HttpError} either when the id is invalid, the question doesn't existm
  *                     or if it exists, it has been already accepted
  */
 async function acceptQuestion(id) {
-    if (!id) {
-        throw createError(StatusCodes.BAD_REQUEST, "Invalid id");
+    if (!id || id <= 0) {
+        throw createError(StatusCodes.BAD_REQUEST, "Invalid id " + id);
     }
 
-    return await prisma.questions
-        .findFirst({
+    await prisma.questions.findFirst({
             where: {
                 question_id: id
             }
@@ -103,7 +109,7 @@ async function acceptQuestion(id) {
                     "Question is already accepted"
                 );
 
-            return await prisma.questions.update({
+            await prisma.questions.update({
                 where: {
                     question_id: id
                 },
@@ -148,8 +154,11 @@ async function proposalQuestion(
     if (!wrongAnswer3)
         throw createError(StatusCodes.BAD_REQUEST, "Invalid wrong answer 3");
 
-    if (!nickname || !validateNickname(nickname))
+    if (!nickname || !validateNickname(nickname)){
+        console.log(nickname);
         throw createError(StatusCodes.BAD_REQUEST, "Invalid nickname");
+    }
+        
 
     return await prisma.questions.create({
         data: {
@@ -167,7 +176,7 @@ async function proposalQuestion(
 }
 
 async function deleteQuestion(questionId) {
-    if (questionId <= 0) {
+    if (!questionId || questionId <= 0) {
         throw createError(
             StatusCodes.BAD_REQUEST,
             "Invalid question identifier"

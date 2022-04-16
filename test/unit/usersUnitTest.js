@@ -34,8 +34,7 @@ function loginTest(nickname, password, expected) {
         });
 }
 
-// TODO: black box equivalence class tests for thoroughly testing every type of input
-describe("Test user path", () => {
+const userTestSuite = () => describe("Test user path", () => {
     // Setup for all user tests
     beforeAll(async () => {
         var salt = bcrypt.genSaltSync(10);
@@ -248,3 +247,5 @@ describe("Test user path", () => {
         });
     });
 });
+
+module.exports = userTestSuite;

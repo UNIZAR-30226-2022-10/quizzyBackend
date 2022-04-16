@@ -17,11 +17,12 @@ var questionsRouter = express.Router();
 
 const { PrismaClientKnownRequestError } = require("@prisma/client");
 
+const { authRestToken } = require('../middleware/auth');
+
 // get questions
 questionsRouter.get("/", function (req, res, next) {
     const { difficulty, category } = req.query;
-    limit = parseInt(req.query.limit);
-
+    let limit = req.query.limit ? parseInt(req.query.limit) : 20;
     getQuestions(limit, difficulty, category)
         .then((questions) => {
             res.statusCode = StatusCodes.OK;
@@ -31,7 +32,7 @@ questionsRouter.get("/", function (req, res, next) {
             });
         })
         .catch((e) => {
-            res.statusCode = StatusCodes.BAD_REQUEST;
+            res.statusCode = e.status;
             res.send({
                 msg: e.message,
                 ok: false
@@ -40,8 +41,10 @@ questionsRouter.get("/", function (req, res, next) {
 });
 
 // get proposals
-questionsRouter.put("/review", function (req, res, next) {
+questionsRouter.put("/review", authRestToken, function (req, res, next) {
+    // query parameters are strings, we have to parse them first!
     const id = parseInt(req.query.id);
+    console.log("review put");
 
     acceptQuestion(id)
         .then(() => {
@@ -60,7 +63,7 @@ questionsRouter.put("/review", function (req, res, next) {
         });
 });
 
-questionsRouter.delete("/review", function (req, res, next) {
+questionsRouter.delete("/review", authRestToken, function (req, res, next) {
     const { questionId } = req.body;
 
     deleteQuestion(questionId)
@@ -93,7 +96,7 @@ questionsRouter.delete("/review", function (req, res, next) {
 });
 
 // proposal
-questionsRouter.post("/proposal", function (req, res, next) {
+questionsRouter.post("/proposal", authRestToken, function (req, res, next) {
     const {
         category,
         statement,
@@ -101,10 +104,9 @@ questionsRouter.post("/proposal", function (req, res, next) {
         correctAnswer,
         wrongAnswer1,
         wrongAnswer2,
-        wrongAnswer3,
-        user
+        wrongAnswer3
     } = req.body;
-    console.log(req.body);
+    
     proposalQuestion(
         statement,
         category,
@@ -113,7 +115,7 @@ questionsRouter.post("/proposal", function (req, res, next) {
         wrongAnswer1,
         wrongAnswer2,
         wrongAnswer3,
-        user
+        req.jwtUser
     )
         .then(() => {
             res.statusCode = StatusCodes.OK;
