@@ -21,7 +21,8 @@
     "morgan": "~1.9.1",
     "nodemon": "^2.0.15",
     "socket.io": "^4.4.1",
-    "socket.io-client": "^4.4.1"
+    "socket.io-client": "^4.4.1",
+    "uuidv4": "^6.2.13"
   },
   "devDependencies": {
     "eslint": "^8.12.0",

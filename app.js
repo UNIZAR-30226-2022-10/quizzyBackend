@@ -15,8 +15,11 @@ var questionsRouter = require("./routes/questions");
 var chatRouter = require("./routes/chat");
 var shopRouter = require("./routes/shop");
 
+// online controller classes
+var PublicController = require('./controllers/common/publicController');
+
 // Middleware imports
-const { authWsToken, authRestToken } = require("./middleware/auth");
+const { authWsToken } = require("./middleware/auth");
 
 // express instance
 var app = express();
@@ -51,8 +54,11 @@ const io = new Server(server, {
     }
 });
 
+let publicControllerInstance = new PublicController();
+
 // Websocket handling imports
 const registerChatHandlers = require("./controllers/ws/chatHandler");
+const registerPublicHandlers = require("./controllers/ws/publicHandler");
 
 const onConnection = (socket) => {
     // join common room
@@ -64,9 +70,13 @@ const onConnection = (socket) => {
         console.log('User with ID ' + socket.id + ' disconnected');
         socket.to('main').emit("otherDisconnect", {name : socket.id, systemMsg : 'disconnection'});
     })
+
     // Register handlers here
     registerChatHandlers(io, socket);
+    registerPublicHandlers(io, socket, publicControllerInstance);
 };
 
 io.on('connection', onConnection);
+io.use(authWsToken);
+
 module.exports = { app, server };

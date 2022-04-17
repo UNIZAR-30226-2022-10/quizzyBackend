@@ -11,7 +11,9 @@ class Room {
     /**
      * Create a new room
      */
-    constructor() {
+    constructor(rid) {
+        // room id
+        this.rid = rid;
 
         // nickname to user mapping for efficient access
         this.users = {};
