@@ -24,7 +24,6 @@ function authRestToken(req, res, next) {
 async function authWsToken(socket, next) {
     // fetch token from handshake auth sent by frontend
     const token = socket.handshake.auth.token;
-    console.log(socket.handshake);
     try {
         // verify jwt token and get user data
         const user = await jwt.verify(token, process.env.TOKEN_SECRET);

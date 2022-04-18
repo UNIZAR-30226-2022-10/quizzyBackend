@@ -42,7 +42,6 @@ class PublicController {
         // prepare room and add to active rooms if possible
         if ( this.queue.length() >= 6 ) {
             // create a new room with 6 players
-            console.log("full game starts");
 
             let users = [];
             for ( var i = 0; i < 6; i++ ) {
@@ -64,15 +63,18 @@ class PublicController {
 
             this.gameTimeout = setTimeout(() => {
                 // create a new room with every player remaining in the room
-                console.log("game starts");
                 
                 let users = [];
                 while ( this.queue.length() > 0 ) {
                     users.push(this.queue.dequeue());
                 }
+                
                 // add room to list of active rooms
-                this.activeRooms[roomUuid] = this.publicRoomFactory.createRoom(users);
-                this.print()
+                let room = this.publicRoomFactory.createRoom(users);
+
+                this.activeRooms[room.rid] = room;
+
+                this.serversocket.to(room.rid).emit('public:server:joined', { rid : room.rid })
             }, 15000);
         }
         this.print()
