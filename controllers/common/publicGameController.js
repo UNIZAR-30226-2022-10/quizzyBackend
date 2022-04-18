@@ -5,10 +5,14 @@
  * Description: game controller for each room
  */
 
-class GameController {
+const GameController = require("./gameController");
+
+class PublicGameController extends GameController {
     constructor() {
 
     }
-}
 
-module.exports = GameController;
+    restartGame() {
+        
+    }
+}

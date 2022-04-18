@@ -12,12 +12,20 @@ module.exports = (io, socket, controller) => {
     const joinPublicGame = () => {
         // join queue
         const user = new User(socket.user.name, socket);
-        controller.enqueue(user);
+        try {
+            controller.enqueue(user);
+        } catch (e) {
+            console.log("User already enqueued!")
+        }
     };
 
     const leavePublicGame = () => {
         // leave queue 
-        controller.delete(socket.user.name);
+        try {
+            controller.removeUser(socket.user.name);
+        } catch (e) {
+            console.log("User not enqueued!")
+        }
     };
 
     // Handle each event separately
