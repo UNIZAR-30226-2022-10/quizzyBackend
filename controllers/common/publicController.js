@@ -10,14 +10,17 @@ const UserQueue = require("./userQueue");
 
 class PublicController {
 
-    constructor() {
+    constructor(io) {
+
+        // server socket 
+        this.serversocket = io;
+
         // matchmaking queue
         this.queue = new UserQueue();
 
         // game timeout reference
         this.gameTimeout = null;
 
-        // list of active rooms
         this.activeRooms = {};
 
         // factories
@@ -27,11 +30,12 @@ class PublicController {
     /**
      * Enqueue a user for public matchmaking.
      * 
-     * If the user is already in the queue, this function will throw an exception
+     * If the user is already in the queue, this function will throw an exception.
      * @param {User} user The user to add into the queue
-     * @returns 
+     * @returns {String}
      */
     enqueue(user) {
+        console.log("enqueuing")
         // Try to enqueue user in queue
         this.queue.enqueue(user);
 
@@ -46,12 +50,18 @@ class PublicController {
             }
 
             // add room to list of active rooms
-            this.activeRooms.roomUuid = this.publicRoomFactory.createRoom(users);
+            let room = this.publicRoomFactory.createRoom(users);
+
+            this.activeRooms[room.rid] = room;
+
+            this.serversocket.to(room.rid).emit('public:server:joined', { rid : room.rid })
             
-        } else if ( this.queue.length() >= 2 ) {
-            // if timeout exists, reset timer
-            if ( this.gameTimeout )
-                clearTimeout(this.gameTimeout);
+        } 
+
+        this.resetOnlineTimer();
+        
+        if ( this.queue.length() >= 2 ) {
+
             this.gameTimeout = setTimeout(() => {
                 // create a new room with every player remaining in the room
                 console.log("game starts");
@@ -61,7 +71,7 @@ class PublicController {
                     users.push(this.queue.dequeue());
                 }
                 // add room to list of active rooms
-                this.activeRooms.roomUuid = this.publicRoomFactory.createRoom(users);
+                this.activeRooms[roomUuid] = this.publicRoomFactory.createRoom(users);
                 this.print()
             }, 15000);
         }
@@ -73,8 +83,19 @@ class PublicController {
         // remove
         this.queue.delete(nickname);
 
+        if ( this.queue.length() < 2 ) {
+            clearTimeout(this.gameTimeout);
+        }
+        
         // print game state
         this.print()
+    }
+
+    resetOnlineTimer() {
+        // if timeout exists, reset timer
+        if ( this.gameTimeout )
+            clearTimeout(this.gameTimeout);
+            this.gameTimeout = null;
     }
 
     print() {

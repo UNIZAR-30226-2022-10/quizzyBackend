@@ -15,14 +15,14 @@ var questionsRouter = require("./routes/questions");
 var chatRouter = require("./routes/chat");
 var shopRouter = require("./routes/shop");
 
+// express instance
+var app = express();
+
 // online controller classes
 var PublicController = require('./controllers/common/publicController');
 
 // Middleware imports
 const { authWsToken } = require("./middleware/auth");
-
-// express instance
-var app = express();
 
 // http server instance to attach Socket.io handlers
 const server = http.createServer(app);
@@ -54,7 +54,7 @@ const io = new Server(server, {
     }
 });
 
-let publicControllerInstance = new PublicController();
+let publicControllerInstance = new PublicController(io);
 
 // Websocket handling imports
 const registerChatHandlers = require("./controllers/ws/chatHandler");
@@ -73,10 +73,10 @@ const onConnection = (socket) => {
 
     // Register handlers here
     registerChatHandlers(io, socket);
-    registerPublicHandlers(io, socket, publicControllerInstance);
+    registerPublicHandlers(socket, publicControllerInstance);
 };
 
 io.on('connection', onConnection);
 io.use(authWsToken);
 
-module.exports = { app, server };
+module.exports = { io, app, server };

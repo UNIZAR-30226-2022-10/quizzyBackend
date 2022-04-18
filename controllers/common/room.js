@@ -8,6 +8,7 @@
 const { User } = require('./userQueue');
 
 class Room {
+    rid
     /**
      * Create a new room
      */

@@ -7,24 +7,28 @@
 
 var User = require('../common/user');
 
-module.exports = (io, socket, controller) => {
+module.exports = (socket, controller) => {
 
-    const joinPublicGame = () => {
+    const joinPublicGame = (args, callback) => {
         // join queue
         const user = new User(socket.user.name, socket);
         try {
             controller.enqueue(user);
+            callback({ ok : true })
         } catch (e) {
-            console.log("User already enqueued!")
+            console.log(e.message)
+            callback({ ok : false })
         }
     };
 
-    const leavePublicGame = () => {
+    const leavePublicGame = (args, callback) => {
         // leave queue 
         try {
             controller.removeUser(socket.user.name);
+            callback({ ok : true })
         } catch (e) {
-            console.log("User not enqueued!")
+            console.log(e.message);
+            callback({ ok : false })
         }
     };
 
