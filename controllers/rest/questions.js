@@ -173,6 +173,9 @@ async function proposalQuestion(
             accepted: false,
             nickname: nickname
         }
+    })
+    .catch(() => {
+        throw createError(StatusCodes.CONFLICT, "Question Error");
     });
 }
 
@@ -188,6 +191,9 @@ async function deleteQuestion(questionId) {
         where: {
             question_id: questionId
         }
+    })
+    .catch(() => {
+        throw createError(StatusCodes.NOT_FOUND, "Question not found")
     });
 }
 

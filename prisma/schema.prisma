@@ -22,10 +22,11 @@ model cosmetics {
 }
 
 model friends {
-  nickname_1                      String @db.VarChar(20)
-  nickname_2                      String @db.VarChar(20)
-  users_friends_nickname_1Tousers users  @relation("friends_nickname_1Tousers", fields: [nickname_1], references: [nickname], onDelete: Cascade, onUpdate: NoAction)
-  users_friends_nickname_2Tousers users  @relation("friends_nickname_2Tousers", fields: [nickname_2], references: [nickname], onDelete: Cascade, onUpdate: NoAction)
+  nickname_1                      String   @db.VarChar(20)
+  nickname_2                      String   @db.VarChar(20)
+  accepted                        Boolean? @default(false)
+  users_friends_nickname_1Tousers users    @relation("friends_nickname_1Tousers", fields: [nickname_1], references: [nickname], onDelete: Cascade, onUpdate: NoAction)
+  users_friends_nickname_2Tousers users    @relation("friends_nickname_2Tousers", fields: [nickname_2], references: [nickname], onDelete: Cascade, onUpdate: NoAction)
 
   @@id([nickname_1, nickname_2])
 }

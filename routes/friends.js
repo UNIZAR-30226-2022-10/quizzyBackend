@@ -9,7 +9,8 @@ const { StatusCodes } = require("http-status-codes");
 const {
     getFriends,
     addFriend,
-    deleteFriend
+    deleteFriend,
+    acceptFriend
 } = require("../controllers/rest/friends");
 
 var friendsRouter = express.Router();
@@ -18,7 +19,7 @@ const { PrismaClientKnownRequestError } = require("@prisma/client");
 
 const { authRestToken } = require('../middleware/auth');
 
-friendsRouter.get("/user/"+ req.jwtUser + "/friends", authRestToken, function(req, res, next){
+friendsRouter.get("/", authRestToken, function(req, res, next){
     
     getFriends(req.jwtUser)
         .then((friends) => {
@@ -29,6 +30,7 @@ friendsRouter.get("/user/"+ req.jwtUser + "/friends", authRestToken, function(re
             });
         })
         .catch((e) => {
+            console.log(e.message);
             res.statusCode = e.status;
             res.send({
                 msg: e.message,
@@ -37,7 +39,7 @@ friendsRouter.get("/user/"+ req.jwtUser + "/friends", authRestToken, function(re
         });
 });
 
-friendsRouter.post("/user/"+ req.jwtUser + "/friends", authRestToken, function(req, res, next){
+friendsRouter.post("/add", authRestToken, function(req, res, next){
     
     const{friendNickname} = req.body;
 
@@ -50,26 +52,15 @@ friendsRouter.post("/user/"+ req.jwtUser + "/friends", authRestToken, function(r
             });
         })
         .catch((e) => {
-            
-            if (e instanceof PrismaClientKnownRequestError){
-                res.statusCode = StatusCodes.CONFLICT;
-
-                res.send({
-                    msg: "User not found",
-                    ok: false
-                });
-            }
-            else{
-                res.statusCode = e.status;
-                res.send({
-                    msg: e.message,
-                    ok: false
-                });
-            }
+            res.statusCode = e.status;
+            res.send({
+                msg: e.message,
+                ok: false
+            });
         });
 });
 
-friendsRouter.delete("/user/"+ req.jwtUser + "/friends", authRestToken, function(req, res, next){
+friendsRouter.delete("/delete", authRestToken, function(req, res, next){
     
     const{friendNickname} = req.body;
 
@@ -82,23 +73,33 @@ friendsRouter.delete("/user/"+ req.jwtUser + "/friends", authRestToken, function
             });
         })
         .catch((e) => {
-
-            if (e instanceof PrismaClientKnownRequestError){
-                res.statusCode = StatusCodes.CONFLICT;
-
-                res.send({
-                    msg: "User not found",
-                    ok: false
-                });
-            }
-            else{
-                res.statusCode = e.status;
-                res.send({
-                    msg: e.message,
-                    ok: false
-                });
-            }
+            res.statusCode = e.status;
+            res.send({
+                msg: e.message,
+                ok: false
+            });
         });
 });
+
+friendsRouter.put("/accept", authRestToken, function(req, res, next){
+    
+    const friendNickname = req.query.id;
+
+    acceptFriend(req.jwtUser, friendNickname)
+        .then(() => {
+            res.statusCode = StatusCodes.OK;
+            res.send({
+                msg: "Succesfull operation",
+                ok: true
+            });
+        })
+        .catch((e) => {
+            res.statusCode = e.status;
+            res.send({
+                msg: e.message,
+                ok: false
+            });
+        });
+})
 
 module.exports = friendsRouter;

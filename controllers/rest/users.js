@@ -55,8 +55,7 @@ async function registerUser(nickname, email, password) {
         var records = wildcards.map(w => {
             return { 
                 nickname, 
-                wildcard_id : w.wildcard_id, 
-                cuantity : 0 
+                wildcard_id : w.wildcard_id
             } 
         })
 

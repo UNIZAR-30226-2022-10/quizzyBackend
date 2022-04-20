@@ -76,23 +76,11 @@ questionsRouter.delete("/review", authRestToken, function (req, res, next) {
             });
         })
         .catch((e) => {
-            // Check type of error
-            if (e instanceof PrismaClientKnownRequestError) {
-                // database conflict error
-                res.statusCode = StatusCodes.CONFLICT;
-                // Send error response
-                res.send({
-                    msg: "The specified resource was not found",
-                    ok: false
-                });
-            } else {
-                // other errors
-                res.statusCode = e.status;
-                res.send({
-                    msg: e.message,
-                    ok: false
-                });
-            }
+            res.statusCode = e.status;
+            res.send({
+                msg: e.message,
+                ok: false
+            });
         });
 });
 
