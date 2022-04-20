@@ -1,3 +1,10 @@
+/*
+ * Author: Darío Marcos Casalé (795306)
+ * Filename: usersUnitTest.js
+ * Module: test
+ * Description: Users Unit Test
+ */
+
 const request = require("supertest");
 const { app } = require("../../app");
 const { PrismaClient } = require("@prisma/client");

@@ -14,6 +14,7 @@ var usersRouter = require("./routes/users");
 var questionsRouter = require("./routes/questions");
 var chatRouter = require("./routes/chat");
 var shopRouter = require("./routes/shop");
+var friendsRouter = require("./routes/friends");
 
 // express instance
 var app = express();
@@ -46,6 +47,7 @@ app.use("/user", usersRouter);
 app.use("/questions", questionsRouter);
 app.use("/chat", chatRouter);
 app.use("/shop", shopRouter);
+app.use("/friends", friendsRouter);
 
 const io = new Server(server, {
     cors: {
