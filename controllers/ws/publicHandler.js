@@ -9,6 +9,14 @@ var User = require('../common/user');
 
 module.exports = (socket, controller) => {
 
+    /**
+     * Try to join the public matchmaking queue.
+     * 
+     * If the user joined the queue, the callback will return an object with
+     * the ok flag set to true. Otherwise, the ok flag will be set as false.
+     * @param {Object} args Argument (should be empty) 
+     * @param {Function} callback The acknowledgment function.
+     */
     const joinPublicGame = (args, callback) => {
         // join queue
         const user = new User(socket.user.name, socket);
@@ -21,6 +29,14 @@ module.exports = (socket, controller) => {
         }
     };
 
+    /**
+     * Try to leave the matchmaking queue.
+     * 
+     * If the user left the queue, the callback will return an object with
+     * the ok flag set to true. Otherwise, the ok flag will be set as false.
+     * @param {Object} args Argument (should be empty) 
+     * @param {Function} callback The acknowledgment function.
+     */
     const leavePublicGame = (args, callback) => {
         // leave queue 
         try {
@@ -31,6 +47,10 @@ module.exports = (socket, controller) => {
             callback({ ok : false })
         }
     };
+
+    const startTurn = (args, callback) => {
+        // try 
+    }
 
     // Handle each event separately
     socket.on("public:join", joinPublicGame);

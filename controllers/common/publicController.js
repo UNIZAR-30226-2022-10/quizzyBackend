@@ -10,6 +10,10 @@ const UserQueue = require("./userQueue");
 
 class PublicController {
 
+    /**
+     * Initialize a new online public controller
+     * @param {io} io The socket.io server handler
+     */
     constructor(io) {
 
         // server socket 
@@ -57,6 +61,7 @@ class PublicController {
             
         } 
 
+        // Reset online timer
         this.resetOnlineTimer();
         
         if ( this.queue.length() >= 2 ) {
@@ -80,7 +85,12 @@ class PublicController {
         this.print()
     }
 
-
+    /**
+     * Remove a user from the matchmaking queue.
+     * 
+     * If the user isn't enqueued, this function will throw an exception.
+     * @param {String} nickname The nickname of the user to remove from the queue
+     */
     removeUser(nickname) {
         // remove
         this.queue.delete(nickname);
@@ -90,9 +100,12 @@ class PublicController {
         }
         
         // print game state
-        this.print()
+        this.print();
     }
 
+    /**
+     * Reset the online timeout for creating a room
+     */
     resetOnlineTimer() {
         // if timeout exists, reset timer
         if ( this.gameTimeout )
