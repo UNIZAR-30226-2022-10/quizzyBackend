@@ -15,8 +15,6 @@ const {
 
 var friendsRouter = express.Router();
 
-const { PrismaClientKnownRequestError } = require("@prisma/client");
-
 const { authRestToken } = require('../middleware/auth');
 
 friendsRouter.get("/", authRestToken, function(req, res, next){
@@ -30,7 +28,6 @@ friendsRouter.get("/", authRestToken, function(req, res, next){
             });
         })
         .catch((e) => {
-            console.log(e.message);
             res.statusCode = e.status;
             res.send({
                 msg: e.message,

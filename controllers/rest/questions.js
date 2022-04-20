@@ -156,7 +156,6 @@ async function proposalQuestion(
         throw createError(StatusCodes.BAD_REQUEST, "Invalid wrong answer 3");
 
     if (!nickname || !validateNickname(nickname)){
-        console.log(nickname);
         throw createError(StatusCodes.BAD_REQUEST, "Invalid nickname");
     }
         

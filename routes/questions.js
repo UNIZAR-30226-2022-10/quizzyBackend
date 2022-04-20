@@ -45,7 +45,6 @@ questionsRouter.get("/", function (req, res, next) {
 questionsRouter.put("/review", authRestToken, function (req, res, next) {
     // query parameters are strings, we have to parse them first!
     const id = parseInt(req.query.id);
-    console.log("review put");
 
     acceptQuestion(id)
         .then(() => {

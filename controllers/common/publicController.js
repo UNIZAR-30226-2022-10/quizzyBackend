@@ -39,7 +39,6 @@ class PublicController {
      * @returns {String}
      */
     enqueue(user) {
-        console.log("enqueuing")
         // Try to enqueue user in queue
         this.queue.enqueue(user);
 
@@ -58,7 +57,6 @@ class PublicController {
             this.activeRooms[room.rid] = room;
 
             this.serversocket.to(room.rid).emit('public:server:joined', { rid : room.rid })
-            
         } 
 
         // Reset online timer
@@ -114,8 +112,8 @@ class PublicController {
     }
 
     print() {
-        console.log(this.queue);
-        console.log(this.activeRooms);
+        console.log("queue : ", this.queue);
+        console.log("rooms : ", this.activeRooms);
     }
 }
 

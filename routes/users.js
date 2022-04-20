@@ -157,7 +157,6 @@ usersRouter.get("/cosmetics", authRestToken, function (req, res, next) {
             });
         })
         .catch((e) => {
-            console.log(e.message);
             // bad input error
             res.statusCode = e.status;
             // Send error response
