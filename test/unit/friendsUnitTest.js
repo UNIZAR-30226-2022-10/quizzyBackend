@@ -13,8 +13,6 @@ const { StatusCodes } = require("http-status-codes");
 const bcrypt = require("bcryptjs");
 const prisma = new PrismaClient();
 
-const { categories, difficulties } = require("../../utils/misc");
-
 /* register user tests */
 
 function friendsGet(expected) {
@@ -139,7 +137,7 @@ const friendsTestSuite = () => describe("Test friends path", () => {
                 });
             });
 
-            // no params + check number of questions
+            // Get friends for any given user
             test("EQ 1", async () => {
                 return friendsGet((response) => {
                     expect(response.statusCode).toBe(StatusCodes.OK);

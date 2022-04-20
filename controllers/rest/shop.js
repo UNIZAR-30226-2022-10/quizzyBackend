@@ -12,15 +12,33 @@ const { StatusCodes } = require("http-status-codes");
 const createError = require("http-errors");
 const { validateNickname } = require("../../utils/validateInput");
 
+/**
+ * Get a list of the available cosmetics
+ * @returns A list with every cosmetic
+ */
 async function getCosmetics() {
     return await prisma.cosmetics.findMany();
 }
 
+/**
+ * Get a list of the available wildcards
+ * @returns 
+ */
 async function getWildcards() {
     return await prisma.wildcards.findMany();
 }
 
-// spaghetti code incoming from here
+/**
+ * Try to buy a cosmetic from the shop.
+ * 
+ * If the cosmetic and user exist and there's enough cash in his wallet
+ * in order to buy the article, its price will be subtracted from the user's wallet
+ * and the item will be included in the user's inventory.
+ * Otherwise, this function will throw an exception with the appropriate message and
+ * HTTP status code.
+ * @param {String} user The user who will buy the cosmetic 
+ * @param {BigInt} id The id of the cosmetic
+ */
 async function buyCosmetic(user, id) {
     // validate inputs
     if (!user || !validateNickname(user))

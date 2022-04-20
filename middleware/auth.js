@@ -8,7 +8,7 @@ function authRestToken(req, res, next) {
     // split bearer from jwt string
     const jwtToken = authHeader && authHeader.split(" ")[1];
 
-    if (jwtToken == null) return res.sendStatus(StatusCodes.UNAUTHORIZED);
+    if ( !jwtToken ) return res.sendStatus(StatusCodes.UNAUTHORIZED);
 
     jwt.verify(jwtToken, process.env.TOKEN_SECRET, (err, user) => {
 
