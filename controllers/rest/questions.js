@@ -1,8 +1,9 @@
 /*
- * Author: Darío Marcos Casalé (795306) & Jaime Martín Trullén
+ * Author: Darío Marcos Casalé (795306) 
+ *      & Jaime Martín Trullén (801965)
  * Filename: questions.js
  * Module: controllers/rest
- * Description: Input validation utilities
+ * Description: Controller for question route
  */
 
 const { PrismaClient } = require("@prisma/client");
@@ -172,6 +173,9 @@ async function proposalQuestion(
             accepted: false,
             nickname: nickname
         }
+    })
+    .catch(() => {
+        throw createError(StatusCodes.CONFLICT, "Question Error");
     });
 }
 
@@ -187,6 +191,9 @@ async function deleteQuestion(questionId) {
         where: {
             question_id: questionId
         }
+    })
+    .catch(() => {
+        throw createError(StatusCodes.NOT_FOUND, "Question not found")
     });
 }
 

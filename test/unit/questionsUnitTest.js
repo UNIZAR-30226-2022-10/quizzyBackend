@@ -1,3 +1,11 @@
+/*
+ * Author: Darío Marcos Casalé (795306)
+ *      & Jaime Martín Trullén (801965)
+ * Filename: questionsUnitTest.js
+ * Module: test
+ * Description: Questions Unit Test
+ */
+
 const request = require("supertest");
 const { app } = require("../../app");
 const { PrismaClient } = require("@prisma/client");
