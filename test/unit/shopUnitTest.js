@@ -83,53 +83,76 @@ const shopTestSuite = () => describe('Test shop route', () => {
         });
 
         describe('Valid classes', () => {
-            test('EQ 1,2,3,7,9,13', async () => {
+            // buy cosmetic
+            test('EQ 1,2,3,7,9,13,15', async () => {
                 return buyCosmeticTest(signToken("usuario"), 2, (response) => {
-                    console.log(response.body);
+                    // check wallet
+                    request(app)
+                        .get("/user")
+                        .set({Accept: 'application/json',
+                            authorization: `Bearer ${signToken("usuario")}`})
+                        .send()
+                        .then(async (response) => {
+                            expect(response.body.wallet).toBe(100);
+                        });
                     expect(response.status).toBe(StatusCodes.OK);
                 })
             })
         });
 
         describe('Invalid classes', () => {
+            // null token
             test('EQ 4', async () => {
                 return buyCosmeticTest(null, 2, (response) => {
                     expect(response.status).toBe(StatusCodes.UNAUTHORIZED);
                 })
             });
 
+            // malformed token
             test('EQ 5', async () => {
                 return buyCosmeticTest("abcd", 2, (response) => {
                     expect(response.status).toBe(StatusCodes.FORBIDDEN);
                 })
             });
 
+            // user doesn't exist
             test('EQ 6', async () => {
                 return buyCosmeticTest(signToken("abcd"), 2, (response) => {
                     expect(response.status).toBe(StatusCodes.NOT_FOUND);
                 })
             });
 
+            // null id
             test('EQ 10', async () => {
                 return buyCosmeticTest(signToken("usuario"), null, (response) => {
                     expect(response.status).toBe(StatusCodes.BAD_REQUEST);
                 })
             });
 
+            // invalid id
             test('EQ 11', async () => {
                 return buyCosmeticTest(signToken("usuario"), -1, (response) => {
                     expect(response.status).toBe(StatusCodes.BAD_REQUEST);
                 })
             });
 
+            // cosmetic doesn't exist
             test('EQ 12', async () => {
                 return buyCosmeticTest(signToken("usuario"), 10000, (response) => {
                     expect(response.status).toBe(StatusCodes.NOT_FOUND);
                 })
             });
 
+            // user already has this item
             test('EQ 14', async () => {
                 return buyCosmeticTest(signToken("usuario"), 1, (response) => {
+                    expect(response.status).toBe(StatusCodes.CONFLICT);
+                })
+            });
+
+            // user doesn't have enough coins
+            test('EQ 16', async () => {
+                return buyCosmeticTest(signToken("usuario"), 5, (response) => {
                     expect(response.status).toBe(StatusCodes.CONFLICT);
                 })
             });

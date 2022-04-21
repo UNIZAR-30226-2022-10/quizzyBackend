@@ -6,11 +6,11 @@ const shopTestSuite = require('./unit/shopUnitTest');
 
 describe('Unit tests', () => {
     // REST API tests
-    userTestSuite();
-    questionsTestSuite();
-    friendsTestSuite();
+    //userTestSuite();
+    //questionsTestSuite();
+    //friendsTestSuite();
     shopTestSuite();
 
     // Real time tests
-    matchmakingTestSuite();
+    //matchmakingTestSuite();
 });
