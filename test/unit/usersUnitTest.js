@@ -10,6 +10,7 @@ const { app } = require("../../app");
 const { PrismaClient } = require("@prisma/client");
 const { StatusCodes } = require("http-status-codes");
 const bcrypt = require("bcryptjs");
+const { signToken } = require("../../utils/auth");
 const prisma = new PrismaClient();
 
 /* register user tests */
@@ -41,6 +42,30 @@ function loginTest(nickname, password, expected) {
         });
 }
 
+function getCosmeticsTest(token, expected) {
+    return request(app)
+        .get("/user/cosmetics")
+        .set({Accept: 'application/json',
+            Authorization: token ? `Bearer ${token}` : null})
+        .send({})
+        .then((response) => {
+            console.log(response.body)
+            expected(response);
+        });
+}
+
+function getWildcardsTest(token, expected) {
+    return request(app)
+        .get("/user/wildcards")
+        .set({Accept: 'application/json',
+            Authorization: token ? `Bearer ${token}` : null})
+        .send({})
+        .then((response) => {
+            console.log(response.body)
+            expected(response);
+        });
+}
+
 const userTestSuite = () => describe("Test user path", () => {
     // Setup for all user tests
     beforeAll(async () => {
@@ -56,6 +81,23 @@ const userTestSuite = () => describe("Test user path", () => {
                 actual_cosmetic: 1
             }
         });
+
+        // Add initial cosmetics
+        await prisma.user_cosmetics.createMany({
+            data : [
+                { cosmetic_id : 1, nickname : "usuario" },
+                { cosmetic_id : 2, nickname : "usuario" },
+                { cosmetic_id : 4, nickname : "usuario" }
+            ]
+        })
+
+        // Add initial wildcard info
+        await prisma.user_wildcards.createMany({
+            data : [
+                { nickname : "usuario", wildcard_id : 1, cuantity : 5 },
+                { nickname : "usuario", wildcard_id : 2, cuantity : 3 }
+            ]
+        })
     });
 
     afterAll(async () => {
@@ -249,6 +291,74 @@ const userTestSuite = () => describe("Test user path", () => {
             test("EQ 11", async () => {
                 return loginTest("usuario", "D:", (response) => {
                     expect(response.statusCode).toBe(StatusCodes.UNAUTHORIZED);
+                });
+            });
+        });
+    });
+
+    // TODO delete and get routes for users
+
+    describe('Test get cosmetics route', () => {
+        describe('Valid classes', () => {
+            test("EQ 1,2,3", async () => {
+                return getCosmeticsTest(signToken("usuario"), (response) => {
+                    expect(response.statusCode).toBe(StatusCodes.OK);
+                });
+            });
+        });
+
+        describe('Invalid classes', () => {
+            // null jwt
+            test("EQ 4", async () => {
+                return getCosmeticsTest(null, (response) => {
+                    expect(response.statusCode).toBe(StatusCodes.UNAUTHORIZED);
+                });
+            });
+
+            // malformed jwt
+            test("EQ 5", async () => {
+                return getCosmeticsTest("abcd", (response) => {
+                    expect(response.statusCode).toBe(StatusCodes.FORBIDDEN);
+                });
+            });
+
+            // user doesn't exist
+            test("EQ 6", async () => {
+                return getCosmeticsTest(signToken("abcd"), (response) => {
+                    expect(response.statusCode).toBe(StatusCodes.NOT_FOUND);
+                });
+            });
+        });
+    });
+
+    describe('Test get wildcards route', () => {
+        describe('Valid classes', () => {
+            test("EQ 1,2,3", async () => {
+                return getWildcardsTest(signToken("usuario"), (response) => {
+                    expect(response.statusCode).toBe(StatusCodes.OK);
+                });
+            });
+        });
+
+        describe('Invalid classes', () => {
+            // null jwt
+            test("EQ 4", async () => {
+                return getWildcardsTest(null, (response) => {
+                    expect(response.statusCode).toBe(StatusCodes.UNAUTHORIZED);
+                });
+            });
+
+            // malformed jwt
+            test("EQ 5", async () => {
+                return getWildcardsTest("abcd", (response) => {
+                    expect(response.statusCode).toBe(StatusCodes.FORBIDDEN);
+                });
+            });
+
+            // user doesn't exist
+            test("EQ 6", async () => {
+                return getWildcardsTest(signToken("abcd"), (response) => {
+                    expect(response.statusCode).toBe(StatusCodes.NOT_FOUND);
                 });
             });
         });

@@ -185,6 +185,16 @@ async function getUserWildcards(nickname) {
         throw createError(StatusCodes.BAD_REQUEST, "Invalid nickname");
 
     // Find user by nickname
+    var user = await prisma.users.findFirst({
+        where: {
+            nickname: nickname
+        }
+    })
+
+    if ( !user ) 
+        throw createError(StatusCodes.NOT_FOUND, "User not found");
+
+    // Find user by nickname
     var wildcards = await prisma.user_wildcards.findMany({
         where: {
             nickname: nickname
@@ -199,7 +209,7 @@ async function getUserWildcards(nickname) {
                 }
             }
         }
-    })
+    });
 
     // throw if user doesn't exist
     if ( !wildcards ) {
