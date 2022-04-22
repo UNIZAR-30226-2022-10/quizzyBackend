@@ -7,12 +7,17 @@
 
 const GameController = require("./gameController");
 
+/**
+ * Object that controls the flow of a public game (including rematches)
+ */
 class PublicGameController extends GameController {
-    constructor() {
-
+    constructor(room) {
+        super(room);
     }
 
     restartGame() {
         
     }
 }
+
+module.exports = PublicGameController;

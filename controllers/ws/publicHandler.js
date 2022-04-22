@@ -21,7 +21,7 @@ module.exports = (socket, controller) => {
         // join queue
         const user = new User(socket.user.name, socket);
         try {
-            controller.enqueue(user);
+            controller.enqueueUser(user);
             callback({ ok : true })
         } catch (e) {
             console.log(e.message)
@@ -40,7 +40,7 @@ module.exports = (socket, controller) => {
     const leavePublicGame = (args, callback) => {
         // leave queue 
         try {
-            controller.removeUser(socket.user.name);
+            controller.dequeueUser(socket.user.name);
             callback({ ok : true })
         } catch (e) {
             console.log(e.message);
@@ -49,10 +49,18 @@ module.exports = (socket, controller) => {
     };
 
     const startTurn = (args, callback) => {
-        // try 
+        try {
+            controller.startTurn(socket.user.name);
+            callback({ ok : true })
+        } catch {
+            console.log(e.message);
+            callback({ ok : false })
+        }
     }
 
     // Handle each event separately
     socket.on("public:join", joinPublicGame);
     socket.on("public:leave", leavePublicGame);
+    socket.on("public:ackTurn", startTurn);
+
 };

@@ -6,9 +6,13 @@
  */
 
 class GameController {
-    constructor() {
-
+    room
+    constructor(room) {
+        this.room = room;
+        this.currentTurn = 0;
     }
+
+    
 }
 
 module.exports = GameController;

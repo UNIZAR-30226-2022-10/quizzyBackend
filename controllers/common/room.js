@@ -47,6 +47,26 @@ class Room {
         // delete map entry
         delete this.users[nickname];
     }
+
+    pauseUser(nickname) {
+        if ( !this.users[nickname] )
+            throw new Error("Can't find user in this room");
+
+        if ( !this.users[nickname].isOnline() )
+            throw new Error("User has already paused the game");
+
+        this.users.setOffline();
+    }
+
+    resumeUser(nickname, socket) {
+        if ( !this.users[nickname] )
+            throw new Error("Can't find user in this room");
+
+        if ( this.users[nickname].isOnline() )
+            throw new Error("User is already online");
+
+        this.users.setOnline(socket);
+    }
 }
 
 module.exports = Room;

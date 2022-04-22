@@ -5,7 +5,7 @@
  * Description: online game controller for public games
  */
 
-const PublicRoomFactory = require('./publicRoomFactory');
+const PublicRoomFactory = require('./publicGameFactory');
 const UserQueue = require("./userQueue");
 
 class PublicController {
@@ -25,7 +25,7 @@ class PublicController {
         // game timeout reference
         this.gameTimeout = null;
 
-        this.activeRooms = {};
+        this.activeGames = {};
 
         // factories
         this.publicRoomFactory = new PublicRoomFactory();
@@ -38,7 +38,7 @@ class PublicController {
      * @param {User} user The user to add into the queue
      * @returns {String}
      */
-    enqueue(user) {
+    enqueueUser(user) {
         console.log("enqueuing")
         // Try to enqueue user in queue
         this.queue.enqueue(user);
@@ -52,12 +52,12 @@ class PublicController {
                 users.push(this.queue.dequeue());
             }
 
-            // add room to list of active rooms
-            let room = this.publicRoomFactory.createRoom(users);
+            // add game to list of active games
+            let game = this.publicRoomFactory.createGame(users);
 
-            this.activeRooms[room.rid] = room;
+            this.activeGames[game.room.rid] = game;
 
-            this.serversocket.to(room.rid).emit('public:server:joined', { rid : room.rid })
+            this.serversocket.to(game.room.rid).emit('public:server:joined', { rid : game.room.rid })
             
         } 
 
@@ -74,12 +74,12 @@ class PublicController {
                     users.push(this.queue.dequeue());
                 }
                 
-                // add room to list of active rooms
-                let room = this.publicRoomFactory.createRoom(users);
+                // add game to list of active games
+                let game = this.publicRoomFactory.createGame(users);
 
-                this.activeRooms[room.rid] = room;
+                this.activeGames[game.room.rid] = game;
 
-                this.serversocket.to(room.rid).emit('public:server:joined', { rid : room.rid })
+                this.serversocket.to(game.room.rid).emit('public:server:joined', { rid : game.room.rid })
             }, 15000);
         }
         this.print()
@@ -91,7 +91,7 @@ class PublicController {
      * If the user isn't enqueued, this function will throw an exception.
      * @param {String} nickname The nickname of the user to remove from the queue
      */
-    removeUser(nickname) {
+    dequeueUser(nickname) {
         // remove
         this.queue.delete(nickname);
 
@@ -113,9 +113,13 @@ class PublicController {
             this.gameTimeout = null;
     }
 
+    startTurn(nickname) {
+
+    }
+
     print() {
         console.log(this.queue);
-        console.log(this.activeRooms);
+        console.log(this.activeGames);
     }
 }
 
