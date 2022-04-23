@@ -7,7 +7,7 @@
 
 const { v4: uuid } = require('uuid');
 
-const Room = require('./room');
+const PublicRoom = require('./publicRoom');
 const PublicGameController = require('./publicGameController');
 
 class PublicGameFactory {
@@ -22,7 +22,7 @@ class PublicGameFactory {
         // generate random room
         let roomUuid = uuid();
 
-        let room = new Room(roomUuid);
+        let room = new PublicRoom(roomUuid);
         users.forEach(user => {
             room.addUser(user);
             user.socket.join(roomUuid);

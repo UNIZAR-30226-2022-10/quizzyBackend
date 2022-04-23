@@ -8,6 +8,8 @@
 const PublicRoomFactory = require('./publicGameFactory');
 const UserQueue = require("./userQueue");
 
+const config = require('../../config');
+
 class PublicController {
 
     /**
@@ -44,11 +46,11 @@ class PublicController {
         this.queue.enqueue(user);
 
         // prepare room and add to active rooms if possible
-        if ( this.queue.length() >= 6 ) {
+        if ( this.queue.length() >= config.publicRoomMaxPlayers ) {
             // create a new room with 6 players
 
             let users = [];
-            for ( var i = 0; i < 6; i++ ) {
+            for ( var i = 0; i < config.publicRoomMaxPlayers; i++ ) {
                 users.push(this.queue.dequeue());
             }
 
@@ -64,7 +66,7 @@ class PublicController {
         // Reset online timer
         this.resetOnlineTimer();
         
-        if ( this.queue.length() >= 2 ) {
+        if ( this.queue.length() >= config.publicRoomMinPlayers ) {
 
             this.gameTimeout = setTimeout(() => {
                 // create a new room with every player remaining in the room
@@ -79,7 +81,7 @@ class PublicController {
 
                 this.activeGames[game.room.rid] = game;
 
-                this.serversocket.to(game.room.rid).emit('public:server:joined', { rid : game.room.rid })
+                this.serversocket.to(game.room.rid).emit('public:server:joined', { rid : game.room.rid, turn : game.getCurrentTurn() })
             }, 15000);
         }
         this.print()
@@ -95,7 +97,7 @@ class PublicController {
         // remove
         this.queue.delete(nickname);
 
-        if ( this.queue.length() < 2 ) {
+        if ( this.queue.length() < config.publicRoomMinPlayers ) {
             clearTimeout(this.gameTimeout);
         }
         
@@ -113,8 +115,11 @@ class PublicController {
             this.gameTimeout = null;
     }
 
-    startTurn(nickname) {
+    playTurn(rid, nickname) {
+        if ( !this.activeGames[rid] ) 
+            throw new Error("This game doesn't exist");
 
+        this.activeGames[rid].playTurn(nickname);
     }
 
     print() {

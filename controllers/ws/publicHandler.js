@@ -24,7 +24,7 @@ module.exports = (socket, controller) => {
             controller.enqueueUser(user);
             callback({ ok : true })
         } catch (e) {
-            console.log(e.message)
+            console.log("error : ", e.message)
             callback({ ok : false })
         }
     };
@@ -48,9 +48,20 @@ module.exports = (socket, controller) => {
         }
     };
 
-    const startTurn = (args, callback) => {
+    /**
+     * Play a turn in the game
+     * @param {Object} args Argument object, which contains the room id of the user.
+     * Example :
+     * 
+     * {
+     *     rid : '15f6bb40-89d9-4c0d-b6ef-a399223ed77f'
+     * }
+     * 
+     * @param {Function} callback The acknowledgement function
+     */
+    const playTurn = (args, callback) => {
         try {
-            controller.startTurn(socket.user.name);
+            controller.playTurn(args.rid, socket.user.name);
             callback({ ok : true })
         } catch {
             console.log(e.message);
@@ -61,6 +72,6 @@ module.exports = (socket, controller) => {
     // Handle each event separately
     socket.on("public:join", joinPublicGame);
     socket.on("public:leave", leavePublicGame);
-    socket.on("public:ackTurn", startTurn);
+    socket.on("public:ackTurn", playTurn);
 
 };

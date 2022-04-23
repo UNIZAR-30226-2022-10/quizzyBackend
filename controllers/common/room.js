@@ -67,6 +67,10 @@ class Room {
 
         this.users.setOnline(socket);
     }
+
+    getUsers() {
+        return Object.keys(this.users);
+    }
 }
 
 module.exports = Room;

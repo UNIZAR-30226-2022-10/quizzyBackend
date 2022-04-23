@@ -8,7 +8,9 @@
 const Room = require('./room');
 
 class PublicRoom extends Room {
-    constructor() {}
+    constructor(rid) {
+        super(rid);
+    }
 }
 
 module.exports = PublicRoom;
