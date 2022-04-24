@@ -49,7 +49,7 @@ module.exports = (socket, controller) => {
     };
 
     /**
-     * Play a turn in the game
+     * Start the first phase of a game turn.
      * @param {Object} args Argument object, which contains the room id of the user.
      * Example :
      * 
@@ -59,19 +59,17 @@ module.exports = (socket, controller) => {
      * 
      * @param {Function} callback The acknowledgement function
      */
-    const playTurn = (args, callback) => {
-        try {
-            controller.playTurn(args.rid, socket.user.name);
+    const startTurn = async (args, callback) => {
+        await controller.startTurn(args.rid, socket.user.name).then(() => {
             callback({ ok : true })
-        } catch {
+        }).catch((e) => {
             console.log(e.message);
             callback({ ok : false })
-        }
+        })
     }
 
     // Handle each event separately
     socket.on("public:join", joinPublicGame);
     socket.on("public:leave", leavePublicGame);
-    socket.on("public:ackTurn", playTurn);
-
+    socket.on("public:startTurn", startTurn);
 };

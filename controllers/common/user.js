@@ -41,15 +41,6 @@ class User {
     isOnline() {
         return this.socket;
     }
-
-    /**
-     * 
-     * @param {String} event The event name
-     * @param {String} msg The message payload
-     */
-    sendMessage(event, msg) {
-        this.socket.emit(event, msg)
-    }
 }
 
 module.exports = User;

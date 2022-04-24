@@ -27,6 +27,10 @@ class PublicController {
         // game timeout reference
         this.gameTimeout = null;
 
+        // turn timeout reference
+        this.turnTimeout = null;
+
+        // Active games identified by room uuid
         this.activeGames = {};
 
         // factories
@@ -59,8 +63,7 @@ class PublicController {
 
             this.activeGames[game.room.rid] = game;
 
-            this.serversocket.to(game.room.rid).emit('public:server:joined', { rid : game.room.rid })
-            
+            this.serversocket.to(game.room.rid).emit('server:public:joined', { rid : game.room.rid });
         } 
 
         // Reset online timer
@@ -81,8 +84,9 @@ class PublicController {
 
                 this.activeGames[game.room.rid] = game;
 
-                this.serversocket.to(game.room.rid).emit('public:server:joined', { rid : game.room.rid, turn : game.getCurrentTurn() })
-            }, 15000);
+                this.serversocket.to(game.room.rid).emit('public:server:joined', { rid : game.room.rid });
+                
+            }, config.publicRoomTimeout);
         }
         this.print()
     }
@@ -115,11 +119,18 @@ class PublicController {
             this.gameTimeout = null;
     }
 
-    playTurn(rid, nickname) {
+    /**
+     * Start current player's turn after acknowledgement.
+     * In this phase, the player must answer the provided question.
+     * The first phase ends when the user answers the question or after timing out.
+     * @param {String} rid The room id 
+     * @param {String} nickname The player's nickname
+     */
+    async startTurn(rid, nickname) {
         if ( !this.activeGames[rid] ) 
             throw new Error("This game doesn't exist");
-
-        this.activeGames[rid].playTurn(nickname);
+            
+        await this.activeGames[rid].startTurn(nickname);
     }
 
     print() {
