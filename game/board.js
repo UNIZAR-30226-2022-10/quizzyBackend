@@ -11,6 +11,9 @@ function createCell(category, rollAgain, hasToken) {
 
 class Board {
 
+    /**
+     * Initialize the board with every cell and edges for traversal.
+     */
     constructor() {
 
         // board structure
@@ -86,6 +89,7 @@ class Board {
         ];
 
         this.edges = [
+            // center
             [1,4,7,10,13,16],
 
             // first radius
@@ -133,6 +137,38 @@ class Board {
 
         // return cell object
         return this.cells[id];
+    }
+
+    /**
+     * Find every cell at the specified distance from pos.
+     * 
+     * This function will perform a simple depth limited search, with
+     * the limit set to the desired distance. This is enough for the 
+     * board's purpose, but this wouldn't work with large distance values,
+     * @param {BigInt} pos The cell id 
+     * @param {BigInt} distance The distance of the cells to find
+     * @returns 
+     */
+    findReachableCells(pos, distance) {
+
+        let result = [];
+        let visited = new Set();
+
+        const ldfs = (cell, d) => {
+            if ( d == 0 ) {
+                result.push(cell);
+            } else {
+                // d >= 0, recursive step through all successors which haven't been visited yet
+                this.edges[cell].forEach(c => {
+                    if ( !visited.has(c) ) {
+                        visited.add(c);
+                        ldfs(c, d-1);
+                    } 
+                })
+            }
+        }
+
+        return result;
     }
 }
 
