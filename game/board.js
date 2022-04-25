@@ -147,28 +147,30 @@ class Board {
      * board's purpose, but this wouldn't work with large distance values,
      * @param {BigInt} pos The cell id 
      * @param {BigInt} distance The distance of the cells to find
-     * @returns 
+     * @returns {Array} The array of reachable cells
      */
     findReachableCells(pos, distance) {
 
-        let result = [];
-        let visited = new Set();
+        var result = new Set();
+        var visited = new Set();
 
         const ldfs = (cell, d) => {
+        		visited.add(cell);
             if ( d == 0 ) {
-                result.push(cell);
+                result.add(cell);
             } else {
                 // d >= 0, recursive step through all successors which haven't been visited yet
                 this.edges[cell].forEach(c => {
                     if ( !visited.has(c) ) {
-                        visited.add(c);
                         ldfs(c, d-1);
                     } 
                 })
             }
         }
+        
+        ldfs(pos, distance)
 
-        return result;
+        return Array.from(result);
     }
 }
 
