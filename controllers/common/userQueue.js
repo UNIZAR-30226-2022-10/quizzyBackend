@@ -4,8 +4,7 @@
  * Module: controllers/common
  * Description: matchmaking user queue
  */
-const { Socket } = require("socket.io");
-const Stats = require("./stats");
+const Stats = require("../../game/stats");
 
 class UserQueue {
 

@@ -5,7 +5,7 @@
  * Description: user stats in a match
  */
 
-const { categories } = require("../../utils/misc");
+const { categories } = require("../utils/misc");
 
 class Stats {
     constructor() {

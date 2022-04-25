@@ -84,7 +84,7 @@ class PublicController {
 
                 this.activeGames[game.room.rid] = game;
 
-                this.serversocket.to(game.room.rid).emit('public:server:joined', { rid : game.room.rid });
+                this.serversocket.to(game.room.rid).emit('server:public:joined', { rid : game.room.rid });
                 
             }, config.publicRoomTimeout);
         }
@@ -98,6 +98,8 @@ class PublicController {
      * @param {String} nickname The nickname of the user to remove from the queue
      */
     dequeueUser(nickname) {
+
+        console.log("dequeue");
         // remove
         this.queue.delete(nickname);
 

@@ -5,7 +5,7 @@
  * Description: Socket.io chat handlers
  */
 
-var User = require('../common/user');
+var User = require('../../game/user');
 
 module.exports = (socket, controller) => {
 
@@ -17,7 +17,7 @@ module.exports = (socket, controller) => {
      * @param {Object} args Argument (should be empty) 
      * @param {Function} callback The acknowledgment function.
      */
-    const joinPublicGame = (args, callback) => {
+    const joinPublicGame = (callback) => {
         // join queue
         const user = new User(socket.user.name, socket);
         try {
@@ -37,8 +37,9 @@ module.exports = (socket, controller) => {
      * @param {Object} args Argument (should be empty) 
      * @param {Function} callback The acknowledgment function.
      */
-    const leavePublicGame = (args, callback) => {
+    const leavePublicGame = (callback) => {
         // leave queue 
+        console.log("leavePublicGame");
         try {
             controller.dequeueUser(socket.user.name);
             callback({ ok : true })
@@ -68,8 +69,13 @@ module.exports = (socket, controller) => {
         })
     }
 
+    const rollDice = (args, callback) => {
+
+    }
+
     // Handle each event separately
     socket.on("public:join", joinPublicGame);
     socket.on("public:leave", leavePublicGame);
-    socket.on("public:startTurn", startTurn);
+    socket.on("client:startTurn", startTurn);
+    socket.on("client:dice", rollDice);
 };
