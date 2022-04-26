@@ -61,16 +61,27 @@ module.exports = (socket, controller) => {
      * @param {Function} callback The acknowledgement function
      */
     const startTurn = async (args, callback) => {
-        await controller.startTurn(args.rid, socket.user.name).then(() => {
-            callback({ ok : true })
-        }).catch((e) => {
-            console.log(e.message);
-            callback({ ok : false })
-        })
+        try {
+            let q = await controller.startTurn(args.rid, socket.user.name);
+            callback(q)
+        } catch (e) {
+            callback({ok : false})
+        }
     }
 
-    const rollDice = (args, callback) => {
-
+    /**
+     * Launch a dice roll and return the number and accessible cells from the player's position
+     * @param {*} args 
+     * @param {*} callback 
+     */
+    const rollDice = (callback) => {
+        try {
+            let roll = controller.rollDice(socket.user.name);
+            callback({ ok : true, roll })
+        } catch (e) {
+            console.log(e.message);
+            callback(false)
+        }
     }
 
     // Handle each event separately

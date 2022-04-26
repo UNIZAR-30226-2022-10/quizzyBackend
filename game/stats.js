@@ -5,17 +5,32 @@
  * Description: user stats in a match
  */
 
-const { categories } = require("../utils/misc");
-
 class Stats {
     constructor() {
-        this.correctAnswers = 0;
-        this.totalAnswers = 0;
+        this.correctAnswers = Array(6).fill(0);
+        this.totalAnswers = Array(6).fill(0);
 
-        // Mapping between token categories and whether the user
-        // has that token or not.
-        this.tokens = {};
-        categories.forEach(c => this.tokens[c] = false);
+        // true if the user has the i-th category token, false otherwise. 
+        this.tokens = Array(6).fill(false);
+    }
+
+    addAnswer(category, outcome) {
+        // Check if category is invalid
+        if ( category < 0 || category >= 6 )
+            throw new Error("Invalid category");
+
+        // If the question out
+        if ( outcome )
+            this.correctAnswers[category]++;
+
+        this.totalAnswers[category]++;
+    }
+
+    addToken(category) {
+        if ( category < 0 || category >= 6 )
+            throw new Error("Invalid category");
+
+        this.tokens[category] = true;
     }
 }
 

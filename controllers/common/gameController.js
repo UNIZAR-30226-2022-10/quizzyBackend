@@ -9,18 +9,18 @@ const { pickRandom } = require("../../utils/algorithm");
 
 const { getQuestions } = require("../rest/questions");
 
-const GameState = require("../../game/gameState"); 
+const GameState = require("../../game/gameState");
 
-const config = require('../../config');
+const config = require("../../config");
 
 class GameController {
-    room
+    room;
 
     /**
      * Create a new game controller with a room linked to it.
-     * 
+     *
      * This will setup a generic game and assign the first room at random
-     * @param {Room} room 
+     * @param {Room} room
      */
     constructor(room) {
         this.room = room;
@@ -41,14 +41,16 @@ class GameController {
         this.currentQuestionTimeout = null;
 
         // Game state
-        this.state = new GameState();
+        this.state = new GameState(room.getUsers());
 
         // start game with random order
         let users = room.getUsers();
         this.turns = pickRandom(users, users.length);
 
         // Send first message to the first player
-        this.room.findUser(this.turns[this.currentTurn]).socket.emit('server:turn', 'turn');
+        this.room
+            .findUser(this.turns[this.currentTurn])
+            .socket.emit("server:turn", "turn");
     }
 
     /**
@@ -56,10 +58,10 @@ class GameController {
      * @param {String} nickname The nickname of the user
      */
     async startTurn(nickname) {
-        if ( this.turns[this.currentTurn] !== nickname )
+        if (this.turns[this.currentTurn] !== nickname)
             throw new Error("This is not your turn!");
 
-        if ( this.ackTurn || this.movePending )
+        if (this.ackTurn || this.movePending)
             throw new Error("Can't start a turn if it is already your turn");
 
         // This statement will throw if user is not in this room.
@@ -69,38 +71,37 @@ class GameController {
         // take into account the current position of the player in the board.
 
         // get current player state
-        getQuestions(1, null, null).then(q => {
-            this.currentQuestion = q[0];
-            user.socket.emit('server:question', q[0]);
+        let question = await getQuestions(1, null, null);
+        this.currentQuestion = question[0];
 
-            const listener = ( answer , callback) => {
-                this.resetAnswerTimer();
-                let ok = answer === this.currentQuestion.correct_answer;
-                if ( ok ) {
-                    this.movePending = true;
-                } else {
-                    this.currentTurn = ( this.currentTurn + 1 ) % this.turns.length;
-                }
-                
-                callback(ok);
+        const listener = (answer, callback) => {
+            this.resetAnswerTimer();
+            let ok = answer === this.currentQuestion.correct_answer;
+            if (ok) {
+                this.movePending = true;
+            } else {
+                this.currentTurn = a(this.currentTurn + 1) % this.turns.length;
             }
 
-            // listen to one answer event.
-            // Any unexpected event will act as a wrong answer
-            user.socket.once("answer", listener);
+            callback(ok);
+        };
 
-            // start timeout
-            this.currentQuestionTimeout = setTimeout(() => {
-                this.currentTurn = ( this.currentTurn + 1 ) % this.turns.length;
-                user.socket.emit('server:timeout', "Timeout");
-                user.socket.off("answer", listener);
-            }, config.publicQuestionTimeout);
-        });
+        // listen to one answer event.
+        // Any unexpected event will act as a wrong answer
+        user.socket.once("client:answer", listener);
+
+        // start timeout
+        this.currentQuestionTimeout = setTimeout(() => {
+            this.currentTurn = (this.currentTurn + 1) % this.turns.length;
+            user.socket.emit("server:timeout", "Timeout");
+            user.socket.off("client:answer", listener);
+        }, config.publicQuestionTimeout);
+
+        console.log(this.currentQuestion);
+        return this.currentQuestion;
     }
 
-    makeMove(nickname) {
-        
-    }
+    rollDice(nickname) {}
 
     getCurrentTurn() {
         return this.currentTurn;
@@ -111,7 +112,7 @@ class GameController {
      */
     resetAnswerTimer() {
         // if timeout exists, reset timer
-        if ( this.currentQuestionTimeout ) {
+        if (this.currentQuestionTimeout) {
             clearTimeout(this.currentQuestionTimeout);
             this.currentQuestionTimeout = null;
         }

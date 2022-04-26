@@ -6,12 +6,18 @@
  */
 
 const Board = require("./board");
+const Stats = require("./stats");
 
 class GameState {
 
     board
-    constructor() {
+    constructor(users) {
         this.board = new Board();
+        this.stats = {}
+
+        users.forEach(u => {
+            this.stats[u] = new Stats();
+        });
     }
 }
 

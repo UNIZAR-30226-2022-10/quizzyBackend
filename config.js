@@ -1,5 +1,5 @@
 let config = {
-    publicRoomTimeout : 10000,
+    publicRoomTimeout : 3000,
     publicRoomMinPlayers : 1,
     publicRoomMaxPlayers : 6,
     publicQuestionTimeout : 50000

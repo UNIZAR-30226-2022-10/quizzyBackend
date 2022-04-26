@@ -132,7 +132,7 @@ class PublicController {
         if ( !this.activeGames[rid] ) 
             throw new Error("This game doesn't exist");
             
-        await this.activeGames[rid].startTurn(nickname);
+        return await this.activeGames[rid].startTurn(nickname);
     }
 
     print() {
