@@ -69,24 +69,8 @@ module.exports = (socket, controller) => {
         }
     }
 
-    /**
-     * Launch a dice roll and return the number and accessible cells from the player's position
-     * @param {*} args 
-     * @param {*} callback 
-     */
-    const rollDice = (callback) => {
-        try {
-            let roll = controller.rollDice(socket.user.name);
-            callback({ ok : true, roll })
-        } catch (e) {
-            console.log(e.message);
-            callback(false)
-        }
-    }
-
     // Handle each event separately
     socket.on("public:join", joinPublicGame);
     socket.on("public:leave", leavePublicGame);
     socket.on("client:startTurn", startTurn);
-    socket.on("client:dice", rollDice);
 };

@@ -68,7 +68,7 @@ class Room {
 
     /**
      * Get users in this room.
-     * @returns {Array} The list of users in the room
+     * @returns {Array} The list of the users' nickname in the room
      */
     getUsers() {
         return Object.keys(this.users);

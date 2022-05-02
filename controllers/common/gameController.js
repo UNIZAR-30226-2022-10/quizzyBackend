@@ -79,11 +79,13 @@ class GameController {
             let ok = answer === this.currentQuestion.correct_answer;
             if (ok) {
                 this.movePending = true;
+                
+                callback({ok, roll : this.rollDice(nickname)});
             } else {
                 this.currentTurn = a(this.currentTurn + 1) % this.turns.length;
+                
+                callback({ok});
             }
-
-            callback(ok);
         };
 
         // listen to one answer event.
@@ -101,7 +103,14 @@ class GameController {
         return this.currentQuestion;
     }
 
-    rollDice(nickname) {}
+    rollDice(nickname) {
+        
+        let roll = Math.floor(Math.random() * 6) + 1;
+
+        let cells = this.state.findReachableCells(nickname, roll);
+
+        return { roll, cells }
+    }
 
     getCurrentTurn() {
         return this.currentTurn;

@@ -130,8 +130,13 @@ class Board {
         ]
     }
 
+
+    checkCell(id) {
+        return (id >= 0 && id < this.cells.length);
+    }
+
     getCell(id) {
-        if ( id < 0 || id >= this.cells.length ) {
+        if ( !this.checkCell(id) ) {
             throw new Error("This cell doesn't exist");
         }
 
@@ -150,6 +155,9 @@ class Board {
      * @returns {Array} The array of reachable cells
      */
     findReachableCells(pos, distance) {
+        if ( !this.checkCell(pos) ) {
+            throw new Error("This cell doesn't exist " + pos.toString());
+        }
 
         var result = new Set();
         var visited = new Set();
