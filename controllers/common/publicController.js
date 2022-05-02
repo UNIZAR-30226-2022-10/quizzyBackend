@@ -135,6 +135,13 @@ class PublicController {
         return await this.activeGames[rid].startTurn(nickname);
     }
 
+    makeMove(rid, nickname, pos) {
+        if ( !this.activeGames[rid] ) 
+            throw new Error("This game doesn't exist");
+
+        return this.activeGames[rid].makeMove(nickname, pos);
+    }
+
     print() {
         console.log(this.queue);
         console.log(this.activeGames);

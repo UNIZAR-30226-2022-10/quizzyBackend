@@ -51,10 +51,6 @@ class Stats {
     hasWon() {
         return this.tokens.every(token => token)
     }
-
-    getPosition() {
-        return this.position;
-    }
 }
 
 module.exports = Stats

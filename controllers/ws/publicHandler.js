@@ -24,8 +24,7 @@ module.exports = (socket, controller) => {
             controller.enqueueUser(user);
             callback({ ok : true })
         } catch (e) {
-            console.log("error : ", e.message)
-            callback({ ok : false })
+            callback({ ok : false, msg : e.message })
         }
     };
 
@@ -45,7 +44,7 @@ module.exports = (socket, controller) => {
             callback({ ok : true })
         } catch (e) {
             console.log(e.message);
-            callback({ ok : false })
+            callback({ ok : false, msg : e.message })
         }
     };
 
@@ -65,7 +64,23 @@ module.exports = (socket, controller) => {
             let q = await controller.startTurn(args.rid, socket.user.name);
             callback(q)
         } catch (e) {
-            callback({ok : false})
+            callback({ ok : false, msg : e.message })
+        }
+    }
+
+    /**
+     * Make a move in the second phase of a game turn, only if the user has previously answered 
+     * a question correctly in the current turn.
+     * @param {Object} args Argument object, which contains the room id of the user and the 
+     * desired position
+     * @param {Function} callback The acknowledgement function
+     */
+    const makeMove = (args, callback) => {
+        try {
+            let r = controller.makeMove(args.rid, socket.user.name, args.pos);
+            callback({ok : true, rollAgain : r});
+        } catch (e) {
+            callback({ ok : false, msg : e.message })
         }
     }
 
@@ -73,4 +88,5 @@ module.exports = (socket, controller) => {
     socket.on("public:join", joinPublicGame);
     socket.on("public:leave", leavePublicGame);
     socket.on("client:startTurn", startTurn);
+    socket.on("client:makeMove", makeMove);
 };

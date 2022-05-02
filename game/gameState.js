@@ -33,6 +33,22 @@ class GameState {
      * @param {BigInt} pos The new position 
      * @returns The cell to which the user moves.
      */
+    getPlayerPos(nickname, pos) {
+        if ( !this.stats[nickname] ) {
+            throw new Error("User can't be found");
+        }
+
+        return this.stats[nickname].position
+    }
+
+    /**
+     * Move player to pos.
+     * If the user is not playing this game or the position is invalid,
+     * this function will throw an exception.
+     * @param {String} nickname The user's nickname
+     * @param {BigInt} pos The new position 
+     * @returns The cell to which the user moves.
+     */
     movePlayer(nickname, pos) {
         if ( !this.stats[nickname] ) {
             throw new Error("User can't be found");
@@ -40,7 +56,7 @@ class GameState {
 
         let cell = this.board.getCell(pos);
 
-        this.stats[u].position = pos;
+        this.stats[nickname].position = pos;
 
         return cell;
     }

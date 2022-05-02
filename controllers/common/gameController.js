@@ -68,24 +68,27 @@ class GameController {
         // Should not throw because precondition always holds
         var user = this.room.findUser(nickname);
 
+        let cell = this.state.board.getCell(this.state.getPlayerPos(nickname));
 
-        // get current player state
         let question = await getQuestions(1, null, null);
         this.currentQuestion = question[0];
 
         const listener = (answer, callback) => {
+            // reset timer
             this.resetAnswerTimer();
-            let ok = answer === this.currentQuestion.correct_answer;
-            if (ok) {
-                this.movePending = true;
 
-                // update user stats
-                this.state.
-                
+            let ok = answer === this.currentQuestion.correct_answer;
+
+            // update game state
+            this.state.addAnswer(nickname, cell.category, ok);
+            if (ok) {
+                if ( cell.hasToken ) {
+                    this.state.addToken(nickname, cell.category);
+                }
+                this.movePending = true;
                 callback({ok, roll : this.rollDice(nickname)});
             } else {
                 this.currentTurn = (this.currentTurn + 1) % this.turns.length;
-                
                 callback({ok});
             }
         };
@@ -96,7 +99,10 @@ class GameController {
 
         // start timeout
         this.currentQuestionTimeout = setTimeout(() => {
+            // update game state
             this.currentTurn = (this.currentTurn + 1) % this.turns.length;
+            this.state.addAnswer(nickname, cate);
+
             user.socket.emit("server:timeout", "Timeout");
             user.socket.off("client:answer", listener);
         }, config.publicQuestionTimeout);
@@ -117,12 +123,28 @@ class GameController {
      * }
      */
     rollDice(nickname) {
-        
         let roll = Math.floor(Math.random() * 6) + 1;
 
         let cells = this.state.findReachableCells(nickname, roll);
 
         return { roll, cells }
+    }
+
+    makeMove(nickname, pos) {
+        if (this.turns[this.currentTurn] !== nickname)
+            throw new Error("This is not your turn!");
+
+        if (!this.movePending)
+            throw new Error("You don't have any pending move yet!");
+
+        let cell = this.state.movePlayer(nickname, pos);
+
+        if ( !cell.rollAgain ) {
+            this.movePending = false;
+            this.ackTurn = false;
+            this.currentTurn = (this.currentTurn + 1) % this.turns.length;
+        }
+        return cell.rollAgain;
     }
 
     /**
