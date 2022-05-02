@@ -45,12 +45,59 @@ class GameState {
         return cell;
     }
 
+    /**
+     * Find the reachable cells which are at a certain distance from a user's 
+     * current position.
+     * @param {String} nickname The user's nickname
+     * @param {String} distance The distance to any of the reachable cells
+     * @returns {Array} An array with the reachable cells' identifiers.
+     */
     findReachableCells(nickname, distance) {
         if ( !this.stats[nickname] ) {
             throw new Error("User can't be found");
         }
 
         return this.board.findReachableCells(this.stats[nickname].position, distance);
+    }
+
+    /**
+     * Add a new answer outcome to the user's stats.
+     * @param {String} nickname The user's nickname
+     * @param {BigInt} category The question's category
+     * @param {Boolean} outcome True if the question was answered correctly, false otherwise
+     */
+    addAnswer(nickname, category, outcome) {
+        if ( !this.stats[nickname] ) {
+            throw new Error("User can't be found");
+        }
+
+        this.stats[nickname].addAnswer(category, outcome);
+    }
+
+    /**
+     * Add a new token to the user's stats.
+     * @param {String} nickname The user's nickname
+     * @param {BigInt} category The question's category
+     */
+    addToken(nickname, category) {
+        if ( !this.stats[nickname] ) {
+            throw new Error("User can't be found");
+        }
+
+        this.stats[nickname].addAnswer(category);
+    }
+
+    /**
+     * Check if the user has won the match
+     * @param {String} nickname The user's nickname
+     * @returns {Boolean} True if the user has every token
+     */
+    hasWon(nickname) {
+        if ( !this.stats[nickname] ) {
+            throw new Error("User can't be found");
+        }
+
+        return this.stats[nickname].hasWon();
     }
 }
 

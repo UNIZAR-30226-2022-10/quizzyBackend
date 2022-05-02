@@ -16,6 +16,11 @@ class Stats {
         this.position = 0;
     }
 
+    /**
+     * Add a new answer outcome to the user's stats.
+     * @param {BigInt} category The question's category
+     * @param {Boolean} outcome True if the question was answered correctly, false otherwise
+     */
     addAnswer(category, outcome) {
         // Check if category is invalid
         if ( category < 0 || category >= 6 )
@@ -28,11 +33,23 @@ class Stats {
         this.totalAnswers[category]++;
     }
 
+    /**
+     * Add a new token to the user's stats.
+     * @param {BigInt} category The question's category
+     */
     addToken(category) {
         if ( category < 0 || category >= 6 )
             throw new Error("Invalid category");
 
         this.tokens[category] = true;
+    }
+
+    /**
+     * Check if the user has won the match
+     * @returns {Boolean} True if the user has every token
+     */
+    hasWon() {
+        return this.tokens.every(token => token)
     }
 
     getPosition() {

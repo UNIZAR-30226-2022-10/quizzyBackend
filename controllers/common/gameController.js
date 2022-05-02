@@ -68,7 +68,6 @@ class GameController {
         // Should not throw because precondition always holds
         var user = this.room.findUser(nickname);
 
-        // take into account the current position of the player in the board.
 
         // get current player state
         let question = await getQuestions(1, null, null);
@@ -79,10 +78,13 @@ class GameController {
             let ok = answer === this.currentQuestion.correct_answer;
             if (ok) {
                 this.movePending = true;
+
+                // update user stats
+                this.state.
                 
                 callback({ok, roll : this.rollDice(nickname)});
             } else {
-                this.currentTurn = a(this.currentTurn + 1) % this.turns.length;
+                this.currentTurn = (this.currentTurn + 1) % this.turns.length;
                 
                 callback({ok});
             }
@@ -103,6 +105,17 @@ class GameController {
         return this.currentQuestion;
     }
 
+    /**
+     * Performs a dice roll and returns and object with the outcome and
+     * the reachable cells from the user's current position.
+     * @param {String} nickname The nickname of the user who will roll the dice.
+     * @returns {Object} An object with an integer and an array of reachable cell positions.
+     * Example: 
+     * {
+     *     roll : 3,
+     *     cells : [ 3, 6, 9, 12, 15, 18 ]
+     * }
+     */
     rollDice(nickname) {
         
         let roll = Math.floor(Math.random() * 6) + 1;
@@ -112,6 +125,10 @@ class GameController {
         return { roll, cells }
     }
 
+    /**
+     * Get the current turn for this game.
+     * @returns {BigInt} The current game's turn. 
+     */
     getCurrentTurn() {
         return this.currentTurn;
     }
