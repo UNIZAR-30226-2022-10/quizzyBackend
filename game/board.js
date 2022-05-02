@@ -23,69 +23,81 @@ class Board {
 
             // first radius
             createCell(4, false, false),
+            createCell(3, false, false),
             createCell(2, false, false),
-            createCell(0, false, false),
 
             // second radius
-            createCell(5, false, false),
+            createCell(1, false, false),
+            createCell(4, false, false),
             createCell(3, false, false),
-            createCell(0, false, false),
 
             // third radius
+            createCell(5, false, false),
             createCell(1, false, false),
-            createCell(2, false, false),
             createCell(4, false, false),
 
             // fourth radius
-            createCell(2, false, false),
-            createCell(5, false, false),
             createCell(0, false, false),
+            createCell(5, false, false),
+            createCell(1, false, false),
 
             // fifth radius
-            createCell(4, false, false),
-            createCell(1, false, false),
-            createCell(3, false, false),
+            createCell(2, false, false),
+            createCell(0, false, false),
+            createCell(5, false, false),
 
             // sixth radius
             createCell(3, false, false),
-            createCell(1, false, false),
-            createCell(5, false, false),
-
-            // first arc
-            createCell(1, false, true),
-            createCell(null, true,  false),
-            createCell(3, false, false),
+            createCell(2, false, false),
             createCell(0, false, false),
 
-            // second arc
-            createCell(4, false, true),
+            // first arc
+            createCell(5, false, true),
+            createCell(1, false, false),
+            createCell(4, false, false),
             createCell(null, true,  false),
+            createCell(3, false, false),
             createCell(2, false, false),
+
+            // second arc
+            createCell(0, false, true),
+            createCell(5, false, false),
+            createCell(1, false, false),
+            createCell(null, true,  false),
+            createCell(4, false, false),
             createCell(3, false, false),
 
             // third arc
-            createCell(0, false, true),
-            createCell(null, true,  false),
-            createCell(4, false, false),
+            createCell(2, false, true),
             createCell(0, false, false),
+            createCell(5, false, false),
+            createCell(null, true,  false),
+            createCell(1, false, false),
+            createCell(4, false, false),
 
             // fourth arc
             createCell(3, false, true),
-            createCell(null, true,  false),
             createCell(2, false, false),
+            createCell(0, false, false),
+            createCell(null, true,  false),
+            createCell(5, false, false),
             createCell(1, false, false),
 
             // fifth arc
-            createCell(5, false, true),
+            createCell(4, false, true),
+            createCell(3, false, false),
+            createCell(2, false, false),
             createCell(null, true,  false),
+            createCell(0, false, false),
             createCell(5, false, false),
-            createCell(1, false, false),
 
             // sixth arc
-            createCell(2, false, true),
-            createCell(null, true,  false),
-            createCell(5, false, false),
+            createCell(1, false, true),
             createCell(4, false, false),
+            createCell(3, false, false),
+            createCell(null, true,  false),
+            createCell(2, false, false),
+            createCell(0, false, false),
         ];
 
         this.edges = [
