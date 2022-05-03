@@ -10,7 +10,8 @@ const {
     getFriends,
     addFriend,
     deleteFriend,
-    acceptFriend
+    acceptFriend,
+    getPendingFriends
 } = require("../controllers/rest/friends");
 
 var friendsRouter = express.Router();
@@ -28,6 +29,26 @@ friendsRouter.get("/", authRestToken, function(req, res, next){
             });
         })
         .catch((e) => {
+            res.statusCode = e.status;
+            res.send({
+                msg: e.message,
+                ok: false
+            });
+        });
+});
+
+friendsRouter.get("/pending", authRestToken, function(req, res, next){
+    
+    getPendingFriends(req.jwtUser)
+        .then((friends) => {
+            res.statusCode = StatusCodes.OK;
+            res.send({
+                friends: friends,
+                ok: true
+            });
+        })
+        .catch((e) => {
+            console.log(e.message);
             res.statusCode = e.status;
             res.send({
                 msg: e.message,
