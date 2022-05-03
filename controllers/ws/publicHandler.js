@@ -5,7 +5,7 @@
  * Description: Socket.io chat handlers
  */
 
-var User = require('../common/user');
+var User = require('../../game/user');
 
 module.exports = (socket, controller) => {
 
@@ -17,15 +17,14 @@ module.exports = (socket, controller) => {
      * @param {Object} args Argument (should be empty) 
      * @param {Function} callback The acknowledgment function.
      */
-    const joinPublicGame = (args, callback) => {
+    const joinPublicGame = (callback) => {
         // join queue
         const user = new User(socket.user.name, socket);
         try {
-            controller.enqueue(user);
+            controller.enqueueUser(user);
             callback({ ok : true })
         } catch (e) {
-            console.log(e.message)
-            callback({ ok : false })
+            callback({ ok : false, msg : e.message })
         }
     };
 
@@ -37,22 +36,57 @@ module.exports = (socket, controller) => {
      * @param {Object} args Argument (should be empty) 
      * @param {Function} callback The acknowledgment function.
      */
-    const leavePublicGame = (args, callback) => {
+    const leavePublicGame = (callback) => {
         // leave queue 
+        console.log("leavePublicGame");
         try {
-            controller.removeUser(socket.user.name);
+            controller.dequeueUser(socket.user.name);
             callback({ ok : true })
         } catch (e) {
             console.log(e.message);
-            callback({ ok : false })
+            callback({ ok : false, msg : e.message })
         }
     };
 
-    const startTurn = (args, callback) => {
-        // try 
+    /**
+     * Start the first phase of a game turn.
+     * @param {Object} args Argument object, which contains the room id of the user.
+     * Example :
+     * 
+     * {
+     *     rid : '15f6bb40-89d9-4c0d-b6ef-a399223ed77f'
+     * }
+     * 
+     * @param {Function} callback The acknowledgement function
+     */
+    const startTurn = async (args, callback) => {
+        try {
+            let q = await controller.startTurn(args.rid, socket.user.name);
+            callback(q)
+        } catch (e) {
+            callback({ ok : false, msg : e.message })
+        }
+    }
+
+    /**
+     * Make a move in the second phase of a game turn, only if the user has previously answered 
+     * a question correctly in the current turn.
+     * @param {Object} args Argument object, which contains the room id of the user and the 
+     * desired position
+     * @param {Function} callback The acknowledgement function
+     */
+    const makeMove = (args, callback) => {
+        try {
+            let r = controller.makeMove(args.rid, socket.user.name, args.pos);
+            callback({ok : true, rollAgain : r});
+        } catch (e) {
+            callback({ ok : false, msg : e.message })
+        }
     }
 
     // Handle each event separately
     socket.on("public:join", joinPublicGame);
     socket.on("public:leave", leavePublicGame);
+    socket.on("client:startTurn", startTurn);
+    socket.on("client:makeMove", makeMove);
 };

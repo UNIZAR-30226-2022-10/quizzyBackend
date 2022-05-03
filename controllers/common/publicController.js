@@ -5,8 +5,10 @@
  * Description: online game controller for public games
  */
 
-const PublicRoomFactory = require('./publicRoomFactory');
+const PublicRoomFactory = require('./publicGameFactory');
 const UserQueue = require("./userQueue");
+
+const config = require('../../config');
 
 class PublicController {
 
@@ -25,7 +27,11 @@ class PublicController {
         // game timeout reference
         this.gameTimeout = null;
 
-        this.activeRooms = {};
+        // turn timeout reference
+        this.turnTimeout = null;
+
+        // Active games identified by room uuid
+        this.activeGames = {};
 
         // factories
         this.publicRoomFactory = new PublicRoomFactory();
@@ -38,31 +44,32 @@ class PublicController {
      * @param {User} user The user to add into the queue
      * @returns {String}
      */
-    enqueue(user) {
+    enqueueUser(user) {
+        console.log("enqueuing")
         // Try to enqueue user in queue
         this.queue.enqueue(user);
 
         // prepare room and add to active rooms if possible
-        if ( this.queue.length() >= 6 ) {
+        if ( this.queue.length() >= config.publicRoomMaxPlayers ) {
             // create a new room with 6 players
 
             let users = [];
-            for ( var i = 0; i < 6; i++ ) {
+            for ( var i = 0; i < config.publicRoomMaxPlayers; i++ ) {
                 users.push(this.queue.dequeue());
             }
 
-            // add room to list of active rooms
-            let room = this.publicRoomFactory.createRoom(users);
+            // add game to list of active games
+            let game = this.publicRoomFactory.createGame(users);
 
-            this.activeRooms[room.rid] = room;
+            this.activeGames[game.room.rid] = game;
 
-            this.serversocket.to(room.rid).emit('public:server:joined', { rid : room.rid })
+            this.serversocket.to(game.room.rid).emit('server:public:joined', { rid : game.room.rid });
         } 
 
         // Reset online timer
         this.resetOnlineTimer();
         
-        if ( this.queue.length() >= 2 ) {
+        if ( this.queue.length() >= config.publicRoomMinPlayers ) {
 
             this.gameTimeout = setTimeout(() => {
                 // create a new room with every player remaining in the room
@@ -72,13 +79,14 @@ class PublicController {
                     users.push(this.queue.dequeue());
                 }
                 
-                // add room to list of active rooms
-                let room = this.publicRoomFactory.createRoom(users);
+                // add game to list of active games
+                let game = this.publicRoomFactory.createGame(users);
 
-                this.activeRooms[room.rid] = room;
+                this.activeGames[game.room.rid] = game;
 
-                this.serversocket.to(room.rid).emit('public:server:joined', { rid : room.rid })
-            }, 15000);
+                this.serversocket.to(game.room.rid).emit('server:public:joined', { rid : game.room.rid });
+                
+            }, config.publicRoomTimeout);
         }
         this.print()
     }
@@ -89,11 +97,13 @@ class PublicController {
      * If the user isn't enqueued, this function will throw an exception.
      * @param {String} nickname The nickname of the user to remove from the queue
      */
-    removeUser(nickname) {
+    dequeueUser(nickname) {
+
+        console.log("dequeue");
         // remove
         this.queue.delete(nickname);
 
-        if ( this.queue.length() < 2 ) {
+        if ( this.queue.length() < config.publicRoomMinPlayers ) {
             clearTimeout(this.gameTimeout);
         }
         
@@ -109,6 +119,27 @@ class PublicController {
         if ( this.gameTimeout )
             clearTimeout(this.gameTimeout);
             this.gameTimeout = null;
+    }
+
+    /**
+     * Start current player's turn after acknowledgement.
+     * In this phase, the player must answer the provided question.
+     * The first phase ends when the user answers the question or after timing out.
+     * @param {String} rid The room id 
+     * @param {String} nickname The player's nickname
+     */
+    async startTurn(rid, nickname) {
+        if ( !this.activeGames[rid] ) 
+            throw new Error("This game doesn't exist");
+            
+        return await this.activeGames[rid].startTurn(nickname);
+    }
+
+    makeMove(rid, nickname, pos) {
+        if ( !this.activeGames[rid] ) 
+            throw new Error("This game doesn't exist");
+
+        return this.activeGames[rid].makeMove(nickname, pos);
     }
 
     print() {

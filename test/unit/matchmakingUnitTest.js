@@ -36,19 +36,21 @@ function joinPlayers(n, users, done) {
     let rid = null;
     let okCount = 0;
     users.forEach((u) => {
-        u.emit("public:join", "", (response) => {
+        u.emit("public:join", (response) => {
             console.log("response : ", response);
             expect(response.ok).toBeTruthy();
         })
-    });
 
-    users.forEach((u) => {
-        u.on("public:server:joined", (response) => {
-            console.log(response)
+        u.on("server:public:joined", (response) => {
+            console.log(response);
             if ( response.rid ) {
                 okCount++;
-                if ( !rid ) rid = response.rid;
-                else expect(response.rid).toBe(rid);
+                if ( !rid ) {
+                    rid = response.rid;
+                } else {
+                    console.log("response : ", response.rid, "expected : ", rid);
+                    expect(response.rid).toBe(rid);
+                } 
 
                 if ( okCount == n ) {
                     done();
@@ -56,7 +58,7 @@ function joinPlayers(n, users, done) {
             } else {
                 throw new Error("Couldn't join a room");
             }
-        })
+        });
     });
 }
 
@@ -96,16 +98,13 @@ const matchmakingTestSuite = () =>
                 await new Promise((r) => setTimeout(r, 500));
             });
 
-            test("Join queue", (done) => {
-                clientSocket.emit("public:join", "", (response) => {
+            test("Join and leave queue", (done) => {
+                clientSocket.emit("public:join", (response) => {
                     console.log("response : ", response);
                     expect(response.ok).toBeTruthy();
-                    done();
                 });
-            });
 
-            test("Leave queue", (done) => {
-                clientSocket.emit("public:leave", "", (response) => {
+                clientSocket.emit("public:leave", (response) => {
                     console.log("response : ", response);
                     expect(response.ok).toBeTruthy();
                     done();
