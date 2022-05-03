@@ -1,8 +1,8 @@
 let config = {
-    publicRoomTimeout : 3000,
-    publicRoomMinPlayers : 1,
+    publicRoomTimeout : 15000,
+    publicRoomMinPlayers : 2,
     publicRoomMaxPlayers : 6,
-    publicQuestionTimeout : 50000
+    publicQuestionTimeout : 20000
 }
 
 module.exports = config;
