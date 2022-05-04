@@ -55,7 +55,7 @@ questionsRouter.put("/review", authRestToken, function (req, res, next) {
             });
         })
         .catch((e) => {
-            res.statusCode = e.status;
+            res.statusCode = e.status || 400;
             res.send({
                 msg: e.message,
                 ok: false
@@ -75,7 +75,7 @@ questionsRouter.delete("/review", authRestToken, function (req, res, next) {
             });
         })
         .catch((e) => {
-            res.statusCode = e.status;
+            res.statusCode = e.status || 400;
             res.send({
                 msg: e.message,
                 ok: false
@@ -113,7 +113,7 @@ questionsRouter.post("/proposal", authRestToken, function (req, res, next) {
             });
         })
         .catch((e) => {
-            res.statusCode = e.status;
+            res.statusCode = e.status || 400;
             res.send({
                 msg: e.message,
                 ok: false

@@ -65,7 +65,7 @@ shopRouter.post('/cosmetics/buy', authRestToken, function (req, res, next) {
         });
     })
     .catch((e) => {
-        res.statusCode = e.status;
+        res.statusCode = e.status || 400;
         res.send({
             msg: e.message,
             ok: false
@@ -89,7 +89,8 @@ shopRouter.post('/wildcards/buy', authRestToken, function (req, res, next) {
         });
     })
     .catch((e) => {
-        res.statusCode = e.status;
+        console.log(e.message);
+        res.statusCode = e.status || 400;
         res.send({
             msg: e.message,
             ok: false

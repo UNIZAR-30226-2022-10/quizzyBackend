@@ -28,7 +28,7 @@ friendsRouter.get("/", authRestToken, function(req, res, next){
             });
         })
         .catch((e) => {
-            res.statusCode = e.status;
+            res.statusCode = e.status || 400;
             res.send({
                 msg: e.message,
                 ok: false
@@ -49,7 +49,7 @@ friendsRouter.post("/add", authRestToken, function(req, res, next){
             });
         })
         .catch((e) => {
-            res.statusCode = e.status;
+            res.statusCode = e.status || 400;
             res.send({
                 msg: e.message,
                 ok: false
@@ -70,7 +70,7 @@ friendsRouter.delete("/delete", authRestToken, function(req, res, next){
             });
         })
         .catch((e) => {
-            res.statusCode = e.status;
+            res.statusCode = e.status || 400;
             res.send({
                 msg: e.message,
                 ok: false
@@ -91,7 +91,7 @@ friendsRouter.put("/accept", authRestToken, function(req, res, next){
             });
         })
         .catch((e) => {
-            res.statusCode = e.status;
+            res.statusCode = e.status || 400;
             res.send({
                 msg: e.message,
                 ok: false

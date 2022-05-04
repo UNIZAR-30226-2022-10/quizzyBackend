@@ -41,7 +41,7 @@ usersRouter.post("/", function (req, res, next) {
         })
         .catch((e) => {
             // bad input error
-            res.statusCode = e.status;
+            res.statusCode = e.status || 400;
             // Send error response
             res.send({
                 msg: e.message,
@@ -66,7 +66,7 @@ usersRouter.post("/login", function (req, res, next) {
             });
         })
         .catch((e) => {
-            res.statusCode = e.status;
+            res.statusCode = e.status || 400;
             // Send error response
             res.send({
                 msg: e.message,
@@ -89,7 +89,7 @@ usersRouter.get("/", authRestToken, function (req, res, next) {
         })
         .catch((e) => {
             // bad input error
-            res.statusCode = e.status;
+            res.statusCode = e.status || 400;
             // Send error response
             res.send({
                 msg: e.message,
@@ -111,7 +111,7 @@ usersRouter.delete("/", authRestToken, function (req, res, next) {
         })
         .catch((e) => {
             // bad input error
-            res.statusCode = e.status;
+            res.statusCode = e.status || 400;
             // Send error response
             res.send({
                 msg: e.message,
@@ -135,7 +135,7 @@ usersRouter.get("/wildcards", authRestToken, function (req, res, next) {
         })
         .catch((e) => {
             // bad input error
-            res.statusCode = e.status;
+            res.statusCode = e.status || 400;
             // Send error response
             res.send({
                 msg: e.message,
@@ -158,7 +158,7 @@ usersRouter.get("/cosmetics", authRestToken, function (req, res, next) {
         })
         .catch((e) => {
             // bad input error
-            res.statusCode = e.status;
+            res.statusCode = e.status || 400;
             // Send error response
             res.send({
                 msg: e.message,
