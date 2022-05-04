@@ -26,6 +26,17 @@ function friendsGet(expected) {
         });
 }
 
+function pendingFriendsGet(expected) {
+    return request(app)
+        .get("/friends/pending")
+        .set({Accept: 'application/json',
+            Authorization: `Bearer ${process.env.JWT_TEST}` })
+        .query({})
+        .then(async (response) => {
+            await expected(response);
+        });
+}
+
 function friendsPost(friendNickname, expected) {
     return request(app)
         .post("/friends/add")
@@ -140,6 +151,92 @@ const friendsTestSuite = () => describe("Test friends path", () => {
             // Get friends for any given user
             test("EQ 1", async () => {
                 return friendsGet((response) => {
+                    expect(response.statusCode).toBe(StatusCodes.OK);
+                    expect(response.body.friends.length).toBe(2);
+                });
+            });
+        });
+    });
+
+    describe("pending friends get", () => {
+        describe("Valid classes", () => {
+
+            // Setup for all user tests
+            beforeAll(async () => {
+                var salt = bcrypt.genSaltSync(10);
+                var hash = bcrypt.hashSync("superSecretHash", salt);
+                // Create dummy user
+                await prisma.users.create({
+                    data: {
+                        nickname: "usuario",
+                        email: "abc@def.gh",
+                        password: hash,
+                        wallet: 0,
+                        actual_cosmetic: 1
+                    }
+                });
+
+                await prisma.users.create({
+                    data: {
+                        nickname: "usuario1",
+                        email: "abc@def.gh",
+                        password: hash,
+                        wallet: 0,
+                        actual_cosmetic: 1
+                    }
+                });
+
+                await prisma.users.create({
+                    data: {
+                        nickname: "usuario2",
+                        email: "abc@def.gh",
+                        password: hash,
+                        wallet: 0,
+                        actual_cosmetic: 1
+                    }
+                });
+
+                await prisma.friends.create({
+                    data: {
+                        nickname_1: "usuario",
+                        nickname_2: "usuario1",
+                        accepted: false
+                    }
+                });
+
+                await prisma.friends.create({
+                    data: {
+                        nickname_1: "usuario",
+                        nickname_2: "usuario2",
+                        accepted: false
+                    }
+                });
+            });
+
+            afterAll(async () => {
+                // delete dummy user
+                await prisma.users.delete({
+                    where: {
+                        nickname: "usuario"
+                    }
+                });
+
+                await prisma.users.delete({
+                    where: {
+                        nickname: "usuario1"
+                    }
+                });
+
+                await prisma.users.delete({
+                    where: {
+                        nickname: "usuario2"
+                    }
+                });
+            });
+
+            // no params + check number of questions
+            test("EQ 1", async () => {
+                return pendingFriendsGet((response) => {
                     expect(response.statusCode).toBe(StatusCodes.OK);
                     expect(response.body.friends.length).toBe(2);
                 });
