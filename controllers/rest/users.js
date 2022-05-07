@@ -194,7 +194,7 @@ async function getUserWildcards(nickname) {
     if ( !user ) 
         throw createError(StatusCodes.NOT_FOUND, "User not found");
 
-    // Find user by nickname
+    // Find wildcards owned by user
     var wildcards = await prisma.user_wildcards.findMany({
         where: {
             nickname: nickname
@@ -268,7 +268,59 @@ async function getUserCosmetics(nickname) {
     });
 }
 
+/**
+ * Equip a cosmetic. This function will throw if the cosmetic doesn't exist
+ * or if the user hasn't bought it. Otherwise, the user's current cosmetic
+ * w
+ * @param {String} nickname The user's nickname
+ * @param {BigInt} id The cosmetic id to equip
+ */
+async function equipCosmetic(nickname, id) {
 
+    // Validate nickname
+    if (!nickname || !validateNickname(nickname))
+        throw createError(StatusCodes.BAD_REQUEST, "Invalid nickname");
+
+    // Find user by nickname
+    var user = await prisma.users.findFirst({
+        where: {
+            nickname: nickname
+        }
+    })
+
+    if ( !user ) 
+        throw createError(StatusCodes.NOT_FOUND, "User not found");
+
+    // check if item exists
+    var item = await prisma.cosmetics.findFirst({
+        where: {
+            cosmetic_id: id
+        }
+    });
+
+    if (!item) throw createError(StatusCodes.NOT_FOUND, "Cosmetic not found");
+
+    // Get user's cosmetics
+    var cosmetics = await prisma.user_cosmetics.findMany({
+        where: {
+            nickname: nickname
+        },
+        select : {
+            cosmetic_id : true
+        }
+    })
+
+    if ( !cosmetics.some(c => c.cosmetic_id === id) ) throw createError(StatusCodes.CONFLICT, "You haven't bought that cosmetic!");
+
+    await prisma.users.update({
+        where: {
+            nickname: nickname,
+        },
+        data: {
+            actual_cosmetic: id,
+        },
+    })
+}
 
 // Exports
 module.exports = {
@@ -277,5 +329,6 @@ module.exports = {
     checkUserCredentials, 
     getUser, 
     getUserWildcards, 
-    getUserCosmetics 
+    getUserCosmetics,
+    equipCosmetic 
 }

@@ -14,7 +14,8 @@ const {
     checkUserCredentials,
     getUser,
     getUserWildcards,
-    getUserCosmetics
+    getUserCosmetics,
+    equipCosmetic
 } = require("../controllers/rest/users");
 
 const { signToken } = require("../utils/auth");
@@ -153,6 +154,27 @@ usersRouter.get("/cosmetics", authRestToken, function (req, res, next) {
             res.statusCode = StatusCodes.OK;
             res.send({
                 cosmetics,
+                ok: true
+            });
+        })
+        .catch((e) => {
+            // bad input error
+            res.statusCode = e.status || 400;
+            // Send error response
+            res.send({
+                msg: e.message,
+                ok: false
+            });
+        });
+});
+
+usersRouter.put("/equip", authRestToken, function (req, res, next) {
+
+    equipCosmetic(req.jwtUser, req.body.id)
+        .then(() => {
+            // Send response back
+            res.statusCode = StatusCodes.OK;
+            res.send({
                 ok: true
             });
         })

@@ -24,18 +24,16 @@ async function getFriends(nickname){
     }
     
     //  GET
+    const allFriends = await prisma.friends.findMany({
+        where: {
+            nickname_1: nickname,
+            accepted: true
+        },
 
-    const allFriends = await prisma.friends.findMany(
-        {
-            where: {
-                nickname_1: nickname,
-                accepted: true
-            },
-
-            select: {
-                nickname_2: true
-            }
-        });
+        select: {
+            nickname_2: true
+        }
+    });
 
     return allFriends;
 }
@@ -47,18 +45,16 @@ async function getPendingFriends(nickname){
     }
     
     //  GET
+    const allFriends = await prisma.friends.findMany({
+        where: {
+            nickname_1: nickname,
+            accepted: false
+        },
 
-    const allFriends = await prisma.friends.findMany(
-        {
-            where: {
-                nickname_1: nickname,
-                accepted: false
-            },
-
-            select: {
-                nickname_2: true
-            }
-        });
+        select: {
+            nickname_2: true
+        }
+    });
 
     return allFriends;
 }
