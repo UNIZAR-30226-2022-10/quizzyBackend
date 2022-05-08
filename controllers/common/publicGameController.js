@@ -1,8 +1,8 @@
 /*
  * Author: Darío Marcos Casalé (795306)
- * Filename: gameController.js
+ * Filename: publicGameController.js
  * Module: controllers/common
- * Description: game controller for each room
+ * Description: game controller for each public room
  */
 
 const GameController = require("./gameController");
