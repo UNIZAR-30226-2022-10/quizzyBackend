@@ -41,7 +41,7 @@ var corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// Use routers
+//use routers
 app.use("/user", usersRouter);
 app.use("/questions", questionsRouter);
 app.use("/shop", shopRouter);
