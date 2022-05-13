@@ -322,13 +322,22 @@ async function equipCosmetic(nickname, id) {
     })
 }
 
+async function searchUsers(query) {
+    console.log(`SELECT * FROM users WHERE nickname LIKE ${"'%" + query + "%'"}`)
+    let v = await prisma.$queryRaw`SELECT * FROM users WHERE nickname LIKE ${"%" + query + "%"}`
+
+    console.log(v);
+    return v;
+}
+ 
 // Exports
 module.exports = {
-    registerUser, 
+    registerUser,
     deleteUser, 
     checkUserCredentials, 
     getUser, 
     getUserWildcards, 
     getUserCosmetics,
-    equipCosmetic 
+    equipCosmetic,
+    searchUsers
 }

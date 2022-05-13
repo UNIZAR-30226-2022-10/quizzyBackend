@@ -15,7 +15,8 @@ const {
     getUser,
     getUserWildcards,
     getUserCosmetics,
-    equipCosmetic
+    equipCosmetic,
+    searchUsers
 } = require("../controllers/rest/users");
 
 const { signToken } = require("../utils/auth");
@@ -85,6 +86,29 @@ usersRouter.get("/", authRestToken, function (req, res, next) {
             res.statusCode = StatusCodes.OK;
             res.send({
                 ...user,
+                ok: true
+            });
+        })
+        .catch((e) => {
+            // bad input error
+            res.statusCode = e.status || 400;
+            // Send error response
+            res.send({
+                msg: e.message,
+                ok: false
+            });
+        });
+});
+
+usersRouter.get("/search", function(req, res, next) {
+
+    console.log(req.query)
+    searchUsers(req.query.nickname)
+        .then((results) => {
+            // Send response back
+            res.statusCode = StatusCodes.OK;
+            res.send({
+                results,
                 ok: true
             });
         })
