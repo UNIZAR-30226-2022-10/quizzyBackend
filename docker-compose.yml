@@ -6,7 +6,7 @@ services:
     env_file:
       - database/.env
     ports:
-      - '5432:5432'
+      - '5001:5432'
     volumes:
       - db:/var/lib/postgresql/data
       - ./database/create.sql:/docker-entrypoint-initdb.d/create_tables.sql
