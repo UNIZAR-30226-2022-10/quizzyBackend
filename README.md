@@ -110,3 +110,15 @@ Or if you want to test individual routes and modules:
 ```
 npm run test -- <filename>
 ```
+
+## Deployment
+
+This repo is linked to the Heroku app. The API URL [https://quizzyappbackend.herokuapp.com](https://quizzyappbackend.herokuapp.com) listens on port 80 by default.
+
+In order to deploy the app, you have to login into the Heroku CLI and enter the following commands:
+
+```
+git add .
+git commit -am "make it better"
+git push heroku master
+```
