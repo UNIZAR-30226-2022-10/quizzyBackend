@@ -64,7 +64,7 @@ function friendsPut(friendNickname, expected) {
         .put("/friends/accept")
         .set({Accept: 'application/json',
             Authorization: `Bearer ${process.env.JWT_TEST}` })
-        .query({id : friendNickname})
+        .send({friendNickname})
         .then(async (response) => {
             await expected(response);
         });
