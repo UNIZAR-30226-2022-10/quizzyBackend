@@ -74,7 +74,7 @@ async function addFriend(nickname, friendNickname){
     await prisma.friends.createMany(
         {
         data: [
-            {nickname_1: nickname,  nickname_2: friendNickname, accepted: true}, 
+            {nickname_1: nickname,          nickname_2: friendNickname}, 
             {nickname_1:friendNickname,     nickname_2: nickname}
         ]
             
@@ -120,7 +120,8 @@ async function acceptFriend(nickname, friendNickname){
     //  Due to a reiterated problem, we decided to use
     //  SQL syntax
     await prisma.$queryRaw`UPDATE friends SET accepted = true
-    WHERE nickname_1 = ${nickname} AND nickname_2 = ${friendNickname} AND accepted = false;`
+    WHERE ((nickname_1 = ${nickname} AND nickname_2 = ${friendNickname}) 
+    OR (nickname_1 = ${friendNickname} AND nickname_2 = ${nickname})) AND accepted = false;`
     .catch(() => {
         throw createError(StatusCodes.NOT_FOUND, "Friend request not found");
     });
