@@ -25,7 +25,7 @@ async function getFriends(nickname){
     
     //  GET
 
-    const allFriends = await prisma.friends.findMany(
+    const allFriends1 = await prisma.friends.findMany(
         {
             where: {
                 nickname_1: nickname,
@@ -34,6 +34,26 @@ async function getFriends(nickname){
 
             select: {
                 nickname_2: true
+            }
+        });
+
+        const allFriends2 = await prisma.friends.findMany(
+            {
+                where: {
+                    nickname_2: nickname,
+                    accepted: true
+                },
+    
+                select: {
+                    nickname_1: true
+                }
+            });
+
+        allFriends = [];
+
+        allFriends1.forEach(element => {
+            if(allFriends2.includes(element)){
+                allFriends.push(element);
             }
         });
 
@@ -78,7 +98,7 @@ async function addFriend(nickname, friendNickname){
     await prisma.friends.createMany(
         {
         data: [
-            {nickname_1: nickname,          nickname_2: friendNickname}, 
+            {nickname_1: nickname,          nickname_2: friendNickname, accepted: true}, 
             {nickname_1:friendNickname,     nickname_2: nickname}
         ]
             
@@ -124,8 +144,7 @@ async function acceptFriend(nickname, friendNickname){
     //  Due to a reiterated problem, we decided to use
     //  SQL syntax
     await prisma.$queryRaw`UPDATE friends SET accepted = true
-    WHERE ((nickname_1 = ${nickname} AND nickname_2 = ${friendNickname}) 
-    OR (nickname_1 = ${friendNickname} AND nickname_2 = ${nickname})) AND accepted = false;`
+    WHERE nickname_1 = ${nickname} AND nickname_2 = ${friendNickname} AND accepted = false;`
     .catch(() => {
         throw createError(StatusCodes.NOT_FOUND, "Friend request not found");
     });

@@ -122,8 +122,24 @@ const friendsTestSuite = () => describe("Test friends path", () => {
 
                 await prisma.friends.create({
                     data: {
+                        nickname_1: "usuario1",
+                        nickname_2: "usuario",
+                        accepted: true
+                    }
+                });
+
+                await prisma.friends.create({
+                    data: {
                         nickname_1: "usuario",
                         nickname_2: "usuario2",
+                        accepted: true
+                    }
+                });
+
+                await prisma.friends.create({
+                    data: {
+                        nickname_1: "usuario2",
+                        nickname_2: "usuario",
                         accepted: true
                     }
                 });
