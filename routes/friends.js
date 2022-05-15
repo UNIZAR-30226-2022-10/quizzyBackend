@@ -11,7 +11,7 @@ const {
     addFriend,
     deleteFriend,
     acceptFriend,
-    getPendingFriends
+    getPendingRequests
 } = require("../controllers/rest/friends");
 
 var friendsRouter = express.Router();
@@ -42,7 +42,7 @@ friendsRouter.get("/", authRestToken, function(req, res, next){
 
 friendsRouter.get("/pending", authRestToken, function(req, res, next){
     
-    getPendingFriends(req.jwtUser)
+    getPendingRequests(req.jwtUser)
         .then((friends) => {
             res.statusCode = StatusCodes.OK;
             res.send({

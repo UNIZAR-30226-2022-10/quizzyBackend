@@ -12,6 +12,7 @@ const { PrismaClient } = require("@prisma/client");
 const { StatusCodes } = require("http-status-codes");
 const bcrypt = require("bcryptjs");
 const prisma = new PrismaClient();
+const { signToken } = require("../../utils/auth");
 
 const { categories, difficulties } = require("../../utils/misc");
 
@@ -21,7 +22,7 @@ function friendsGet(expected) {
     return request(app)
         .get("/friends")
         .set({Accept: 'application/json',
-            Authorization: `Bearer ${process.env.JWT_TEST}` })
+            Authorization: `Bearer ${signToken("usuario")}` })
         .query({})
         .then(async (response) => {
             await expected(response);
@@ -32,7 +33,7 @@ function pendingFriendsGet(expected) {
     return request(app)
         .get("/friends/pending")
         .set({Accept: 'application/json',
-            Authorization: `Bearer ${process.env.JWT_TEST}` })
+            Authorization: `Bearer ${signToken("usuario")}` })
         .query({})
         .then(async (response) => {
             await expected(response);
@@ -43,7 +44,7 @@ function friendsPost(friendNickname, expected) {
     return request(app)
         .post("/friends/add")
         .set({Accept: 'application/json',
-            Authorization: `Bearer ${process.env.JWT_TEST}` })
+            Authorization: `Bearer ${signToken("usuario")}` })
         .send({friendNickname})
         .then(async (response) => {
             await expected(response);
@@ -54,7 +55,7 @@ function friendsDelete(friendNickname, expected) {
     return request(app)
         .delete("/friends/delete")
         .set({Accept: 'application/json',
-            Authorization: `Bearer ${process.env.JWT_TEST}` })
+            Authorization: `Bearer ${signToken("usuario")}` })
         .send({friendNickname})
         .then(async (response) => {
             await expected(response);
@@ -65,7 +66,7 @@ function friendsPut(friendNickname, expected) {
     return request(app)
         .put("/friends/accept")
         .set({Accept: 'application/json',
-            Authorization: `Bearer ${process.env.JWT_TEST}` })
+            Authorization: `Bearer ${signToken("usuario")}` })
         .send({friendNickname})
         .then(async (response) => {
             await expected(response);
