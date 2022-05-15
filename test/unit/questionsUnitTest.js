@@ -12,6 +12,7 @@ const { PrismaClient } = require("@prisma/client");
 const { StatusCodes } = require("http-status-codes");
 const bcrypt = require("bcryptjs");
 const prisma = new PrismaClient();
+const { signToken } = require("../../utils/auth");
 
 const { categories, difficulties } = require("../../utils/misc");
 
@@ -30,7 +31,7 @@ function questionDelete(questionId, expected) {
     return request(app)
         .delete("/questions/review")
         .set({Accept: 'application/json',
-            Authorization: `Bearer ${process.env.JWT_TEST}` })
+            Authorization: `Bearer ${signToken("usuario")}` })
         .send({questionId})
         .then(async (response) => {
             await expected(response);
@@ -41,7 +42,7 @@ function questionPut(questionId, expected) {
     return request(app)
         .put("/questions/review")
         .set({Accept: 'application/json',
-            Authorization: `Bearer ${process.env.JWT_TEST}` })
+            Authorization: `Bearer ${signToken("usuario")}` })
         .query({id : questionId})
         .then(async (response) => {
             await expected(response);
@@ -61,7 +62,7 @@ function questionPost(
     return request(app)
         .post("/questions/proposal")
         .set({Accept: 'application/json',
-            Authorization: `Bearer ${process.env.JWT_TEST}` })
+            Authorization: `Bearer ${signToken("usuario")}` })
         .send({
             category, 
             statement, 
@@ -277,7 +278,6 @@ const questionsTestSuite = () => describe("Test questions path", () => {
 
         describe("Valid classes", () => {
 
-            
             // full correct params
             test("EQ 1, 2, 3, 4, 5, 6, 7, 8, 9", async () => {
                 return questionPost("Art", "Is this a question?", "easy", "Yes", "No", "Maybe", "Really?",  (response) => {
