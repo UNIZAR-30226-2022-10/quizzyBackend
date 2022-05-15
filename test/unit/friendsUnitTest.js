@@ -55,7 +55,7 @@ function friendsPut(friendNickname, expected) {
         .put("/friends/accept")
         .set({Accept: 'application/json',
             Authorization: `Bearer ${process.env.JWT_TEST}` })
-        .query({id : friendNickname})
+        .send({friendNickname})
         .then(async (response) => {
             await expected(response);
         });
@@ -357,8 +357,7 @@ const friendsTestSuite = () => describe("Test friends path", () => {
             await prisma.friends.create({
                 data: {
                     nickname_1: "usuario1",
-                    nickname_2: "usuario",
-                    accepted: true
+                    nickname_2: "usuario"
                 }
             });
 
@@ -390,6 +389,7 @@ const friendsTestSuite = () => describe("Test friends path", () => {
             test("EQ 1, 2", async () => {
                 return friendsPut("usuario1", (response) => {
                     expect(response.statusCode).toBe(StatusCodes.OK);
+                    console.log(response.message);
                 });
             });
         });

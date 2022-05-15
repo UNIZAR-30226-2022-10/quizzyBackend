@@ -62,7 +62,7 @@ friendsRouter.post("/add", authRestToken, function(req, res, next){
 
 friendsRouter.delete("/delete", authRestToken, function(req, res, next){
     
-    const{friendNickname} = req.body;
+    const {friendNickname} = req.body;
 
     deleteFriend(req.jwtUser, friendNickname)
         .then(() => {
@@ -83,7 +83,7 @@ friendsRouter.delete("/delete", authRestToken, function(req, res, next){
 
 friendsRouter.put("/accept", authRestToken, function(req, res, next){
     
-    const friendNickname = req.query.id;
+    const {friendNickname} = req.body;
 
     acceptFriend(req.jwtUser, friendNickname)
         .then(() => {
