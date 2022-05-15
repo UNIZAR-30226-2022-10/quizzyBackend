@@ -88,7 +88,7 @@ async function addFriend(nickname, friendNickname){
     //  ADD
 
     await prisma.friends.createMany(
-        {
+    {
         data: [
             {nickname_1: nickname,       nickname_2: friendNickname, accepted: true}, 
             {nickname_1: friendNickname, nickname_2: nickname}
@@ -96,7 +96,7 @@ async function addFriend(nickname, friendNickname){
             
     })
     .catch(() => {
-        throw createError(StatusCodes.NOT_FOUND, "Friend request not found");
+        throw createError(StatusCodes.NOT_FOUND, "You already have a pending friend request!");
     });
 }
 
