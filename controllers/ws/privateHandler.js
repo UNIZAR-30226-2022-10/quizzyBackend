@@ -130,6 +130,7 @@ module.exports = (socket, controller) => {
     socket.on("private:join", joinPrivateGame);
     socket.on("private:leave", leavePrivateGame);
     socket.on("private:cancel", cancelPrivateGame);
-    socket.on("client:startTurn", startTurn);
-    socket.on("client:makeMove", makeMove);
+    // change to common handler TODO
+    socket.on("private:startTurn", startTurn);
+    socket.on("private:makeMove", makeMove);
 };

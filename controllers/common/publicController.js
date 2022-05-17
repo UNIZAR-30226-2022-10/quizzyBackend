@@ -5,7 +5,7 @@
  * Description: online game controller for public games
  */
 
-const PublicRoomFactory = require('./publicGameFactory');
+const PublicGameFactory = require('./publicGameFactory');
 const UserQueue = require("./userQueue");
 
 const config = require('../../config');
@@ -34,7 +34,7 @@ class PublicController {
         this.activeGames = {};
 
         // factories
-        this.publicRoomFactory = new PublicRoomFactory();
+        this.publicGameFactory = new PublicGameFactory();
     }
 
     /**
@@ -59,11 +59,16 @@ class PublicController {
             }
 
             // add game to list of active games
-            let game = this.publicRoomFactory.createGame(users);
+            let game = this.publicGameFactory.createGame(users);
+
+            console.log(game)
 
             this.activeGames[game.room.rid] = game;
 
             this.serversocket.to(game.room.rid).emit('server:public:joined', { rid : game.room.rid });
+
+
+            this.print()
         } 
 
         // Reset online timer
@@ -80,9 +85,11 @@ class PublicController {
                 }
                 
                 // add game to list of active games
-                let game = this.publicRoomFactory.createGame(users);
+                let game = this.publicGameFactory.createGame(users);
 
                 this.activeGames[game.room.rid] = game;
+
+                console.log(game)
 
                 this.serversocket.to(game.room.rid).emit('server:public:joined', { rid : game.room.rid });
                 
@@ -129,15 +136,15 @@ class PublicController {
      * @param {String} nickname The player's nickname
      */
     async startTurn(rid, nickname) {
-        if ( !this.activeGames[rid] ) 
-            throw new Error("This game doesn't exist");
+        if ( this.activeGames[rid] === null ) 
+            throw new Error("startturn : This game doesn't exist");
             
         return await this.activeGames[rid].startTurn(nickname);
     }
 
     makeMove(rid, nickname, pos) {
         if ( !this.activeGames[rid] ) 
-            throw new Error("This game doesn't exist");
+            throw new Error("makemove : This game doesn't exist");
 
         return this.activeGames[rid].makeMove(nickname, pos);
     }

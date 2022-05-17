@@ -40,6 +40,9 @@ class GameController {
         // Timeout object
         this.currentQuestionTimeout = null;
 
+        // Tokens on current turn
+        this.currentTurnTokens = 0;
+
         // Game state
         this.state = new GameState(room.getUsers());
 
@@ -84,6 +87,24 @@ class GameController {
             if (ok) {
                 if ( cell.hasToken ) {
                     this.state.addToken(nickname, cell.category);
+                    // TODO : check if player has won the match
+                
+                    if(this.state.hasWon(nickname)){
+                        this.room.serversocket(room.rid).emit("server:winner", nickname);
+
+                        // room persistence add match
+                    }
+                    else{
+                        this.currentTurnTokens = this.currentTurnTokens + 1;
+
+                        if(this.currentTurnTokens == 3){
+                            this.currentTurnTokens = 0;
+                            this.currentTurn = (this.currentTurn + 1) % this.turns.length;
+                            callback({ok});
+                        }
+
+                        //  check if this runs ok in case the user won 3 tokens in a same turn
+                    }
                 }
                 this.movePending = true;
                 callback({ok, roll : this.rollDice(nickname)});
@@ -101,7 +122,7 @@ class GameController {
         this.currentQuestionTimeout = setTimeout(() => {
             // update game state
             this.currentTurn = (this.currentTurn + 1) % this.turns.length;
-            this.state.addAnswer(nickname, cate);
+            this.state.addAnswer(nickname, cell.category);
 
             user.socket.emit("server:timeout", "Timeout");
             user.socket.off("client:answer", listener);
@@ -139,10 +160,11 @@ class GameController {
 
         let cell = this.state.movePlayer(nickname, pos);
 
-        if ( !cell.rollAgain ) {
+        if ( cell.rollAgain ) {
+            
+        } else {
             this.movePending = false;
             this.ackTurn = false;
-            this.currentTurn = (this.currentTurn + 1) % this.turns.length;
         }
         return cell.rollAgain;
     }

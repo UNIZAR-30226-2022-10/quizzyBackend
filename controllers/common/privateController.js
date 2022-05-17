@@ -72,7 +72,7 @@ class PrivateController {
         if ( !this.activeGames[rid] ) 
             throw new Error("This game doesn't exist");
 
-        this.activeGames[rid].room.addUser(user);
+        this.activeGames[rid].room.removeUser(user);
     }
 
     

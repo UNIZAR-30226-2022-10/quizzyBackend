@@ -87,6 +87,6 @@ module.exports = (socket, controller) => {
     // Handle each event separately
     socket.on("public:join", joinPublicGame);
     socket.on("public:leave", leavePublicGame);
-    socket.on("client:startTurn", startTurn);
-    socket.on("client:makeMove", makeMove);
+    socket.on("public:startTurn", startTurn);
+    socket.on("public:makeMove", makeMove);
 };
