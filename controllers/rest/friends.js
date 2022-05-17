@@ -96,7 +96,7 @@ async function addFriend(nickname, friendNickname){
             
     })
     .catch(() => {
-        throw createError(StatusCodes.NOT_FOUND, "You already have a pending friend request!");
+        throw createError(StatusCodes.CONFLICT, "You already have a pending friend request!");
     });
 }
 
