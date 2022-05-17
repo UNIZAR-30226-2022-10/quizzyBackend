@@ -7,6 +7,7 @@
 
 class Room {
     rid
+    users
     /**
      * Create a new room
      */

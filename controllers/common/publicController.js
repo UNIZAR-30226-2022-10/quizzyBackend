@@ -61,14 +61,10 @@ class PublicController {
             // add game to list of active games
             let game = this.publicGameFactory.createGame(users);
 
-            console.log(game)
-
             this.activeGames[game.room.rid] = game;
 
             this.serversocket.to(game.room.rid).emit('server:public:joined', { rid : game.room.rid });
 
-
-            this.print()
         } 
 
         // Reset online timer
@@ -88,8 +84,6 @@ class PublicController {
                 let game = this.publicGameFactory.createGame(users);
 
                 this.activeGames[game.room.rid] = game;
-
-                console.log(game)
 
                 this.serversocket.to(game.room.rid).emit('server:public:joined', { rid : game.room.rid });
                 
@@ -116,6 +110,18 @@ class PublicController {
         
         // print game state
         this.print();
+    }
+
+    getUserMatches(nickname) {
+        let result = Object.values(this.activeGames)
+            .filter(gm => gm.room.getUsers().includes(nickname))
+            .map(gm => {
+                let users = Object.values(gm.room.users).map(u => {
+                    return { nickname : u.nickname, stats : u.stats };
+                })
+                return { rid: gm.room.rid, users };
+            });
+        return result;
     }
 
     /**

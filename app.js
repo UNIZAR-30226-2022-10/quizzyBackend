@@ -9,12 +9,6 @@ var logger = require("morgan");
 const { Server } = require("socket.io");
 const cors = require("cors");
 
-// Router imports
-var usersRouter = require("./routes/users");
-var questionsRouter = require("./routes/questions");
-var chatRouter = require("./routes/chat");
-var shopRouter = require("./routes/shop");
-
 // express instance
 var app = express();
 
@@ -42,12 +36,6 @@ var corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// Use routers
-app.use("/user", usersRouter);
-app.use("/questions", questionsRouter);
-app.use("/chat", chatRouter);
-app.use("/shop", shopRouter);
-
 const io = new Server(server, {
     cors: {
         origin: "*",
@@ -57,6 +45,21 @@ const io = new Server(server, {
 
 let publicControllerInstance = new PublicController(io);
 let privateControllerInstance = new PrivateController(io);
+
+// Router imports
+var usersRouter = require("./routes/users");
+var questionsRouter = require("./routes/questions");
+var chatRouter = require("./routes/games");
+var shopRouter = require("./routes/shop");
+var gamesRouter = require("./routes/games")(privateControllerInstance, publicControllerInstance);
+
+
+// Use routers
+app.use("/user", usersRouter);
+app.use("/questions", questionsRouter);
+app.use("/chat", chatRouter);
+app.use("/shop", shopRouter);
+app.use("/games", gamesRouter);
 
 // Websocket handling imports
 const registerChatHandlers = require("./controllers/ws/chatHandler");
