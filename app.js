@@ -9,17 +9,12 @@ var logger = require("morgan");
 const { Server } = require("socket.io");
 const cors = require("cors");
 
-// Router imports
-var usersRouter = require("./routes/users");
-var questionsRouter = require("./routes/questions");
-var shopRouter = require("./routes/shop");
-var friendsRouter = require("./routes/friends");
-
 // express instance
 var app = express();
 
 // online controller classes
 var PublicController = require('./controllers/common/publicController');
+var PrivateController = require("./controllers/common/privateController");
 
 // Middleware imports
 const { authWsToken } = require("./middleware/auth");
@@ -41,12 +36,6 @@ var corsOptions = {
 };
 app.use(cors(corsOptions));
 
-//use routers
-app.use("/user", usersRouter);
-app.use("/questions", questionsRouter);
-app.use("/shop", shopRouter);
-app.use("/friends", friendsRouter);
-
 const io = new Server(server, {
     cors: {
         origin: "*",
@@ -55,10 +44,27 @@ const io = new Server(server, {
 });
 
 let publicControllerInstance = new PublicController(io);
+let privateControllerInstance = new PrivateController(io);
+
+// Router imports
+var usersRouter = require("./routes/users");
+var questionsRouter = require("./routes/questions");
+var chatRouter = require("./routes/games");
+var shopRouter = require("./routes/shop");
+var gamesRouter = require("./routes/games")(privateControllerInstance, publicControllerInstance);
+
+
+// Use routers
+app.use("/user", usersRouter);
+app.use("/questions", questionsRouter);
+app.use("/chat", chatRouter);
+app.use("/shop", shopRouter);
+app.use("/games", gamesRouter);
 
 // Websocket handling imports
 const registerChatHandlers = require("./controllers/ws/chatHandler");
 const registerPublicHandlers = require("./controllers/ws/publicHandler");
+const registerPrivateHandlers = require("./controllers/ws/privateHandler")
 
 const onConnection = (socket) => {
     // join common room
@@ -74,6 +80,7 @@ const onConnection = (socket) => {
     // Register handlers here
     registerChatHandlers(io, socket);
     registerPublicHandlers(socket, publicControllerInstance);
+    registerPrivateHandlers(socket, privateControllerInstance);
 };
 
 io.on('connection', onConnection);

@@ -1,13 +1,29 @@
 /*
- * Author: Darío Marcos Casalé (795306) & Mathis Boston
- * Filename: chatHandler.js
+ * Author: Jaime Martín Trullén (801965)
+ * Filename: privateHandler.js
  * Module: controllers/ws
- * Description: Socket.io chat handlers
+ * Description: Socket.io private games handlers
  */
 
 var User = require('../../game/user');
 
 module.exports = (socket, controller) => {
+
+
+
+    const createPrivateGame = (args, callback) => {
+        console.log("createPublicGame");
+
+        const user = new User(socket.user.name, socket);
+
+        try {
+            controller.createPrivateGame(user, args.turnTimeout, args.difficulty, args.wildcardsEnable);
+            callback({ok: true});
+        } catch (e) {
+            callback({ok: false, msg :e.message});
+        }
+    };
+
 
     /**
      * Try to join the public matchmaking queue.
@@ -17,11 +33,11 @@ module.exports = (socket, controller) => {
      * @param {Object} args Argument (should be empty) 
      * @param {Function} callback The acknowledgment function.
      */
-    const joinPublicGame = (callback) => {
+    const joinPrivateGame = (args, callback) => {
         // join queue
         const user = new User(socket.user.name, socket);
         try {
-            controller.enqueueUser(user);
+            controller.addUserPrivateGame(args.rid, user);
             callback({ ok : true })
         } catch (e) {
             callback({ ok : false, msg : e.message })
@@ -36,14 +52,38 @@ module.exports = (socket, controller) => {
      * @param {Object} args Argument (should be empty) 
      * @param {Function} callback The acknowledgment function.
      */
-    const leavePublicGame = (callback) => {
+    const leavePrivateGame = (args, callback) => {
         // leave queue 
         console.log("leavePublicGame");
+        const user = new User(socket.user.name, socket);
         try {
-            controller.dequeueUser(socket.user.name);
+            controller.delUserPrivateGame(args.rid, user);
             callback({ ok : true })
         } catch (e) {
             console.log(e.message);
+            callback({ ok : false, msg : e.message })
+        }
+    };
+
+
+    const startPrivateGame = (args, callback) => {
+
+        const user = new User(socket.user.name, socket);
+        try {
+            controller.startPrivateGame(args.rid, user);
+            callback({ ok : true })
+        } catch (e) {
+            callback({ ok : false, msg : e.message })
+        }
+    };
+
+    const cancelPrivateGame = (args, callback) => {
+
+        const user = new User(socket.user.name, socket);
+        try {
+            controller.cancelPrivateGame(args.rid, user);
+            callback({ ok : true })
+        } catch (e) {
             callback({ ok : false, msg : e.message })
         }
     };
@@ -85,8 +125,12 @@ module.exports = (socket, controller) => {
     }
 
     // Handle each event separately
-    socket.on("public:join", joinPublicGame);
-    socket.on("public:leave", leavePublicGame);
-    socket.on("public:startTurn", startTurn);
-    socket.on("public:makeMove", makeMove);
+    socket.on("private:create", createPrivateGame);
+    socket.on("private:start", startPrivateGame);
+    socket.on("private:join", joinPrivateGame);
+    socket.on("private:leave", leavePrivateGame);
+    socket.on("private:cancel", cancelPrivateGame);
+    // change to common handler TODO
+    socket.on("private:startTurn", startTurn);
+    socket.on("private:makeMove", makeMove);
 };

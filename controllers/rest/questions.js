@@ -3,7 +3,11 @@
  *      & Jaime Martín Trullén (801965)
  * Filename: questions.js
  * Module: controllers/rest
+<<<<<<< HEAD
  * Description: Controller for question route
+=======
+ * Description: Question route controllers
+>>>>>>> devOnline
  */
 
 const { PrismaClient } = require("@prisma/client");
@@ -21,8 +25,8 @@ const createError = require("http-errors");
 /**
  * Make an object containing the filters for the database query for fetching questions.
  * If a filter parameter is null, it won't be included in the query.
- * @param {*} diff the difficulty filter (can be null)
- * @param {*} cat the category filter (can be null)
+ * @param {String} diff the difficulty filter (can be null)
+ * @param {String} cat the category filter (can be null)
  * @returns An object with the provided filters which are not null.
  */
 function queryArgs(diff, cat) {

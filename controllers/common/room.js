@@ -5,10 +5,9 @@
  * Description: Room object
  */
 
-const { User } = require('./userQueue');
-
 class Room {
     rid
+    users
     /**
      * Create a new room
      */

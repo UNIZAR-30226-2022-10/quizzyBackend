@@ -5,7 +5,7 @@
  * Description: online game controller for public games
  */
 
-const PublicRoomFactory = require('./publicGameFactory');
+const PublicGameFactory = require('./publicGameFactory');
 const UserQueue = require("./userQueue");
 
 const config = require('../../config');
@@ -34,7 +34,7 @@ class PublicController {
         this.activeGames = {};
 
         // factories
-        this.publicRoomFactory = new PublicRoomFactory();
+        this.publicGameFactory = new PublicGameFactory();
     }
 
     /**
@@ -59,11 +59,13 @@ class PublicController {
             }
 
             // add game to list of active games
-            let game = this.publicRoomFactory.createGame(users);
+            let game = this.publicGameFactory.createGame(users, this.serversocket);
 
             this.activeGames[game.room.rid] = game;
 
             this.serversocket.to(game.room.rid).emit('server:public:joined', { rid : game.room.rid });
+
+            game.startGame();
         } 
 
         // Reset online timer
@@ -80,12 +82,14 @@ class PublicController {
                 }
                 
                 // add game to list of active games
-                let game = this.publicRoomFactory.createGame(users);
+                let game = this.publicGameFactory.createGame(users, this.serversocket);
 
                 this.activeGames[game.room.rid] = game;
 
                 this.serversocket.to(game.room.rid).emit('server:public:joined', { rid : game.room.rid });
-                
+
+                game.startGame();
+
             }, config.publicRoomTimeout);
         }
         this.print()
@@ -111,6 +115,18 @@ class PublicController {
         this.print();
     }
 
+    getUserMatches(nickname) {
+        let result = Object.values(this.activeGames)
+            .filter(gm => gm.room.getUsers().includes(nickname))
+            .map(gm => {
+                let users = Object.values(gm.room.users).map(u => {
+                    return { nickname : u.nickname, stats : u.stats };
+                })
+                return { rid: gm.room.rid, users };
+            });
+        return result;
+    }
+
     /**
      * Reset the online timeout for creating a room
      */
@@ -129,15 +145,15 @@ class PublicController {
      * @param {String} nickname The player's nickname
      */
     async startTurn(rid, nickname) {
-        if ( !this.activeGames[rid] ) 
-            throw new Error("This game doesn't exist");
+        if ( this.activeGames[rid] === null ) 
+            throw new Error("startturn : This game doesn't exist");
             
         return await this.activeGames[rid].startTurn(nickname);
     }
 
     makeMove(rid, nickname, pos) {
         if ( !this.activeGames[rid] ) 
-            throw new Error("This game doesn't exist");
+            throw new Error("makemove : This game doesn't exist");
 
         return this.activeGames[rid].makeMove(nickname, pos);
     }
