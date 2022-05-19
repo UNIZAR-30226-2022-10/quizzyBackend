@@ -19,10 +19,16 @@ class GameController {
     /**
      * Create a new game controller with a room linked to it.
      *
-     * This will setup a generic game and assign the first room at random
+     * This will setup a generic game and assign the first room at random.
+     * 
+     * Note: We shouldn't write socket code here, this task should be delegated
+     * to the startGame routine.
      * @param {Room} room
+     * @param {Socket} srvsock The server's main socket
      */
-    constructor(room) {
+    constructor(room, srvsock) {
+        this.serversocket = srvsock;
+
         this.room = room;
 
         // Player turn index. Updates on round-robin
@@ -49,11 +55,20 @@ class GameController {
         // start game with random order
         let users = room.getUsers();
         this.turns = pickRandom(users, users.length);
+    }
 
-        // Send first message to the first player
-        this.room
-            .findUser(this.turns[this.currentTurn])
-            .socket.emit("server:turn", "turn");
+    /**
+     * Start the current game. This function will be called after constructing the game controller object
+     */
+    startGame() {
+        
+        // Send initial turn message
+        this.serversocket.to(this.room.rid).emit("server:turn", 
+            { 
+                turns : this.turns[this.currentTurn], 
+                stats : this.state.stats 
+            }
+        );
     }
 
     /**
@@ -90,7 +105,7 @@ class GameController {
                     // TODO : check if player has won the match
                 
                     if(this.state.hasWon(nickname)){
-                        this.room.serversocket(room.rid).emit("server:winner", nickname);
+                        this.serversocket.to(room.rid).emit("server:winner", nickname);
 
                         // room persistence add match
                     }
@@ -99,7 +114,7 @@ class GameController {
 
                         if(this.currentTurnTokens == 3){
                             this.currentTurnTokens = 0;
-                            this.currentTurn = (this.currentTurn + 1) % this.turns.length;
+                            this.nextTurn();
                             callback({ok});
                         }
 
@@ -109,27 +124,43 @@ class GameController {
                 this.movePending = true;
                 callback({ok, roll : this.rollDice(nickname)});
             } else {
-                this.currentTurn = (this.currentTurn + 1) % this.turns.length;
+                this.nextTurn();
                 callback({ok});
             }
         };
 
         // listen to one answer event.
         // Any unexpected event will act as a wrong answer
-        user.socket.once("client:answer", listener);
+        user.socket.once("public:answer", listener);
 
         // start timeout
         this.currentQuestionTimeout = setTimeout(() => {
             // update game state
-            this.currentTurn = (this.currentTurn + 1) % this.turns.length;
+            this.nextTurn();
             this.state.addAnswer(nickname, cell.category);
 
             user.socket.emit("server:timeout", "Timeout");
-            user.socket.off("client:answer", listener);
+            user.socket.off("public:answer", listener);
         }, config.publicQuestionTimeout);
 
         console.log(this.currentQuestion);
         return this.currentQuestion;
+    }
+
+    /**
+     * Perform next turn.
+     * This function will increment the turn value on a round robin, 
+     * and for each turn it will send the current turn's user's nickname
+     * and the game stats for each player.
+     */
+    nextTurn() {
+        this.currentTurn = (this.currentTurn + 1) % this.turns.length;
+        this.serversocket.to(this.room.rid).emit("server:turn", 
+            { 
+                turns : this.turns[this.currentTurn], 
+                stats : this.state.stats 
+            }
+        );
     }
 
     /**

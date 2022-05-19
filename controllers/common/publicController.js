@@ -59,12 +59,13 @@ class PublicController {
             }
 
             // add game to list of active games
-            let game = this.publicGameFactory.createGame(users);
+            let game = this.publicGameFactory.createGame(users, this.serversocket);
 
             this.activeGames[game.room.rid] = game;
 
             this.serversocket.to(game.room.rid).emit('server:public:joined', { rid : game.room.rid });
 
+            game.startGame();
         } 
 
         // Reset online timer
@@ -81,12 +82,14 @@ class PublicController {
                 }
                 
                 // add game to list of active games
-                let game = this.publicGameFactory.createGame(users);
+                let game = this.publicGameFactory.createGame(users, this.serversocket);
 
                 this.activeGames[game.room.rid] = game;
 
                 this.serversocket.to(game.room.rid).emit('server:public:joined', { rid : game.room.rid });
-                
+
+                game.startGame();
+
             }, config.publicRoomTimeout);
         }
         this.print()

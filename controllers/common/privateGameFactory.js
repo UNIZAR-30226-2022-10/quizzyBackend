@@ -12,6 +12,8 @@ const PrivateGameController = require('./privateGameController');
 
 class PrivateGameFactory {
 
+    static nextCode = 0;
+
     /**
      * Create a new room and join every user's socket to the Socket.io room.
      * @param {Array} users The list of user objects
@@ -20,7 +22,7 @@ class PrivateGameFactory {
     createGame(nickname, turnTimeout, difficulty, wildcardsEnable) {
 
         // generate random room
-        let roomUuid = uuid();
+        let roomUuid = PrivateGameFactory.nextCode++;
 
         let roomManager = nickname;
 
