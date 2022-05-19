@@ -196,7 +196,18 @@ async function deleteQuestion(questionId) {
     });
 }
 
-module.exports.getQuestions = getQuestions;
-module.exports.acceptQuestion = acceptQuestion;
-module.exports.proposalQuestion = proposalQuestion;
-module.exports.deleteQuestion = deleteQuestion;
+async function getPendingProposals() {
+    return await prisma.questions.findMany({
+        where : {
+            accepted : false
+        }
+    })
+}
+
+module.exports = {
+    getPendingProposals,
+    getQuestions,
+    acceptQuestion,
+    proposalQuestion,
+    deleteQuestion
+}

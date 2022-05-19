@@ -1,6 +1,8 @@
 const { StatusCodes } = require("http-status-codes");
 const jwt = require("jsonwebtoken");
 
+const { getUser } = require('../controllers/rest/users'); 
+
 function authRestToken(req, res, next) {
     // Get authorization header
     const authHeader = req.headers["authorization"];
@@ -37,5 +39,23 @@ async function authWsToken(socket, next) {
     }
 }
 
-module.exports.authRestToken = authRestToken;
-module.exports.authWsToken = authWsToken;
+async function authAdmin(req, res, next) {
+    // delete user in database
+    getUser(req.jwtUser)
+        .then((user) => {
+            if ( user.is_admin ) {
+                next();
+            } else {
+                return res.sendStatus(StatusCodes.FORBIDDEN);
+            }
+        })
+        .catch((e) => {
+            return res.sendStatus(e.status);
+        });
+}
+
+module.exports = {
+    authRestToken,
+    authWsToken,
+    authAdmin
+}

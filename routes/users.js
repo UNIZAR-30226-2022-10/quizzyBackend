@@ -79,7 +79,7 @@ usersRouter.post("/login", function (req, res, next) {
 
 usersRouter.get("/", authRestToken, function (req, res, next) {
 
-    // delete user in database
+    // get token user from database
     getUser(req.jwtUser)
         .then((user) => {
             // Send response back

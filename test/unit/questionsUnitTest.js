@@ -27,22 +27,22 @@ function questionGet(limit, difficulty, category, expected) {
         });
 }
 
-function questionDelete(questionId, expected) {
+function questionDelete(questionId, nickname, expected) {
     return request(app)
         .delete("/questions/review")
         .set({Accept: 'application/json',
-            Authorization: `Bearer ${signToken("usuario")}` })
-        .send({questionId})
+            Authorization: `Bearer ${signToken(nickname)}` })
+        .query({id : questionId})
         .then(async (response) => {
             await expected(response);
         });
 }
 
-function questionPut(questionId, expected) {
+function questionPut(questionId, nickname, expected) {
     return request(app)
         .put("/questions/review")
         .set({Accept: 'application/json',
-            Authorization: `Bearer ${signToken("usuario")}` })
+            Authorization: `Bearer ${signToken(nickname)}` })
         .query({id : questionId})
         .then(async (response) => {
             await expected(response);
@@ -90,8 +90,25 @@ const questionsTestSuite = () => describe("Test questions path", () => {
                 email: "abc@def.gh",
                 password: hash,
                 wallet: 0,
-                actual_cosmetic: 1
+                actual_cosmetic: 1,
+                is_admin: true,
             }
+        }).catch(e => {
+            console.log("test user exists");
+        });
+
+        // Create dummy user who is not an admin in order to try the middleware
+        await prisma.users.create({
+            data: {
+                nickname: "usuariomal",
+                email: "abc@def.gh",
+                password: hash,
+                wallet: 0,
+                actual_cosmetic: 1,
+                is_admin: false,
+            }
+        }).catch(e => {
+            console.log("test user exists");
         });
     });
 
@@ -100,6 +117,12 @@ const questionsTestSuite = () => describe("Test questions path", () => {
         await prisma.users.delete({
             where: {
                 nickname: "usuario"
+            }
+        });
+
+        await prisma.users.delete({
+            where: {
+                nickname: "usuariomal"
             }
         });
     });
@@ -185,6 +208,8 @@ const questionsTestSuite = () => describe("Test questions path", () => {
                     wrong_answer_3 : "Kittens",
                     accepted : true
                 }
+            }).catch(e => {
+                console.log("test question exists");
             })
         });
 
@@ -192,7 +217,7 @@ const questionsTestSuite = () => describe("Test questions path", () => {
             
             // questionId >= 1 && questionId != null
             test("EQ 1, 2", async () => {
-                return questionDelete(id, (response) => {
+                return questionDelete(id, "usuario", (response) => {
                     expect(response.statusCode).toBe(StatusCodes.OK);
                 });
             });
@@ -201,15 +226,23 @@ const questionsTestSuite = () => describe("Test questions path", () => {
         describe("Invalid classes", () => {
             // questionId < 1
             test("EQ 3", async () => {
-                return questionDelete(-2, (response) => {
+                return questionDelete(-2, "usuario", (response) => {
                     expect(response.statusCode).toBe(StatusCodes.BAD_REQUEST);
                 });
             });
 
             // null questionId
             test("EQ 4", async () => {
-                return questionDelete(null, (response) => {
+                return questionDelete(null, "usuario", (response) => {
                     expect(response.statusCode).toBe(StatusCodes.BAD_REQUEST);
+                });
+            });
+
+            // not an admin
+            test("EQ 5", async () => {
+                return questionDelete(id, "usuariomal", (response) => {
+                    console.log(response.body);
+                    expect(response.statusCode).toBe(StatusCodes.FORBIDDEN);
                 });
             });
         });
@@ -233,6 +266,8 @@ const questionsTestSuite = () => describe("Test questions path", () => {
                     wrong_answer_3 : "Kittens",
                     accepted : false
                 }
+            }).catch(e => {
+                console.log("test questions exist");
             })
         });
 
@@ -249,7 +284,7 @@ const questionsTestSuite = () => describe("Test questions path", () => {
             
             // questionId >= 1 && questionId != null
             test("EQ 1, 2", async () => {
-                return questionPut(id, (response) => {
+                return questionPut(id, "usuario", (response) => {
                     console.log(response.body);
                     expect(response.statusCode).toBe(StatusCodes.OK);
                 });
@@ -259,15 +294,23 @@ const questionsTestSuite = () => describe("Test questions path", () => {
         describe("Invalid classes", () => {
             // questionId < 1
             test("EQ 3", async () => {
-                return questionPut(-2, (response) => {
+                return questionPut(-2, "usuario", (response) => {
                     expect(response.statusCode).toBe(StatusCodes.BAD_REQUEST);
                 });
             });
 
             // null questionId
             test("EQ 4", async () => {
-                return questionPut(null, (response) => {
+                return questionPut(null, "usuario", (response) => {
                     expect(response.statusCode).toBe(StatusCodes.BAD_REQUEST);
+                });
+            });
+
+            // user is not an admin
+            test("EQ 5", async () => {
+                return questionPut(id, "usuariomal", (response) => {
+                    console.log(response.body);
+                    expect(response.statusCode).toBe(StatusCodes.FORBIDDEN);
                 });
             });
         });

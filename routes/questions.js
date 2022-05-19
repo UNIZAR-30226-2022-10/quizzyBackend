@@ -11,14 +11,34 @@ const {
     getQuestions,
     acceptQuestion,
     proposalQuestion,
-    deleteQuestion
+    deleteQuestion,
+    getPendingProposals
 } = require("../controllers/rest/questions");
 
 var questionsRouter = express.Router();
 
-const { PrismaClientKnownRequestError } = require("@prisma/client");
+const { authRestToken, authAdmin } = require('../middleware/auth');
 
-const { authRestToken } = require('../middleware/auth');
+// get questions
+questionsRouter.get("/", function (req, res, next) {
+    const { difficulty, category } = req.query;
+    let limit = req.query.limit ? parseInt(req.query.limit) : 20;
+    getQuestions(limit, difficulty, category)
+        .then((questions) => {
+            res.statusCode = StatusCodes.OK;
+            res.send({
+                questions: questions,
+                ok: true
+            });
+        })
+        .catch((e) => {
+            res.statusCode = e.status;
+            res.send({
+                msg: e.message,
+                ok: false
+            });
+        });
+});
 
 // get questions
 questionsRouter.get("/", function (req, res, next) {
@@ -42,7 +62,7 @@ questionsRouter.get("/", function (req, res, next) {
 });
 
 // get proposals
-questionsRouter.put("/review", authRestToken, function (req, res, next) {
+questionsRouter.put("/review", authRestToken, authAdmin, function (req, res, next) {
     // query parameters are strings, we have to parse them first!
     const id = parseInt(req.query.id);
 
@@ -63,10 +83,11 @@ questionsRouter.put("/review", authRestToken, function (req, res, next) {
         });
 });
 
-questionsRouter.delete("/review", authRestToken, function (req, res, next) {
-    const { questionId } = req.body;
+questionsRouter.delete("/review", authRestToken, authAdmin, function (req, res, next) {
+    // query parameters are strings, we have to parse them first!
+    const id = parseInt(req.query.id);
 
-    deleteQuestion(questionId)
+    deleteQuestion(id)
         .then(() => {
             res.statusCode = StatusCodes.OK;
             res.send({
