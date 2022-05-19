@@ -3,11 +3,7 @@
  *      & Jaime Martín Trullén (801965)
  * Filename: questions.js
  * Module: controllers/rest
-<<<<<<< HEAD
  * Description: Controller for question route
-=======
- * Description: Question route controllers
->>>>>>> devOnline
  */
 
 const { PrismaClient } = require("@prisma/client");
