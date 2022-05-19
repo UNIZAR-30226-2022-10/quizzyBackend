@@ -333,7 +333,7 @@ const friendsTestSuite = () => describe("Test friends path", () => {
 
             test("EQ 6", async () => {
                 return friendsPost("usuario", (response) => {
-                    expect(response.statusCode).toBe(StatusCodes.NOT_FOUND);
+                    expect(response.statusCode).toBe(StatusCodes.CONFLICT);
                 });
             });
 

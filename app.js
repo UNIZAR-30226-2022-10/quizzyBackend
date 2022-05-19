@@ -51,6 +51,7 @@ var usersRouter = require("./routes/users");
 var questionsRouter = require("./routes/questions");
 var chatRouter = require("./routes/games");
 var shopRouter = require("./routes/shop");
+var friendsRouter = require("./routes/friends");
 var gamesRouter = require("./routes/games")(privateControllerInstance, publicControllerInstance);
 
 
@@ -59,6 +60,7 @@ app.use("/user", usersRouter);
 app.use("/questions", questionsRouter);
 app.use("/chat", chatRouter);
 app.use("/shop", shopRouter);
+app.use("/friends", friendsRouter);
 app.use("/games", gamesRouter);
 
 // Websocket handling imports

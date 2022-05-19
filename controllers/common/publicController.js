@@ -31,7 +31,7 @@ class PublicController {
         this.turnTimeout = null;
 
         // Active games identified by room uuid
-        this.activeGames = {};
+        this.activeGames = { a : 1 };
 
         // factories
         this.publicGameFactory = new PublicGameFactory();
@@ -63,10 +63,10 @@ class PublicController {
 
             this.activeGames[game.room.rid] = game;
 
-            this.serversocket.to(game.room.rid).emit('server:public:joined', { rid : game.room.rid });
+            this.serversocket.to(game.room.rid).emit('server:public:joined', { rid : game.room.rid } );
 
             game.startGame();
-        } 
+        }
 
         // Reset online timer
         this.resetOnlineTimer();
@@ -108,7 +108,8 @@ class PublicController {
         this.queue.delete(nickname);
 
         if ( this.queue.length() < config.publicRoomMinPlayers ) {
-            clearTimeout(this.gameTimeout);
+            // Reset online timer
+            this.resetOnlineTimer();
         }
         
         // print game state

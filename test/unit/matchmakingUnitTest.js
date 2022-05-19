@@ -37,13 +37,13 @@ function joinPlayers(n, users, done) {
     let okCount = 0;
     users.forEach((u) => {
         u.emit("public:join", (response) => {
-            console.log("response : ", response);
+            //console.log("response : ", response);
             expect(response.ok).toBeTruthy();
         })
 
         u.on("server:public:joined", (response) => {
-            console.log(response);
-            if ( response.rid ) {
+            console.log("joined");
+            if ( response.rid !== null ) {
                 okCount++;
                 if ( !rid ) {
                     rid = response.rid;
@@ -52,10 +52,12 @@ function joinPlayers(n, users, done) {
                     expect(response.rid).toBe(rid);
                 } 
 
-                if ( okCount == n ) {
+                if ( okCount === n ) {
+                    console.log("done");
                     done();
                 }
             } else {
+                console.log("error : ", response);
                 throw new Error("Couldn't join a room");
             }
         });
