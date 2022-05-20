@@ -40,11 +40,9 @@ questionsRouter.get("/", function (req, res, next) {
         });
 });
 
-// get questions
-questionsRouter.get("/", function (req, res, next) {
-    const { difficulty, category } = req.query;
-    let limit = req.query.limit ? parseInt(req.query.limit) : 20;
-    getQuestions(limit, difficulty, category)
+// get review pending questions
+questionsRouter.get("/pending", authRestToken, authAdmin, function (req, res, next) {
+    getPendingProposals()
         .then((questions) => {
             res.statusCode = StatusCodes.OK;
             res.send({
