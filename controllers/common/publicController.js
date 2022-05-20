@@ -116,18 +116,6 @@ class PublicController {
         this.print();
     }
 
-    getUserMatches(nickname) {
-        let result = Object.values(this.activeGames)
-            .filter(gm => gm.room.getUsers().includes(nickname))
-            .map(gm => {
-                let users = Object.values(gm.room.users).map(u => {
-                    return { nickname : u.nickname, stats : u.stats };
-                })
-                return { rid: gm.room.rid, users };
-            });
-        return result;
-    }
-
     /**
      * Reset the online timeout for creating a room
      */
@@ -163,6 +151,19 @@ class PublicController {
         console.log("queue : ", this.queue);
         console.log("rooms : ", this.activeRooms);
     }
+
+    getUserMatches(nickname) {
+        let result = Object.values(this.activeGames)
+            .filter(gm => gm.room.getUsers().includes(nickname))
+            .map(gm => {
+                let users = Object.values(gm.room.users).map(u => {
+                    return { nickname : u.nickname, stats : u.stats };
+                })
+                return { rid: gm.room.rid, users };
+            });
+        return result;
+    }
+
 }
 
 module.exports = PublicController;

@@ -31,25 +31,26 @@ class PrivateController {
 
 
     createPrivateGame(user, turnTimeout, difficulty, wildcardsEnable){
-        let game = this.privateRoomFactory.createGame(user, turnTimeout, difficulty, wildcardsEnable);
+        let game = this.privateRoomFactory.createGame(user, turnTimeout, difficulty, wildcardsEnable, this.serversocket);
     
         this.activeGames[game.room.rid] = game;
-        this.serversocket.to(this.activeGames[rid].room.rid).emit('server:private:created', { rid : game.room.rid });
+        return game.room.rid;
     }
 
     startPrivateGame(rid, user){
         if ( !this.activeGames[rid] ) 
             throw new Error("This game doesn't exist");
 
-        if (user != this.activeGames[rid].roomManager)
+        if (user.nickname !== this.activeGames[rid].roomManager.nickname)
             throw new Error("You must be the room manager to start the game");
 
 
-        if ( this.activeGames[rid].room.users.length() < config.privateRoomMinPlayers )
+        if ( this.activeGames[rid].room.users.length < config.privateRoomMinPlayers )
             throw new Error("There should be at least" + config.privateRoomMinPlayers + "players");
             
         
-        this.serversocket.to(this.activeGames[rid].room.rid).emit('server:private:joined', { rid : game.room.rid });  
+        this.serversocket.to(this.activeGames[rid].room.rid).emit('server:private:joined');
+        this.activeGames[rid].startGame();
     }
 
 
@@ -59,7 +60,7 @@ class PrivateController {
         if ( !this.activeGames[rid] ) 
             throw new Error("This game doesn't exist");
 
-        if (this.activeGames[rid].users.length() == config.publicRoomMaxPlayers)
+        if (this.activeGames[rid].room.users.length == config.publicRoomMaxPlayers)
             throw new Error("There should be at least" + config.privateRoomMinPlayers + "players");
         
         this.activeGames[rid].room.addUser(user);
@@ -83,7 +84,7 @@ class PrivateController {
         if (user != this.activeGames[rid].roomManager)
             throw new Error("You must be the room manager to cancel the game");
 
-            this.serversocket.to(this.activeGames[rid].room.rid).emit('server:private:cancelled', { rid : game.room.rid });
+            this.serversocket.to(this.activeGames[rid].room.rid).emit('server:private:cancelled');
         delete this.activeGames[rid];
     }
 
@@ -112,6 +113,19 @@ class PrivateController {
     print() {
         console.log(this.activeGames);
     }
+
+    getUserMatches(nickname) {
+        let result = Object.values(this.activeGames)
+            .filter(gm => gm.room.getUsers().includes(nickname))
+            .map(gm => {
+                let users = Object.values(gm.room.users).map(u => {
+                    return { nickname : u.nickname, stats : u.stats };
+                })
+                return { rid: gm.room.rid, users };
+            });
+        return result;
+    }
+
 }
 
 module.exports = PrivateController;

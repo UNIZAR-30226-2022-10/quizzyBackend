@@ -10,15 +10,29 @@ var User = require('../../game/user');
 module.exports = (socket, controller) => {
 
 
-
+    /**
+     * 
+     * @param {Object} args Argument object, which contains the room parameters:
+     *  - The question timeout, in milliseconds
+     *  - The difficulty
+     *  - A flag enabling wildcards if set to true.
+     * Example :
+     * 
+     * {
+     *     turnTimeout : 10000,
+     *     difficulty  : "easy",
+     *     wildcardsEnable : true
+     * }
+     * @param {Function} callback The acknowledgement function, which returns the room identifier.
+     */
     const createPrivateGame = (args, callback) => {
         console.log("createPublicGame");
 
         const user = new User(socket.user.name, socket);
 
         try {
-            controller.createPrivateGame(user, args.turnTimeout, args.difficulty, args.wildcardsEnable);
-            callback({ok: true});
+            let rid = controller.createPrivateGame(user, args.turnTimeout, args.difficulty, args.wildcardsEnable);
+            callback({ok: true, rid});
         } catch (e) {
             callback({ok: false, msg :e.message});
         }
@@ -26,11 +40,16 @@ module.exports = (socket, controller) => {
 
 
     /**
-     * Try to join the public matchmaking queue.
+     * Try to join a room.
      * 
-     * If the user joined the queue, the callback will return an object with
-     * the ok flag set to true. Otherwise, the ok flag will be set as false.
-     * @param {Object} args Argument (should be empty) 
+     * If the user joined the room, the callback will return an object with
+     * the ok flag set to true. Otherwise, the ok flag will be set to false.
+     * @param {Object} args Argument object, which contains the rid of the room to join.
+     *  - rid: The room's identifier
+     * Example: 
+     * {
+     *     rid : 4
+     * }
      * @param {Function} callback The acknowledgment function.
      */
     const joinPrivateGame = (args, callback) => {
@@ -45,11 +64,17 @@ module.exports = (socket, controller) => {
     };
 
     /**
-     * Try to leave the matchmaking queue.
+     * Try to leave a private game
      * 
-     * If the user left the queue, the callback will return an object with
-     * the ok flag set to true. Otherwise, the ok flag will be set as false.
-     * @param {Object} args Argument (should be empty) 
+     * If the room doesn't exist or the user is not in this room, the callback will return an object
+     * with the ok flag set to false and the error message. Otherwise, the ok flag 
+     * will be set to true 
+     * @param {Object} args Argument object, which contains the rid of the room to leave.
+     *  - rid: The room's identifier
+     * Example: 
+     * {
+     *     rid : 4
+     * }
      * @param {Function} callback The acknowledgment function.
      */
     const leavePrivateGame = (args, callback) => {
@@ -130,6 +155,7 @@ module.exports = (socket, controller) => {
     socket.on("private:join", joinPrivateGame);
     socket.on("private:leave", leavePrivateGame);
     socket.on("private:cancel", cancelPrivateGame);
+    
     // change to common handler TODO
     socket.on("private:startTurn", startTurn);
     socket.on("private:makeMove", makeMove);

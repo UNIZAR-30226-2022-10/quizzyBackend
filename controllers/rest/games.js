@@ -10,7 +10,7 @@ function getPublicGames(nickname, publicController) {
 }
 
 function getPrivateGames(nickname, privateController) {
-    
+    return privateController.getUserMatches(nickname);
 }
 
 module.exports = {
