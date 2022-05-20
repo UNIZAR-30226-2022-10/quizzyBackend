@@ -1,28 +1,23 @@
 /*
  * Author: Jaime Martín Trullén (801965)
- * Filename: publicController.js
+ * Filename: privateController.js
  * Module: controllers/common
- * Description: online game controller for public games
+ * Description: online game controller for private games
  */
 
 const PrivateRoomFactory = require('./privateGameFactory');
-const UserQueue = require("./userQueue");
-
+const Controller = require("./controller");
 const config = require('../../config');
 
-class PrivateController {
+class PrivateController extends Controller {
 
     /**
-     * Initialize a new online public controller
+     * Initialize a new online private controller
      * @param {io} io The socket.io server handler
      */
     constructor(io) {
 
-        // server socket 
-        this.serversocket = io;
-
-        // Active games identified by room uuid
-        this.activeGames = {};
+        super(io)
 
         // factories
         this.privateRoomFactory = new PrivateRoomFactory();
@@ -87,45 +82,6 @@ class PrivateController {
             this.serversocket.to(this.activeGames[rid].room.rid).emit('server:private:cancelled');
         delete this.activeGames[rid];
     }
-
-
-    /**
-     * Start current player's turn after acknowledgement.
-     * In this phase, the player must answer the provided question.
-     * The first phase ends when the user answers the question or after timing out.
-     * @param {String} rid The room id 
-     * @param {String} nickname The player's nickname
-     */
-    async startTurn(rid, nickname) {
-        if ( !this.activeGames[rid] ) 
-            throw new Error("This game doesn't exist");
-            
-        return await this.activeGames[rid].startTurn(nickname);
-    }
-
-    makeMove(rid, nickname, pos) {
-        if ( !this.activeGames[rid] ) 
-            throw new Error("This game doesn't exist");
-
-        return this.activeGames[rid].makeMove(nickname, pos);
-    }
-
-    print() {
-        console.log(this.activeGames);
-    }
-
-    getUserMatches(nickname) {
-        let result = Object.values(this.activeGames)
-            .filter(gm => gm.room.getUsers().includes(nickname))
-            .map(gm => {
-                let users = Object.values(gm.room.users).map(u => {
-                    return { nickname : u.nickname, stats : u.stats };
-                })
-                return { rid: gm.room.rid, users };
-            });
-        return result;
-    }
-
 }
 
 module.exports = PrivateController;

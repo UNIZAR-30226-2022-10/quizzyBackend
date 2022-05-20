@@ -5,8 +5,6 @@
  * Description: public room factory object
  */
 
-const { v4: uuid } = require('uuid');
-
 const PublicRoom = require('./publicRoom');
 const PublicGameController = require('./publicGameController');
 
