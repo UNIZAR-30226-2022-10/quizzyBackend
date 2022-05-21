@@ -42,12 +42,12 @@ async function getFriends(nickname){
      * A is B's friend iff A has accepted B's request and viceversa.
      */
     let allFriends = await prisma.$queryRaw`
-        SELECT F.nickname_2 FROM (
+        SELECT U.nickname, U.actual_cosmetic FROM (
             SELECT nickname_1, nickname_2 
             FROM friends A
             WHERE ( nickname_1 = ${nickname} AND accepted = TRUE)
-        ) AS F, friends AS G
-        WHERE G.nickname_1 = F.nickname_2 AND G.nickname_2 = F.nickname_1 AND G.accepted = TRUE;
+        ) AS F, friends AS G, users U
+        WHERE G.nickname_1 = F.nickname_2 AND G.nickname_2 = F.nickname_1 AND G.accepted = TRUE AND U.nickname = F.nickname_2;
         `
 
     return allFriends;
