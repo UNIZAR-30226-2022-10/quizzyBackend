@@ -54,7 +54,7 @@ module.exports = (socket, controller) => {
      * Example :
      * 
      * {
-     *     rid : '15f6bb40-89d9-4c0d-b6ef-a399223ed77f'
+     *     rid : 0
      * }
      * 
      * @param {Function} callback The acknowledgement function
@@ -73,6 +73,12 @@ module.exports = (socket, controller) => {
      * a question correctly in the current turn.
      * @param {Object} args Argument object, which contains the room id of the user and the 
      * desired position
+     * Example :
+     * 
+     * {
+     *     rid : 0,
+     *     pos : 3
+     * }
      * @param {Function} callback The acknowledgement function
      */
     const makeMove = (args, callback) => {

@@ -322,12 +322,58 @@ async function equipCosmetic(nickname, id) {
     })
 }
 
+/**
+ * Search users by a query string
+ * @param {String} query The query to match
+ * @returns {ArrayList} The list of users that match the query
+ */
 async function searchUsers(query) {
     console.log(`SELECT * FROM users WHERE nickname LIKE ${"'%" + query + "%'"}`)
     let v = await prisma.$queryRaw`SELECT * FROM users WHERE nickname LIKE ${"%" + query + "%"}`
 
     console.log(v);
     return v;
+}
+
+async function addMatch(winner, stats) {
+
+    // update wallet
+    // no ORM feature currently available (see https://github.com/prisma/prisma-client-js/issues/775)
+    await prisma.$queryRaw`UPDATE users SET wallet = wallet + 50
+        WHERE nickname = ${winner};`;
+
+    // TODO: add match to match history
+}
+
+async function useWildcard(nickname, id) {
+
+    // Validate nickname
+    if (!nickname || !validateNickname(nickname))
+    throw createError(StatusCodes.BAD_REQUEST, "Invalid nickname");
+
+    // Find user by nickname
+    var user = await prisma.users.findFirst({
+        where: {
+            nickname: nickname
+        }
+    })
+
+    if ( !user ) 
+        throw createError(StatusCodes.NOT_FOUND, "User not found");
+
+    // check if item exists
+    var item = await prisma.cosmetics.findFirst({
+        where: {
+            cosmetic_id: id
+        }
+    });
+
+    if (!item) throw createError(StatusCodes.NOT_FOUND, "Cosmetic not found");
+
+    // update wallet
+    // no ORM feature currently available (see https://github.com/prisma/prisma-client-js/issues/775)
+    await prisma.$queryRaw`UPDATE users SET cuantity = cuantity - 1
+        WHERE nickname = ${winner};`;
 }
  
 // Exports
@@ -339,5 +385,6 @@ module.exports = {
     getUserWildcards, 
     getUserCosmetics,
     equipCosmetic,
-    searchUsers
+    searchUsers,
+    addMatch
 }

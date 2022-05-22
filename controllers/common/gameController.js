@@ -13,6 +13,8 @@ const GameState = require("../../game/gameState");
 
 const config = require("../../config");
 
+const { addMatch } = require("../rest/users");
+
 class GameController {
     room;
 
@@ -82,6 +84,8 @@ class GameController {
         if (this.ackTurn || this.movePending)
             throw new Error("Can't start a turn if it is already your turn");
 
+        this.ackTurn = true;
+
         // This statement will throw if user is not in this room.
         // Should not throw because precondition always holds
         var user = this.room.findUser(nickname);
@@ -108,17 +112,17 @@ class GameController {
                         this.serversocket.to(room.rid).emit("server:winner", nickname);
 
                         // room persistence add match
+                        addMatch(nickname);
                     }
                     else{
                         this.currentTurnTokens = this.currentTurnTokens + 1;
 
-                        if(this.currentTurnTokens == 3){
+                        if (this.currentTurnTokens === 3) {
+                            console.log("3 tokens in one turn!")
                             this.currentTurnTokens = 0;
                             this.nextTurn();
                             callback({ok});
                         }
-
-                        //  check if this runs ok in case the user won 3 tokens in a same turn
                     }
                 }
                 this.movePending = true;
@@ -143,7 +147,6 @@ class GameController {
             user.socket.off("public:answer", listener);
         }, config.publicQuestionTimeout);
 
-        console.log(this.currentQuestion);
         return this.currentQuestion;
     }
 
@@ -154,6 +157,8 @@ class GameController {
      * and the game stats for each player.
      */
     nextTurn() {
+        this.ackTurn = false;
+        this.movePending = false;
         this.currentTurn = (this.currentTurn + 1) % this.turns.length;
         this.serversocket.to(this.room.rid).emit("server:turn", 
             { 

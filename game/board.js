@@ -19,7 +19,10 @@ class Board {
         // board structure
         this.cells = [
             // center cell
-            createCell(null, false, true),
+            // Note : In the original game, once you get all tokens, you
+            // must reach the center cell and answer a last question of any category.
+            // For the sake of simplicity, this cell will act as a normal cell.
+            createCell(null, false, false),
 
             // first radius
             createCell(4, false, false),

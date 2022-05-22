@@ -100,7 +100,9 @@ class GameState {
             throw new Error("User can't be found");
         }
 
-        this.stats[nickname].addAnswer(category);
+        this.stats[nickname].addToken(category);
+
+        console.log(this.stats[nickname]);
     }
 
     /**
