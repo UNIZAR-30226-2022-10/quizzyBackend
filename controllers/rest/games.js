@@ -50,6 +50,28 @@ async function invitePlayer(nickname, rid, leaderNick) {
     if ( rid == null || rid < 0 )
         throw createError(StatusCodes.BAD_REQUEST, "Invalid room id");
 
+    // TODO: include in atomic transaction
+    await prisma.users.count({
+            where : {
+                nickname
+            }
+        })
+        .then(c => {
+            if ( c === 0 ) {
+                throw createError(StatusCodes.NOT_FOUND, "Can't find user")
+            }
+        })
+    await prisma.users.count({
+            where : {
+                nickname : leaderNick
+            }
+        })
+        .then(c => {
+            if ( c === 0 ) {
+                throw createError(StatusCodes.NOT_FOUND, "Can't find leader")
+            }
+        })
+
     await prisma.game_invites.create({
         data : {
             nickname,

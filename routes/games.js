@@ -46,7 +46,7 @@ module.exports = function (privateController, publicController) {
                 });
             })
             .catch((e) => {
-                console.log(e.message);
+                //console.log(e.message);
                 res.statusCode = e.status || 400;
                 res.send({
                     msg: e.message,
@@ -67,7 +67,7 @@ module.exports = function (privateController, publicController) {
                 });
             })
             .catch((e) => {
-                console.log(e.message);
+                //console.log(e.message);
                 res.statusCode = e.status || 400;
                 res.send({
                     msg: e.message,
@@ -88,7 +88,7 @@ module.exports = function (privateController, publicController) {
                 });
             })
             .catch((e) => {
-                console.log(e.message);
+                //console.log(e.message);
                 res.statusCode = e.status || 400;
                 res.send({
                     msg: e.message,
