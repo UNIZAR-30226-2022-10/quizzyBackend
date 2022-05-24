@@ -1,7 +1,7 @@
 const { io } = require("socket.io-client");
 const { signToken } = require("../../utils/auth");
 
-var port = process.env.PORT || 5000;
+var port = process.env.PORT || 6000;
 
 //server.js
 const { server } = require("../../app");
@@ -11,7 +11,7 @@ function connectPlayers(n, done) {
     let users = [];
     let connCount = 0;
     for (var i = 0; i < n; i++) {
-        let user = io("http://localhost:5000", {
+        let user = io(`http://localhost:${port}`, {
             auth: {
                 token: signToken("usuario" + i.toString())
             }
@@ -83,7 +83,7 @@ const matchmakingTestSuite = () =>
             let clientSocket;
 
             beforeAll((done) => {
-                clientSocket = io("http://localhost:5000", {
+                clientSocket = io(`http://localhost:${port}`, {
                     auth: {
                         token: signToken("usuario")
                     }

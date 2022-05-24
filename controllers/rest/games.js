@@ -100,7 +100,7 @@ async function removeInvite(nickname, rid) {
 
     await prisma.game_invites.deleteMany({
         where : {
-            nickname,
+            leader_nickname : nickname,
             rid
         }
     })
