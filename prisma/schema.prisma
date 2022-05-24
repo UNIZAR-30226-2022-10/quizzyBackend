@@ -22,11 +22,10 @@ model cosmetics {
 }
 
 model friends {
-  nickname_1                      String   @db.VarChar(20)
-  nickname_2                      String   @db.VarChar(20)
-  accepted                        Boolean? @default(false)
-  users_friends_nickname_1Tousers users    @relation("friends_nickname_1Tousers", fields: [nickname_1], references: [nickname], onDelete: Cascade, onUpdate: NoAction)
-  users_friends_nickname_2Tousers users    @relation("friends_nickname_2Tousers", fields: [nickname_2], references: [nickname], onDelete: Cascade, onUpdate: NoAction)
+  nickname_1                      String @db.VarChar(20)
+  nickname_2                      String @db.VarChar(20)
+  users_friends_nickname_1Tousers users  @relation("friends_nickname_1Tousers", fields: [nickname_1], references: [nickname], onDelete: Cascade, onUpdate: NoAction)
+  users_friends_nickname_2Tousers users  @relation("friends_nickname_2Tousers", fields: [nickname_2], references: [nickname], onDelete: Cascade, onUpdate: NoAction)
 
   @@id([nickname_1, nickname_2])
 }
@@ -160,26 +159,23 @@ model user_wildcards {
 }
 
 model users {
-  nickname                                         String                @id @db.VarChar(20)
-  email                                            String                @db.VarChar(50)
-  password                                         String                @db.VarChar(100)
-  wallet                                           Int                   @default(300)
-  actual_cosmetic                                  Int                   @default(1)
-  is_admin                                         Boolean               @default(false)
-  cosmetics                                        cosmetics             @relation(fields: [actual_cosmetic], references: [cosmetic_id], onDelete: Cascade, onUpdate: NoAction)
-  friends_friends_nickname_1Tousers                friends[]             @relation("friends_nickname_1Tousers")
-  friends_friends_nickname_2Tousers                friends[]             @relation("friends_nickname_2Tousers")
-  game_invites_game_invites_leader_nicknameTousers game_invites[]        @relation("game_invites_leader_nicknameTousers")
-  game_invites_game_invites_nicknameTousers        game_invites[]        @relation("game_invites_nicknameTousers")
-  individual_game                                  individual_game[]
-  private_game                                     private_game[]
-  private_games_state                              private_games_state[]
-  public_game                                      public_game[]
-  public_games_state                               public_games_state[]
-  user_cosmetics                                   user_cosmetics[]
-  user_private_games                               user_private_games[]
-  user_public_games                                user_public_games[]
-  user_wildcards                                   user_wildcards[]
+  nickname                          String                @id @db.VarChar(20)
+  email                             String                @db.VarChar(50)
+  password                          String                @db.VarChar(100)
+  wallet                            Int                   @default(300)
+  actual_cosmetic                   Int                   @default(1)
+  cosmetics                         cosmetics             @relation(fields: [actual_cosmetic], references: [cosmetic_id], onDelete: Cascade, onUpdate: NoAction)
+  friends_friends_nickname_1Tousers friends[]             @relation("friends_nickname_1Tousers")
+  friends_friends_nickname_2Tousers friends[]             @relation("friends_nickname_2Tousers")
+  individual_game                   individual_game[]
+  private_game                      private_game[]
+  private_games_state               private_games_state[]
+  public_game                       public_game[]
+  public_games_state                public_games_state[]
+  user_cosmetics                    user_cosmetics[]
+  user_private_games                user_private_games[]
+  user_public_games                 user_public_games[]
+  user_wildcards                    user_wildcards[]
 }
 
 model wildcards {
@@ -204,14 +200,4 @@ model public_chat {
   nickname           String?             @db.VarChar(20)
   message            String?             @db.VarChar(150)
   public_games_state public_games_state? @relation(fields: [game_id, nickname], references: [game_id, nickname], onDelete: Cascade, onUpdate: NoAction)
-}
-
-model game_invites {
-  nickname                                  String @db.VarChar(20)
-  rid                                       Int
-  leader_nickname                           String @db.VarChar(20)
-  users_game_invites_leader_nicknameTousers users  @relation("game_invites_leader_nicknameTousers", fields: [leader_nickname], references: [nickname], onDelete: Cascade, onUpdate: NoAction)
-  users_game_invites_nicknameTousers        users  @relation("game_invites_nicknameTousers", fields: [nickname], references: [nickname], onDelete: Cascade, onUpdate: NoAction)
-
-  @@id([nickname, rid])
 }

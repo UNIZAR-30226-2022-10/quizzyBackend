@@ -16,7 +16,8 @@ const {
     getUserWildcards,
     getUserCosmetics,
     equipCosmetic,
-    searchUsers
+    searchUsers,
+    useWildcard
 } = require("../controllers/rest/users");
 
 const { signToken } = require("../utils/auth");
@@ -199,6 +200,28 @@ usersRouter.put("/equip", authRestToken, function (req, res, next) {
             // Send response back
             res.statusCode = StatusCodes.OK;
             res.send({
+                ok: true
+            });
+        })
+        .catch((e) => {
+            // bad input error
+            res.statusCode = e.status || 400;
+            // Send error response
+            res.send({
+                msg: e.message,
+                ok: false
+            });
+        });
+});
+
+usersRouter.put("/use", authRestToken, function (req, res, next) {
+
+    useWildcard(req.jwtUser, parseInt(req.query.id))
+        .then((e) => {
+            // Send response back
+            res.statusCode = StatusCodes.OK;
+            res.send({
+                e,
                 ok: true
             });
         })

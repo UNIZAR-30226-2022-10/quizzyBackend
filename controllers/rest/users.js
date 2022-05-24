@@ -347,6 +347,8 @@ async function addMatch(winner, stats) {
 
 async function useWildcard(nickname, id) {
 
+    console.log(id);
+
     // Validate nickname
     if (!nickname || !validateNickname(nickname))
     throw createError(StatusCodes.BAD_REQUEST, "Invalid nickname");
@@ -362,18 +364,28 @@ async function useWildcard(nickname, id) {
         throw createError(StatusCodes.NOT_FOUND, "User not found");
 
     // check if item exists
-    var item = await prisma.cosmetics.findFirst({
+    var item = await prisma.wildcards.findFirst({
         where: {
-            cosmetic_id: id
+            wildcard_id: id
         }
     });
 
-    if (!item) throw createError(StatusCodes.NOT_FOUND, "Cosmetic not found");
+    if (!item) throw createError(StatusCodes.NOT_FOUND, "Wildcard not found");
 
+    //  check if cuantity is > 0
+    var num = await prisma.user_wildcards.findFirst({
+        where: {
+            wildcard_id : id,
+            nickname: nickname
+        }
+    });
+
+    if (!num || num.cuantity <= 0) throw createError(StatusCodes.NOT_FOUND, "Error user-wildcard not found");
+    
     // update wallet
     // no ORM feature currently available (see https://github.com/prisma/prisma-client-js/issues/775)
-    await prisma.$queryRaw`UPDATE users SET cuantity = cuantity - 1
-        WHERE nickname = ${winner};`;
+    await prisma.$queryRaw`UPDATE user_wildcards SET cuantity = cuantity - 1
+        WHERE nickname = ${nickname} AND wildcard_id = ${id};`;
 }
  
 // Exports
@@ -386,5 +398,6 @@ module.exports = {
     getUserCosmetics,
     equipCosmetic,
     searchUsers,
-    addMatch
+    addMatch,
+    useWildcard
 }
