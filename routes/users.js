@@ -17,7 +17,8 @@ const {
     getUserCosmetics,
     equipCosmetic,
     searchUsers,
-    useWildcard
+    useWildcard,
+    getUserReduced
 } = require("../controllers/rest/users");
 
 const { signToken } = require("../utils/auth");
@@ -82,6 +83,29 @@ usersRouter.get("/", authRestToken, function (req, res, next) {
 
     // get token user from database
     getUser(req.jwtUser)
+        .then((user) => {
+            // Send response back
+            res.statusCode = StatusCodes.OK;
+            res.send({
+                ...user,
+                ok: true
+            });
+        })
+        .catch((e) => {
+            // bad input error
+            res.statusCode = e.status || 400;
+            // Send error response
+            res.send({
+                msg: e.message,
+                ok: false
+            });
+        });
+});
+
+usersRouter.get("/reduced", function (req, res, next) {
+
+    // get token user from database
+    getUserReduced(req.query.nickname)
         .then((user) => {
             // Send response back
             res.statusCode = StatusCodes.OK;
