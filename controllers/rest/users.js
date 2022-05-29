@@ -106,6 +106,39 @@ async function getUser(nickname) {
 }
 
 /**
+ * Get rduced user information.
+ * 
+ * Note that this is an async function so it must be handled via async/await or
+ * the promise API.
+ * @param {String} nickname The user's nickname
+ * @returns {User} The user info object
+ */
+ async function getUserReduced(nickname) {
+    // Validate nickname
+    if (!nickname || !validateNickname(nickname))
+        throw createError(StatusCodes.BAD_REQUEST, "Invalid nickname");
+
+    // Find user by nickname
+    var user = await prisma.users.findFirst({
+        where: {
+            nickname: nickname
+        },
+
+        select: {
+            nickname: true,
+            actual_cosmetic: true
+        }
+    })
+
+    // throw if user doesn't exist
+    if ( !user ) {
+        throw createError(StatusCodes.NOT_FOUND);
+    }
+
+    return user;
+}
+
+/**
  * Delete user by its nickname.
  * 
  * Note that this is an async function so it must be handled via async/await or
@@ -399,5 +432,6 @@ module.exports = {
     equipCosmetic,
     searchUsers,
     addMatch,
-    useWildcard
+    useWildcard,
+    getUserReduced
 }
