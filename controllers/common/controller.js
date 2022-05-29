@@ -23,7 +23,7 @@ class Controller {
          * @param {String} nickname The player's nickname
          */
     async startTurn(rid, nickname) {
-        if ( this.activeGames[rid] === null ) 
+        if ( this.activeGames[rid] == null ) 
             throw new Error("startturn : This game doesn't exist");
             
         return await this.activeGames[rid].startTurn(nickname);
@@ -51,7 +51,6 @@ class Controller {
             });
         return result;
     }
-
 }
 
 module.exports = Controller;

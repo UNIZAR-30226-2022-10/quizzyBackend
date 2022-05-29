@@ -155,8 +155,6 @@ module.exports = (socket, controller) => {
     socket.on("private:join", joinPrivateGame);
     socket.on("private:leave", leavePrivateGame);
     socket.on("private:cancel", cancelPrivateGame);
-    
-    // change to common handler TODO
     socket.on("private:startTurn", startTurn);
     socket.on("private:makeMove", makeMove);
 };
