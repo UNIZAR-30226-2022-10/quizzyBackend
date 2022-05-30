@@ -85,6 +85,10 @@ class Room {
 
         return this.users[nickname];
     }
+
+    empty() {
+        return Object.keys(this.users).length === 0;
+    }
 }
 
 module.exports = Room;

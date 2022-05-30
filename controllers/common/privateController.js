@@ -94,12 +94,17 @@ class PrivateController extends Controller {
         if ( !this.activeGames[rid] ) 
             throw new Error("This game doesn't exist");
 
-        this.activeGames[rid].room.removeUser(user);
+        this.activeGames[rid].room.removeUser(user.nickname);
 
         // todo: choose new leader if leader left
         // if (user.nickname !== this.activeGames[rid].roomManager.nickname) {
         // 
         // }
+
+        // if room is empty after user leaves, delete room
+        if ( this.activeGames[rid].room.empty() ) {
+            delete this.activeGames[rid];
+        }
     }
 
     /**
