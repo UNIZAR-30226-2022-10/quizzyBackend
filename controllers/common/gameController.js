@@ -106,7 +106,12 @@ class GameController {
             if (ok) {
                 if ( cell.hasToken ) {
                     this.state.addToken(nickname, cell.category);
-                    // TODO : check if player has won the match
+                    this.serversocket.to(this.room.rid).emit("server:turn", 
+                        { 
+                            turns : this.turns[this.currentTurn], 
+                            stats : this.state.stats 
+                        }
+                    );
                 
                     if(this.state.hasWon(nickname)){
                         this.serversocket.to(room.rid).emit("server:winner", nickname);
@@ -121,15 +126,15 @@ class GameController {
                             console.log("3 tokens in one turn!")
                             this.currentTurnTokens = 0;
                             this.nextTurn();
-                            callback({ok});
+                            callback({ok, continue : false});
                         }
                     }
                 }
                 this.movePending = true;
-                callback({ok, roll : this.rollDice(nickname)});
+                callback({ok, continue : true, roll : this.rollDice(nickname)});
             } else {
                 this.nextTurn();
-                callback({ok});
+                callback({ok, continue : false});
             }
         };
 
@@ -140,11 +145,11 @@ class GameController {
         // start timeout
         this.currentQuestionTimeout = setTimeout(() => {
             // update game state
-            this.nextTurn();
-            this.state.addAnswer(nickname, cell.category);
+            user.socket.off("public:answer", listener);
+            this.state.addAnswer(nickname, cell.category, false);
 
             user.socket.emit("server:timeout", "Timeout");
-            user.socket.off("public:answer", listener);
+            this.nextTurn();
         }, config.publicQuestionTimeout);
 
         return this.currentQuestion;
@@ -221,6 +226,30 @@ class GameController {
         if (this.currentQuestionTimeout) {
             clearTimeout(this.currentQuestionTimeout);
             this.currentQuestionTimeout = null;
+        }
+    }
+
+    /**
+     * Pause user. This will set the user's socket as null
+     * @param {String} nickname 
+     */
+    pause(nickname) {
+        this.room.pause(nickname);
+    }
+
+    /**
+     * Resume user game. This will set the user's socket to the new
+     * connection object.
+     * @param {String} nickname The user's nickname
+     * @param {String} socket The user's new socket
+     */
+    resume(nickname, socket) {
+        this.room.resume(nickname, socket)
+
+        var user = this.room.findUser(nickname);
+        return { 
+            turns : this.turns[this.currentTurn], 
+            stats : this.state.stats 
         }
     }
 

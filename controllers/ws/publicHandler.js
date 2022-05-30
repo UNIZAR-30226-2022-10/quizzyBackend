@@ -90,9 +90,29 @@ module.exports = (socket, controller) => {
         }
     }
 
+    const pause = (args, callback) => {
+        try {
+            controller.pause(socket.user.name, args.rid);
+            callback({ok : true});
+        } catch (e) {
+            callback({ ok : false, msg : e.message })
+        }
+    }
+
+    const resume = (args, callback) => {
+        try {
+            let info = controller.resume(socket.user.name, args.rid, socket);
+            callback({ ok : true, info});
+        } catch (e) {
+            callback({ ok : false, msg : e.message })
+        }
+    }
+
     // Handle each event separately
     socket.on("public:join", joinPublicGame);
     socket.on("public:leave", leavePublicGame);
     socket.on("public:startTurn", startTurn);
     socket.on("public:makeMove", makeMove);
+    socket.on("public:pause", pause);
+    socket.on("public:resume", resume);
 };

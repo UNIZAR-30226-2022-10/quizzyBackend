@@ -36,6 +36,8 @@ class User {
     }
 
     /**
+     * Check if the user has an active connection.
+     * 
      * @returns the user's socket 
      */
     isOnline() {

@@ -51,6 +51,20 @@ class Controller {
             });
         return result;
     }
+
+    pause(nickname, rid) {
+        if ( !this.activeGames[rid] ) 
+            throw new Error("pause : This game doesn't exist");
+
+        this.activeGames[rid].pause(nickname);
+    }
+
+    resume(nickname, rid, socket) {
+        if ( !this.activeGames[rid] ) 
+            throw new Error("restart : This game doesn't exist");
+
+        return this.activeGames[rid].resume(nickname);
+    }
 }
 
 module.exports = Controller;

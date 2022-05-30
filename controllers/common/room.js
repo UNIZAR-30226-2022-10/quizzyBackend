@@ -45,24 +45,24 @@ class Room {
         delete this.users[nickname];
     }
 
-    pauseUser(nickname) {
+    pause(nickname) {
         if ( !this.users[nickname] )
             throw new Error("Can't find user in this room");
 
         if ( !this.users[nickname].isOnline() )
             throw new Error("User has already paused the game");
 
-        this.users.setOffline();
+        this.users[nickname].setOffline();
     }
 
-    resumeUser(nickname, socket) {
+    resume(nickname, socket) {
         if ( !this.users[nickname] )
             throw new Error("Can't find user in this room");
 
         if ( this.users[nickname].isOnline() )
             throw new Error("User is already online");
 
-        this.users.setOnline(socket);
+        this.users[nickname].setOnline(socket);
     }
 
     /**

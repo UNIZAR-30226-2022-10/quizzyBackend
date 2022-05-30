@@ -102,7 +102,7 @@ class GameState {
 
         this.stats[nickname].addToken(category);
 
-        console.log(this.stats[nickname]);
+        console.log("token won", this.stats[nickname]);
     }
 
     /**

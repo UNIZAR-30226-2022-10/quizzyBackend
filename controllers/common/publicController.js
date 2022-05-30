@@ -42,7 +42,6 @@ class PublicController extends Controller {
      * @returns {String}
      */
     enqueueUser(user) {
-        console.log("enqueuing")
         // Try to enqueue user in queue
         this.queue.enqueue(user);
 
@@ -100,7 +99,6 @@ class PublicController extends Controller {
      */
     dequeueUser(nickname) {
 
-        console.log("dequeue");
         // remove
         this.queue.delete(nickname);
 

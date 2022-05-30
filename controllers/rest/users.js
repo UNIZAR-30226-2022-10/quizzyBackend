@@ -413,9 +413,9 @@ async function useWildcard(nickname, id) {
         }
     });
 
-    if (!num || num.cuantity <= 0) throw createError(StatusCodes.NOT_FOUND, "Error user-wildcard not found");
+    if (!num || num.cuantity <= 0) throw createError(StatusCodes.CONFLICT, "You don't have this type of wildcard!");
     
-    // update wallet
+    // update wildcard accound
     // no ORM feature currently available (see https://github.com/prisma/prisma-client-js/issues/775)
     await prisma.$queryRaw`UPDATE user_wildcards SET cuantity = cuantity - 1
         WHERE nickname = ${nickname} AND wildcard_id = ${id};`;
