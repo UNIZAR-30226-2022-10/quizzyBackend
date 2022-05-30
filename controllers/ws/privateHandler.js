@@ -149,6 +149,29 @@ module.exports = (socket, controller) => {
         }
     }
 
+    /**
+     * Pause user's game
+     * @param {Object} args Argument object, which contains the room id
+     * @param {Function} callback The acknowledgement function
+     */
+    const pause = (args, callback) => {
+        try {
+            controller.pause(socket.user.name, args.rid);
+            callback({ok : true});
+        } catch (e) {
+            callback({ ok : false, msg : e.message })
+        }
+    }
+
+    const resume = (args, callback) => {
+        try {
+            let info = controller.resume(socket.user.name, args.rid, socket);
+            callback({ ok : true, info});
+        } catch (e) {
+            callback({ ok : false, msg : e.message })
+        }
+    }
+
     // Handle each event separately
     socket.on("private:create", createPrivateGame);
     socket.on("private:start", startPrivateGame);
@@ -157,4 +180,7 @@ module.exports = (socket, controller) => {
     socket.on("private:cancel", cancelPrivateGame);
     socket.on("private:startTurn", startTurn);
     socket.on("private:makeMove", makeMove);
+    
+    socket.on("public:pause", pause);
+    socket.on("public:resume", resume);
 };

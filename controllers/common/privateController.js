@@ -56,7 +56,7 @@ class PrivateController extends Controller {
         if ( Object.keys(this.activeGames[rid].room.users).length < config.privateRoomMinPlayers )
             throw new Error("There should be at least" + config.privateRoomMinPlayers + "players");
             
-        this.serversocket.to(this.activeGames[rid].room.rid).emit('server:private:joined');
+        this.serversocket.to(this.activeGames[rid].room.rid).emit('server:private:start');
         this.activeGames[rid].startGame();
     }
 
@@ -64,6 +64,9 @@ class PrivateController extends Controller {
     /**
      * Try to join a game. If the game doesn't exist, the user is already in the room 
      * or the game is already full, this function will throw an exception.
+     * 
+     * If the player joined the room, an event will be send to that room, with the new
+     * player's nickname.
      * @param {BigInt} rid The room id
      * @param {User} user The user who wants to join the game
      */
@@ -76,6 +79,7 @@ class PrivateController extends Controller {
             throw new Error("This room is already full");
         
         this.activeGames[rid].room.addUser(user);
+        this.serversocket.to(this.activeGames[rid].room.rid).emit('server:private:player', "");
         user.socket.join(rid);
             
     }
@@ -91,6 +95,11 @@ class PrivateController extends Controller {
             throw new Error("This game doesn't exist");
 
         this.activeGames[rid].room.removeUser(user);
+
+        // todo: choose new leader if leader left
+        // if (user.nickname !== this.activeGames[rid].roomManager.nickname) {
+        // 
+        // }
     }
 
     /**
@@ -104,8 +113,6 @@ class PrivateController extends Controller {
     cancelPrivateGame(rid, user){
         if ( !this.activeGames[rid] ) 
             throw new Error("This game doesn't exist");
-
-        console.log()
 
         if (user.nickname !== this.activeGames[rid].roomManager.nickname)
             throw new Error("You must be the room manager to cancel the game");
