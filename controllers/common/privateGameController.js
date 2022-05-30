@@ -17,12 +17,13 @@ class PrivateGameController extends GameController {
     difficulty
     wildcardsEnable
 
-    constructor(room, roomManager, turnTimeout, difficulty, wildcardsEnable, srvsock) {
+    constructor(room, roomManager, turnTimeout, difficulty, categories, wildcardsEnable, srvsock) {
         super(room, srvsock);
 
         this.roomManager = roomManager;
         this.turnTimeout = turnTimeout;
         this.difficulty = difficulty;
+        this.categories = categories
         this.wildcardsEnable = wildcardsEnable;
     }
 

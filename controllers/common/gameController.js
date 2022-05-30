@@ -92,6 +92,7 @@ class GameController {
 
         let cell = this.state.board.getCell(this.state.getPlayerPos(nickname));
 
+        // TODO: get from valid category
         let question = await getQuestions(1, null, null);
         this.currentQuestion = question[0];
 

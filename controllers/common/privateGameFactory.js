@@ -19,7 +19,7 @@ class PrivateGameFactory {
      * @param {Array} users The list of user objects
      * @returns The newly created room
      */
-    createGame(nickname, turnTimeout, difficulty, wildcardsEnable, serversocket) {
+    createGame(nickname, turnTimeout, difficulty, categories, wildcardsEnable, serversocket) {
 
         // generate random room
         let roomUuid = PrivateGameFactory.nextCode++;
@@ -30,7 +30,7 @@ class PrivateGameFactory {
             room.addUser(nickname);
             nickname.socket.join(roomUuid);
 
-        return new PrivateGameController(room, roomManager, turnTimeout, difficulty, wildcardsEnable, serversocket);
+        return new PrivateGameController(room, roomManager, turnTimeout, difficulty, categories, wildcardsEnable, serversocket);
     }
 }
 

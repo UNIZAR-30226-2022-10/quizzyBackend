@@ -21,6 +21,7 @@ module.exports = (socket, controller) => {
      * {
      *     turnTimeout : 10000,
      *     difficulty  : "easy",
+     *     categories  : [true, true, false, false, true, false]
      *     wildcardsEnable : true
      * }
      * @param {Function} callback The acknowledgement function, which returns the room identifier.
@@ -31,7 +32,7 @@ module.exports = (socket, controller) => {
         const user = new User(socket.user.name, socket);
 
         try {
-            let rid = controller.createPrivateGame(user, args.turnTimeout, args.difficulty, args.wildcardsEnable);
+            let rid = controller.createPrivateGame(user, args.turnTimeout, args.difficulty, args.categories, args.wildcardsEnable);
             callback({ok: true, rid});
         } catch (e) {
             callback({ok: false, msg :e.message});
