@@ -56,7 +56,6 @@ class PrivateController extends Controller {
         if ( Object.keys(this.activeGames[rid].room.users).length < config.privateRoomMinPlayers )
             throw new Error("There should be at least" + config.privateRoomMinPlayers + "players");
             
-        this.serversocket.to(this.activeGames[rid].room.rid).emit('server:private:start');
         this.activeGames[rid].startGame();
     }
 
