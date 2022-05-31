@@ -6,7 +6,7 @@
  */
 module.exports = (io, socket) => {
     const sendMsg = ({ username, message, roomName },callback) => {
-
+        console.log("chat msg : ", username, message, roomName);
         // generate data to send to receivers
         const outgoingMessage = {
             name: username,

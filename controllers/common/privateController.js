@@ -79,7 +79,7 @@ class PrivateController extends Controller {
             throw new Error("This room is already full");
         
         this.activeGames[rid].room.addUser(user);
-        this.serversocket.to(this.activeGames[rid].room.rid).emit('server:private:player', user.nickname);
+        this.serversocket.to(this.activeGames[rid].room.rid).emit('server:private:player:join', { player : user.nickname });
         user.socket.join(rid);
             
         return Object.keys(this.activeGames[rid].room.users);
@@ -96,6 +96,7 @@ class PrivateController extends Controller {
             throw new Error("This game doesn't exist");
 
         this.activeGames[rid].room.removeUser(user.nickname);
+        this.serversocket.to(this.activeGames[rid].room.rid).emit('server:private:player:leave', { player : user.nickname });
 
         // todo: choose new leader if leader left
         // if (user.nickname !== this.activeGames[rid].roomManager.nickname) {
