@@ -14,7 +14,7 @@ const GameState = require("../../game/gameState");
 const config = require("../../config");
 
 const { addMatch } = require("../rest/users");
-
+const categories = ["Geography", "Art", "Histoire", "Science", "Sports", "Entertainment"];
 class GameController {
     room;
 
@@ -91,9 +91,8 @@ class GameController {
         var user = this.room.findUser(nickname);
 
         let cell = this.state.board.getCell(this.state.getPlayerPos(nickname));
-
         // TODO: get from valid category
-        let question = await getQuestions(1, null, null);
+        let question = await getQuestions(1, null, categories[cell.category]);
         this.currentQuestion = question[0];
 
         const listener = (answer, callback) => {
@@ -153,7 +152,9 @@ class GameController {
             this.nextTurn();
         }, config.publicQuestionTimeout);
 
-        return this.currentQuestion;
+        const currentQuestion = this.currentQuestion;
+        const timeout = config.publicQuestionTimeout;
+        return {currentQuestion, timeout};
     }
 
     /**
