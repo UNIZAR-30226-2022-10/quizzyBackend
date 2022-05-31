@@ -28,7 +28,7 @@ class GameController {
      * @param {Room} room
      * @param {Socket} srvsock The server's main socket
      */
-    constructor(room, srvsock) {
+    constructor(room, srvsock, pub) {
         this.serversocket = srvsock;
 
         this.room = room;
@@ -53,6 +53,8 @@ class GameController {
 
         // Game state
         this.state = new GameState(room.getUsers());
+
+        this.pub = pub;
 
         // start game with random order
         let users = room.getUsers();
@@ -140,12 +142,12 @@ class GameController {
 
         // listen to one answer event.
         // Any unexpected event will act as a wrong answer
-        user.socket.once("public:answer", listener);
+        user.socket.once(`${this.pub ? "public" : "private"}:answer`, listener);
 
         // start timeout
         this.currentQuestionTimeout = setTimeout(() => {
             // update game state
-            user.socket.off("public:answer", listener);
+            user.socket.off(`${this.pub ? "public" : "private"}:answer`, listener);
             this.state.addAnswer(nickname, cell.category, false);
 
             user.socket.emit("server:timeout", "Timeout");
@@ -204,12 +206,12 @@ class GameController {
         let cell = this.state.movePlayer(nickname, pos);
 
         if ( cell.rollAgain ) {
-            
+            return { rollAgain : cell.rollAgain, ...this.rollDice(nickname) };
         } else {
             this.movePending = false;
             this.ackTurn = false;
+            return { rollAgain : cell.rollAgain };
         }
-        return cell.rollAgain;
     }
 
     /**

@@ -12,7 +12,7 @@ const GameController = require("./gameController");
  */
 class PublicGameController extends GameController {
     constructor(room, srvsock) {
-        super(room, srvsock);
+        super(room, srvsock, true);
     }
 
     restartGame() {
