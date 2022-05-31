@@ -14,7 +14,7 @@ const GameState = require("../../game/gameState");
 const config = require("../../config");
 
 const { addMatch } = require("../rest/users");
-const categories = ["Geography", "Art", "Histoire", "Science", "Sports", "Entertainment"];
+const categories = ["Geography", "Art", "History", "Science", "Sports", "Entertainment"];
 class GameController {
     room;
 
