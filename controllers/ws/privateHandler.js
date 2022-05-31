@@ -57,8 +57,8 @@ module.exports = (socket, controller) => {
         // join queue
         const user = new User(socket.user.name, socket);
         try {
-            controller.addUserPrivateGame(args.rid, user);
-            callback({ ok : true })
+            let players = controller.addUserPrivateGame(args.rid, user);
+            callback({ ok : true, players })
         } catch (e) {
             callback({ ok : false, msg : e.message })
         }
