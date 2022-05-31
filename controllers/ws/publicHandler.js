@@ -83,8 +83,8 @@ module.exports = (socket, controller) => {
      */
     const makeMove = (args, callback) => {
         try {
-            let r = controller.makeMove(args.rid, socket.user.name, args.pos);
-            callback({ok : true, rollAgain : r});
+            let { r, roll, cells } = controller.makeMove(args.rid, socket.user.name, args.pos);
+            callback({ok : true, rollAgain : r, roll, cells });
         } catch (e) {
             callback({ ok : false, msg : e.message })
         }
