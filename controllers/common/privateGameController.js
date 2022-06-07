@@ -12,19 +12,10 @@ const GameController = require("./gameController");
  */
 class PrivateGameController extends GameController {
 
-    roomManager
-    turnTimeout
-    difficulty
-    wildcardsEnable
 
-    constructor(room, roomManager, turnTimeout, difficulty, categories, wildcardsEnable, srvsock) {
-        super(room, srvsock, false);
-
+    constructor(room, roomManager, turnTimeout, difficulty, wildcardsEnable, srvsock) {
+        super(room, srvsock, false, turnTimeout, difficulty, wildcardsEnable);
         this.roomManager = roomManager;
-        this.turnTimeout = turnTimeout;
-        this.difficulty = difficulty;
-        this.categories = categories
-        this.wildcardsEnable = wildcardsEnable;
     }
 
     restartGame() {

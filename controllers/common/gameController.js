@@ -17,6 +17,10 @@ const { addMatch } = require("../rest/users");
 
 class GameController {
     room;
+    roomManager;
+    turnTimeout;
+    difficulty;
+    wildcardsEnable;
 
     /**
      * Create a new game controller with a room linked to it.
@@ -28,7 +32,13 @@ class GameController {
      * @param {Room} room
      * @param {Socket} srvsock The server's main socket
      */
-    constructor(room, srvsock, pub) {
+    constructor(room, srvsock, pub, turnTimeout, difficulty, wildcardsEnable) {
+
+        // Game params
+        this.turnTimeout = turnTimeout;
+        this.difficulty = difficulty;
+        this.wildcardsEnable = wildcardsEnable;
+
         this.serversocket = srvsock;
 
         this.room = room;
@@ -70,7 +80,8 @@ class GameController {
         this.serversocket.to(this.room.rid).emit("server:turn", 
             { 
                 turns : this.turns[this.currentTurn], 
-                stats : this.state.stats 
+                stats : this.state.stats,
+                timer : this.turnTimeout
             }
         );
     }
@@ -112,7 +123,8 @@ class GameController {
                     this.serversocket.to(this.room.rid).emit("server:turn", 
                         { 
                             turns : this.turns[this.currentTurn], 
-                            stats : this.state.stats 
+                            stats : this.state.stats,
+                            timer : this.turnTimeout
                         }
                     );
                 

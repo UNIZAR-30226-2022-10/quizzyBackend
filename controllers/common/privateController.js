@@ -31,8 +31,8 @@ class PrivateController extends Controller {
      * @param {Boolean} wildcardsEnable A flag that enables wildcards when set to true.
      * @returns {BigInt} The new room id
      */
-    createPrivateGame(user, turnTimeout, difficulty, categories, wildcardsEnable){
-        let game = this.privateRoomFactory.createGame(user, turnTimeout, difficulty, categories, wildcardsEnable, this.serversocket);
+    createPrivateGame(user, turnTimeout, difficulty, wildcardsEnable){
+        let game = this.privateRoomFactory.createGame(user, turnTimeout, difficulty, wildcardsEnable, this.serversocket);
     
         this.activeGames[game.room.rid] = game;
         return game.room.rid;
@@ -81,7 +81,13 @@ class PrivateController extends Controller {
         this.serversocket.to(this.activeGames[rid].room.rid).emit('server:private:player:join', { player : user.nickname });
         user.socket.join(rid);
             
-        return Object.keys(this.activeGames[rid].room.users);
+        return { 
+            players : Object.keys(this.activeGames[rid].room.users), 
+            config : { 
+                turnTimeout : this.activeGames[rid].turnTimeout,
+                difficulty : this.activeGames[rid].difficulty
+            } 
+        };
     }
 
     /**
