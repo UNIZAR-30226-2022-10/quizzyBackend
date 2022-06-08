@@ -217,7 +217,9 @@ class GameController {
 
         let cell = this.state.movePlayer(nickname, pos);
 
-        if ( cell.rollAgain ) {
+        console.log("cell : ", cell);
+
+        if ( cell.rollAgain === true ) {
             return { rollAgain : cell.rollAgain, ...this.rollDice(nickname) };
         } else {
             this.movePending = false;
