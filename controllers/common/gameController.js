@@ -224,6 +224,12 @@ class GameController {
         } else {
             this.movePending = false;
             this.ackTurn = false;
+            this.serversocket.to(this.room.rid).emit("server:turn", 
+                { 
+                    turns : this.turns[this.currentTurn], 
+                    stats : this.state.stats 
+                }
+            );
             return { rollAgain : cell.rollAgain };
         }
     }
