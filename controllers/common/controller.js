@@ -63,7 +63,7 @@ class Controller {
         if ( !this.activeGames[rid] ) 
             throw new Error("restart : This game doesn't exist");
 
-        return this.activeGames[rid].resume(nickname);
+        return this.activeGames[rid].resume(nickname, socket);
     }
 }
 

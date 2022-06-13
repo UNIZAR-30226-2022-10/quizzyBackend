@@ -264,7 +264,6 @@ class GameController {
     resume(nickname, socket) {
         this.room.resume(nickname, socket)
 
-        var user = this.room.findUser(nickname);
         return { 
             turns : this.turns[this.currentTurn], 
             stats : this.state.stats 
