@@ -25,7 +25,7 @@ class PublicGameFactory {
         let room = new PublicRoom(roomUuid);
         users.forEach(user => {
             room.addUser(user);
-            user.socket.join(roomUuid);
+            user.socket?.join(roomUuid);
         })
 
         return new PublicGameController(room, serversocket);

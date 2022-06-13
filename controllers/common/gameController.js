@@ -154,15 +154,15 @@ class GameController {
 
         // listen to one answer event.
         // Any unexpected event will act as a wrong answer
-        user.socket.once(`${this.pub ? "public" : "private"}:answer`, listener);
+        user.socket?.once(`${this.pub ? "public" : "private"}:answer`, listener);
 
         // start timeout
         this.currentQuestionTimeout = setTimeout(() => {
             // update game state
-            user.socket.off(`${this.pub ? "public" : "private"}:answer`, listener);
+            user.socket?.off(`${this.pub ? "public" : "private"}:answer`, listener);
             this.state.addAnswer(nickname, cell.category, false);
 
-            user.socket.emit("server:timeout", "Timeout");
+            user.socket?.emit("server:timeout", "Timeout");
             this.nextTurn();
         }, config.publicQuestionTimeout);
 
@@ -178,6 +178,7 @@ class GameController {
      * and the game stats for each player.
      */
     nextTurn() {
+        console.log("nextturn");
         this.ackTurn = false;
         this.movePending = false;
         this.currentTurn = (this.currentTurn + 1) % this.turns.length;

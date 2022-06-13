@@ -63,6 +63,7 @@ class Room {
             throw new Error("User is already online");
 
         this.users[nickname].setOnline(socket);
+        socket.join(this.rid);
     }
 
     /**

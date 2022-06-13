@@ -79,7 +79,7 @@ class PrivateController extends Controller {
         
         this.activeGames[rid].room.addUser(user);
         this.serversocket.to(this.activeGames[rid].room.rid).emit('server:private:player:join', { player : user.nickname });
-        user.socket.join(rid);
+        user.socket?.join(rid);
             
         return { 
             players : Object.keys(this.activeGames[rid].room.users), 
