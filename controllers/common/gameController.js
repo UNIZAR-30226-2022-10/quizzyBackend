@@ -119,13 +119,6 @@ class GameController {
             if (ok) {
                 if ( cell.hasToken ) {
                     this.state.addToken(nickname, cell.category);
-                    this.serversocket.to(this.room.rid).emit("server:turn", 
-                        { 
-                            turns : this.turns[this.currentTurn], 
-                            stats : this.state.stats,
-                            timer : this.turnTimeout
-                        }
-                    );
                 
                     if(this.state.hasWon(nickname)){
                         this.serversocket.to(room.rid).emit("server:winner", nickname);
