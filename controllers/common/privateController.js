@@ -84,7 +84,8 @@ class PrivateController extends Controller {
             players : Object.keys(this.activeGames[rid].room.users), 
             config : { 
                 turnTimeout : this.activeGames[rid].turnTimeout,
-                difficulty : this.activeGames[rid].difficulty
+                difficulty : this.activeGames[rid].difficulty,
+                wildcardsEnable : this.activeGames[rid].wildcardsEnable
             } 
         };
     }

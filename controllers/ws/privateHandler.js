@@ -32,7 +32,7 @@ module.exports = (socket, controller) => {
         const user = new User(socket.user.name, socket);
 
         try {
-            let rid = controller.createPrivateGame(user, args.turnTimeout, args.difficulty, args.categories, args.wildcardsEnable);
+            let rid = controller.createPrivateGame(user, args.turnTimeout, args.difficulty, args.wildcardsEnable);
             callback({ok: true, rid});
         } catch (e) {
             callback({ok: false, msg :e.message});
