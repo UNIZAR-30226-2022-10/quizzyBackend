@@ -58,6 +58,12 @@ class GameController {
         // Timeout object
         this.currentQuestionTimeout = null;
 
+        // Timestamp of the beginning of the timeout object
+        this.start = null;
+
+        // Remaining timeof the timeout object 
+        this.remaining = null;
+
         // Tokens on current turn
         this.currentTurnTokens = 0;
 
@@ -154,14 +160,21 @@ class GameController {
         user.socket.once(`${this.pub ? "public" : "private"}:answer`, listener);
 
         // start timeout
-        this.currentQuestionTimeout = setTimeout(() => {
-            // update game state
-            user.socket.off(`${this.pub ? "public" : "private"}:answer`, listener);
-            this.state.addAnswer(nickname, cell.category, false);
+        this.remaining = config.publicQuestionTimeout;
+        this.start = Date.now();
+        this.currentQuestionTimeout = null;
+        this.resumeAnswerTimer(user,listener,nickname,cell)
 
-            user.socket.emit("server:timeout", "Timeout");
-            this.nextTurn();
-        }, config.publicQuestionTimeout);
+        // listen once to more time joker.
+        // Any unexpected event will act as a wrong answer
+        user.socket.once('moreTime', () => {
+            // reset timer
+            this.pauseAnswerTimer();
+            setTimeout(() => {
+                this.resumeAnswerTimer(user,listener,nickname,cell);
+            }
+            , config.moreTimeWildcard); //15s
+        })
 
         const currentQuestion = this.currentQuestion;
         const timeout = config.publicQuestionTimeout;
@@ -249,6 +262,39 @@ class GameController {
             clearTimeout(this.currentQuestionTimeout);
             this.currentQuestionTimeout = null;
         }
+    }
+
+    /**
+     * Pause the online timeout for answering a question
+     */
+    pauseAnswerTimer() {
+        // if timeout exists, pause timer
+        if (this.currentQuestionTimeout) {
+            clearTimeout(this.currentQuestionTimeout);
+            this.currentQuestionTimeout = null;
+            this.remaining -= Date.now() - this.start;
+        }
+    }
+
+    /**
+     * Resume the online timeout for answering a question
+     */
+    resumeAnswerTimer(user,listener,nickname,cell) {
+        // if timer don't exists, resume timer
+        if (this.currentQuestionTimeout) {
+            return;
+        }
+        this.start = Date.now();
+        this.currentQuestionTimeout = setTimeout(() => {
+            // update game state
+            user.socket?.off(`${this.pub ? "public" : "private"}:answer`, listener);
+            this.state.addAnswer(nickname, cell.category, false);
+
+            user.socket.emit("server:timeout", "Timeout");
+            this.nextTurn();
+        }, this.remaining);
+
+        
     }
 
     /**

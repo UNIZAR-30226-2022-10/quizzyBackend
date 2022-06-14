@@ -3,6 +3,7 @@ let config = {
     publicRoomMinPlayers : 2,
     publicRoomMaxPlayers : 6,
     publicQuestionTimeout : 15000,
+    moreTimeWildcard : 15000,
 
     privateRoomMinPlayers : 2,
     privateRoomMaxPlayers : 6
