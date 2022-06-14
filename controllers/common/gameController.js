@@ -119,6 +119,11 @@ class GameController {
             if (ok) {
                 if ( cell.hasToken ) {
                     this.state.addToken(nickname, cell.category);
+                    this.serversocket.to(this.room.rid).emit("server:turn", 
+                        { 
+                            stats : this.state.stats 
+                        }
+                    );
                 
                     if(this.state.hasWon(nickname)){
                         this.serversocket.to(room.rid).emit("server:winner", nickname);
@@ -128,7 +133,7 @@ class GameController {
                     }
                     else{
                         this.currentTurnTokens = this.currentTurnTokens + 1;
-
+                        console.log("========"+this.currentTurnTokens+"========");
                         if (this.currentTurnTokens === 3) {
                             console.log("3 tokens in one turn!")
                             this.currentTurnTokens = 0;
