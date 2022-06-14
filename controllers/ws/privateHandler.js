@@ -27,7 +27,7 @@ module.exports = (socket, controller) => {
      * @param {Function} callback The acknowledgement function, which returns the room identifier.
      */
     const createPrivateGame = (args, callback) => {
-        console.log("createPublicGame");
+        console.log("createPrivateGame");
 
         const user = new User(socket.user.name, socket);
 
@@ -80,7 +80,7 @@ module.exports = (socket, controller) => {
      */
     const leavePrivateGame = (args, callback) => {
         // leave queue 
-        console.log("leavePublicGame");
+        console.log("leavePrivateGame");
         const user = new User(socket.user.name, socket);
         try {
             controller.delUserPrivateGame(args.rid, user);

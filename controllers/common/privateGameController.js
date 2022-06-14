@@ -18,6 +18,12 @@ class PrivateGameController extends GameController {
         this.roomManager = roomManager;
     }
 
+    addUser(user) {
+        this.room.addUser(user);
+        this.state.addUserStats(user.nickname);
+        user.socket.join(this.room.rid);
+    }
+
     restartGame() {
         
     }
