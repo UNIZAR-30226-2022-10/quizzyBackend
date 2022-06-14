@@ -229,6 +229,11 @@ async function getUserWildcards(nickname) {
 
     // Find wildcards owned by user
     var wildcards = await prisma.user_wildcards.findMany({
+        orderBy: [
+            {
+                wildcard_id: 'asc',
+            },
+        ],
         where: {
             nickname: nickname
         },
