@@ -196,10 +196,10 @@ async function checkUserCredentials(nickname, password) {
 
                 // user exists but passwords do not match
                 if ( !validPassword )
-                    throw createError(StatusCodes.UNAUTHORIZED, "Passwords do not match");
+                    throw createError(StatusCodes.UNAUTHORIZED, "Wrong username or password");
             } else {
                 // User doesn't exist
-                throw createError(StatusCodes.NOT_FOUND, `Can't find ${nickname}`);
+                throw createError(StatusCodes.NOT_FOUND, "Wrong username or password");
             }
         })
 }
