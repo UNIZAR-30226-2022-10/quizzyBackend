@@ -74,7 +74,7 @@ class GameController {
      */
     startGame() {
 
-        let users = room.getUsers();
+        let users = this.room.getUsers();
         this.turns = pickRandom(users, users.length);
         // Send initial turn message
         this.serversocket.to(this.room.rid).emit("server:turn", 
