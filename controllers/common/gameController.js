@@ -97,6 +97,12 @@ class GameController {
         if (this.ackTurn || this.movePending)
             throw new Error("Can't start a turn if it is already your turn");
 
+        if (this.currentTurnTokens === 3) {
+            this.currentTurnTokens = 0;
+            this.nextTurn();
+            throw new Error("Can't start a turn, you won 3 tokens in the last turn!");
+        }
+
         this.ackTurn = true;
 
         // This statement will throw if user is not in this room.
@@ -104,7 +110,6 @@ class GameController {
         var user = this.room.findUser(nickname);
 
         let cell = this.state.board.getCell(this.state.getPlayerPos(nickname));
-        // TODO: get from valid category
         let question = await getQuestions(1, null, categories[cell.category]);
         this.currentQuestion = question[0];
 
@@ -133,18 +138,12 @@ class GameController {
                     }
                     else{
                         this.currentTurnTokens = this.currentTurnTokens + 1;
-                        console.log("========"+this.currentTurnTokens+"========");
-                        if (this.currentTurnTokens === 3) {
-                            console.log("3 tokens in one turn!")
-                            this.currentTurnTokens = 0;
-                            this.nextTurn();
-                            callback({ok, continue : false});
-                        }
                     }
                 }
                 this.movePending = true;
                 callback({ok, continue : true, roll : this.rollDice(nickname)});
             } else {
+                this.currentTurnTokens = 0;
                 this.nextTurn();
                 callback({ok, continue : false});
             }
