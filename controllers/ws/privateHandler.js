@@ -182,6 +182,6 @@ module.exports = (socket, controller) => {
     socket.on("private:startTurn", startTurn);
     socket.on("private:makeMove", makeMove);
     
-    socket.on("public:pause", pause);
-    socket.on("public:resume", resume);
+    socket.on("private:pause", pause);
+    socket.on("private:resume", resume);
 };
