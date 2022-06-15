@@ -58,6 +58,12 @@ class GameController {
         // Timeout object
         this.currentQuestionTimeout = null;
 
+        // Timestamp of the beginning of the timeout object
+        this.start = null;
+
+        // Remaining timeof the timeout object 
+        this.remaining = null;
+
         // Tokens on current turn
         this.currentTurnTokens = 0;
 
@@ -97,6 +103,12 @@ class GameController {
         if (this.ackTurn || this.movePending)
             throw new Error("Can't start a turn if it is already your turn");
 
+        if (this.currentTurnTokens === 3) {
+            this.currentTurnTokens = 0;
+            this.nextTurn();
+            throw new Error("Can't start a turn, you won 3 tokens in the last turn!");
+        }
+
         this.ackTurn = true;
 
         // This statement will throw if user is not in this room.
@@ -104,8 +116,7 @@ class GameController {
         var user = this.room.findUser(nickname);
 
         let cell = this.state.board.getCell(this.state.getPlayerPos(nickname));
-        // TODO: get from valid category
-        let question = await getQuestions(1, null, categories[cell.category]);
+        let question = await getQuestions(1, this.difficulty, categories[cell.category]);
         this.currentQuestion = question[0];
 
         const listener = (answer, callback) => {
@@ -121,9 +132,7 @@ class GameController {
                     this.state.addToken(nickname, cell.category);
                     this.serversocket.to(this.room.rid).emit("server:turn", 
                         { 
-                            turns : this.turns[this.currentTurn], 
-                            stats : this.state.stats,
-                            timer : this.turnTimeout
+                            stats : this.state.stats 
                         }
                     );
                 
@@ -135,18 +144,12 @@ class GameController {
                     }
                     else{
                         this.currentTurnTokens = this.currentTurnTokens + 1;
-
-                        if (this.currentTurnTokens === 3) {
-                            console.log("3 tokens in one turn!")
-                            this.currentTurnTokens = 0;
-                            this.nextTurn();
-                            callback({ok, continue : false});
-                        }
                     }
                 }
                 this.movePending = true;
                 callback({ok, continue : true, roll : this.rollDice(nickname)});
             } else {
+                this.currentTurnTokens = 0;
                 this.nextTurn();
                 callback({ok, continue : false});
             }
@@ -157,18 +160,24 @@ class GameController {
         user.socket.once(`${this.pub ? "public" : "private"}:answer`, listener);
 
         // start timeout
-        this.currentQuestionTimeout = setTimeout(() => {
-            // update game state
-            user.socket.off(`${this.pub ? "public" : "private"}:answer`, listener);
-            this.state.addAnswer(nickname, cell.category, false);
+        this.remaining = this.turnTimeout ;
+        this.start = Date.now();
+        this.currentQuestionTimeout = null;
+        this.resumeAnswerTimer(user,listener,nickname,cell)
 
-            user.socket.emit("server:timeout", "Timeout");
-            this.nextTurn();
-        }, config.publicQuestionTimeout);
+        // listen once to more time joker.
+        // Any unexpected event will act as a wrong answer
+        user.socket.once('moreTime', () => {
+            // reset timer
+            this.pauseAnswerTimer();
+            setTimeout(() => {
+                this.resumeAnswerTimer(user,listener,nickname,cell);
+            }
+            , config.moreTimeWildcard); //15s
+        })
 
         const currentQuestion = this.currentQuestion;
-        const timeout = config.publicQuestionTimeout;
-        return {currentQuestion, timeout};
+        return {currentQuestion};
     }
 
     /**
@@ -244,6 +253,14 @@ class GameController {
     }
 
     /**
+     * Check if wildcards are enabled for this game.
+     * @returns {Boolean} True if wildcards are enabled, false otherwise.
+     */
+    wildcardsStatus() {
+        return this.wildcardsEnable;
+    }
+
+    /**
      * Reset the online timeout for answering a question
      */
     resetAnswerTimer() {
@@ -252,6 +269,39 @@ class GameController {
             clearTimeout(this.currentQuestionTimeout);
             this.currentQuestionTimeout = null;
         }
+    }
+
+    /**
+     * Pause the online timeout for answering a question
+     */
+    pauseAnswerTimer() {
+        // if timeout exists, pause timer
+        if (this.currentQuestionTimeout) {
+            clearTimeout(this.currentQuestionTimeout);
+            this.currentQuestionTimeout = null;
+            this.remaining -= Date.now() - this.start;
+        }
+    }
+
+    /**
+     * Resume the online timeout for answering a question
+     */
+    resumeAnswerTimer(user,listener,nickname,cell) {
+        // if timer don't exists, resume timer
+        if (this.currentQuestionTimeout) {
+            return;
+        }
+        this.start = Date.now();
+        this.currentQuestionTimeout = setTimeout(() => {
+            // update game state
+            user.socket?.off(`${this.pub ? "public" : "private"}:answer`, listener);
+            this.state.addAnswer(nickname, cell.category, false);
+
+            user.socket.emit("server:timeout", "Timeout");
+            this.nextTurn();
+        }, this.remaining);
+
+        
     }
 
     /**

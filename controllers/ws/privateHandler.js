@@ -150,6 +150,16 @@ module.exports = (socket, controller) => {
         }
     }
 
+    const wildcardsStatus = (args, callback) => {
+        try {
+            let r = controller.wildcardsStatus(args.rid);
+            callback({ok : true, status : r});
+        } catch (e) {
+            callback({ ok : false, msg : e.message })
+        }
+    }
+
+
     /**
      * Pause user's game
      * @param {Object} args Argument object, which contains the room id
@@ -181,6 +191,7 @@ module.exports = (socket, controller) => {
     socket.on("private:cancel", cancelPrivateGame);
     socket.on("private:startTurn", startTurn);
     socket.on("private:makeMove", makeMove);
+    socket.on("private:wildcardsStatus", wildcardsStatus);
     
     socket.on("private:pause", pause);
     socket.on("private:resume", resume);
