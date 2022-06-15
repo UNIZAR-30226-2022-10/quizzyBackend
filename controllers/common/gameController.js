@@ -72,16 +72,16 @@ class GameController {
 
         this.pub = pub;
 
-        // start game with random order
-        let users = room.getUsers();
-        this.turns = pickRandom(users, users.length);
+        this.turns = []
     }
 
     /**
      * Start the current game. This function will be called after constructing the game controller object
      */
     startGame() {
-        
+
+        let users = this.room.getUsers();
+        this.turns = pickRandom(users, users.length);
         // Send initial turn message
         this.serversocket.to(this.room.rid).emit("server:turn", 
             { 

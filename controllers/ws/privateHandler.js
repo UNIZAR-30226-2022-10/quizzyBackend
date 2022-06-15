@@ -27,12 +27,12 @@ module.exports = (socket, controller) => {
      * @param {Function} callback The acknowledgement function, which returns the room identifier.
      */
     const createPrivateGame = (args, callback) => {
-        console.log("createPublicGame");
+        console.log("createPrivateGame");
 
         const user = new User(socket.user.name, socket);
 
         try {
-            let rid = controller.createPrivateGame(user, args.turnTimeout, args.difficulty, args.categories, args.wildcardsEnable);
+            let rid = controller.createPrivateGame(user, args.turnTimeout, args.difficulty, args.wildcardsEnable);
             callback({ok: true, rid});
         } catch (e) {
             callback({ok: false, msg :e.message});
@@ -80,7 +80,7 @@ module.exports = (socket, controller) => {
      */
     const leavePrivateGame = (args, callback) => {
         // leave queue 
-        console.log("leavePublicGame");
+        console.log("leavePrivateGame");
         const user = new User(socket.user.name, socket);
         try {
             controller.delUserPrivateGame(args.rid, user);
@@ -182,6 +182,6 @@ module.exports = (socket, controller) => {
     socket.on("private:startTurn", startTurn);
     socket.on("private:makeMove", makeMove);
     
-    socket.on("public:pause", pause);
-    socket.on("public:resume", resume);
+    socket.on("private:pause", pause);
+    socket.on("private:resume", resume);
 };

@@ -77,15 +77,15 @@ class PrivateController extends Controller {
         if (this.activeGames[rid].room.users.length == config.publicRoomMaxPlayers)
             throw new Error("This room is already full");
         
-        this.activeGames[rid].room.addUser(user);
+        this.activeGames[rid].addUser(user);
         this.serversocket.to(this.activeGames[rid].room.rid).emit('server:private:player:join', { player : user.nickname });
-        user.socket.join(rid);
             
         return { 
             players : Object.keys(this.activeGames[rid].room.users), 
             config : { 
                 turnTimeout : this.activeGames[rid].turnTimeout,
-                difficulty : this.activeGames[rid].difficulty
+                difficulty : this.activeGames[rid].difficulty,
+                wildcardsEnable : this.activeGames[rid].wildcardsEnable
             } 
         };
     }

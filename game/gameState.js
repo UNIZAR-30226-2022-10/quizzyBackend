@@ -25,6 +25,10 @@ class GameState {
         });
     }
 
+    addUserStats(nickname) {
+        this.stats[nickname] = new Stats();
+    }
+
     /**
      * Move player to pos.
      * If the user is not playing this game or the position is invalid,
