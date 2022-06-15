@@ -36,6 +36,12 @@ class Controller {
         return this.activeGames[rid].makeMove(nickname, pos);
     }
 
+    wildcardsStatus(rid) {
+        if ( !this.activeGames[rid] ) 
+            throw new Error("wildcardsStatus : This game doesn't exist");
+        return this.activeGames[rid].wildcardsStatus();
+    }
+
     print() {
         console.log("queue : ", this.queue);
     }

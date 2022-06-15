@@ -116,7 +116,7 @@ class GameController {
         var user = this.room.findUser(nickname);
 
         let cell = this.state.board.getCell(this.state.getPlayerPos(nickname));
-        let question = await getQuestions(1, null, categories[cell.category]);
+        let question = await getQuestions(1, this.difficulty, categories[cell.category]);
         this.currentQuestion = question[0];
 
         const listener = (answer, callback) => {
@@ -251,6 +251,14 @@ class GameController {
      */
     getCurrentTurn() {
         return this.currentTurn;
+    }
+
+    /**
+     * Check if wildcards are enabled for this game.
+     * @returns {Boolean} True if wildcards are enabled, false otherwise.
+     */
+    wildcardsStatus() {
+        return this.wildcardsEnable;
     }
 
     /**
