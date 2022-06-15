@@ -135,7 +135,7 @@ async function getInvites(nickname) {
     if (!nickname || !validateNickname(nickname))
         throw createError(StatusCodes.BAD_REQUEST, "Invalid nickname");
 
-    let games = await prisma.$queryRaw`SELECT PG.GAME_ID, PG.WINNERFROM PUBLIC_GAME PG, USER_PUBLIC_GAMES UPG 
+    let games = await prisma.$queryRaw`SELECT PG.GAME_ID, PG.WINNER FROM PUBLIC_GAME PG, USER_PUBLIC_GAMES UPG 
         WHERE nickname = ${nickname} AND PG.GAME_ID = UPG.GAME_ID;`
     
     let result = await Promise.all(games.map(g =>
@@ -163,7 +163,7 @@ async function getPrivateHistory(nickname) {
     if (!nickname || !validateNickname(nickname))
         throw createError(StatusCodes.BAD_REQUEST, "Invalid nickname");
 
-    let games = await prisma.$queryRaw`SELECT PG.GAME_ID, PG.WILDCARDS_ENABLE, PG.ANSWER_TIME, PG.DIFFICULTY, PG.WINNER 
+    let games = await prisma.$queryRaw`SELECT PG.GAME_ID, PG.WILDCARDS_ENABLE, PG.ANSWER_TIME, PG.DIFFICULTY, PG.WINNER  
         FROM PRIVATE_GAME PG, USER_PRIVATE_GAMES UPG WHERE nickname = ${nickname} AND PG.GAME_ID = UPG.GAME_ID;`
     
     let result = await Promise.all(games.map(g =>
