@@ -160,7 +160,7 @@ class GameController {
         user.socket.once(`${this.pub ? "public" : "private"}:answer`, listener);
 
         // start timeout
-        this.remaining = config.publicQuestionTimeout;
+        this.remaining = this.turnTimeout ;
         this.start = Date.now();
         this.currentQuestionTimeout = null;
         this.resumeAnswerTimer(user,listener,nickname,cell)
@@ -177,8 +177,7 @@ class GameController {
         })
 
         const currentQuestion = this.currentQuestion;
-        const timeout = config.publicQuestionTimeout;
-        return {currentQuestion, timeout};
+        return {currentQuestion};
     }
 
     /**
