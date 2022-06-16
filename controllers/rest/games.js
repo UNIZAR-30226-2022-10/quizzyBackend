@@ -153,7 +153,7 @@ async function getInvites(nickname) {
                 }
             }
         })
-        .then(players => { return { ...g, players : players.map(p => p.nickname) } })
+        .then(players => { return { ...g, players : players.map(player => player.users) } } )
     ))
 
     return result;
