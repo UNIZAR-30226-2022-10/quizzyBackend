@@ -137,7 +137,7 @@ class GameController {
                     );
                 
                     if(this.state.hasWon(nickname)){
-                        this.serversocket.to(room.rid).emit("server:winner", nickname);
+                        this.serversocket.to(this.room.rid).emit("server:winner", nickname);
 
                         // room persistence add match
                         addMatch(nickname);
