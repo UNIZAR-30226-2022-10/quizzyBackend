@@ -131,6 +131,7 @@ async function getInvites(nickname) {
  * @param {String} nickname 
  */
  async function getPublicHistory(nickname) {
+    console.log(nickname)
     // Validate nickname
     if (!nickname || !validateNickname(nickname))
         throw createError(StatusCodes.BAD_REQUEST, "Invalid nickname");
@@ -145,7 +146,7 @@ async function getInvites(nickname) {
             },
             select : {
                 nickname : true
-            }
+            },
         })
         .then(players => { return { ...g, players : players.map(p => p.nickname) } })
     ))
@@ -171,11 +172,16 @@ async function getPrivateHistory(nickname) {
             where : {
                 game_id : g.game_id
             },
-            select : {
-                nickname : true
+            include:{
+                users: {
+                    select: {
+                        actual_cosmetic : true,
+                        nickname : true
+                    },
+                }
             }
         })
-        .then(players => { return { ...g, players : players.map(p => p.nickname) } })
+        .then(players => { return { ...g, players : players.map(player => player.users) } } )
     ))
 
     return result;
