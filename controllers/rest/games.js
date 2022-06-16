@@ -144,9 +144,14 @@ async function getInvites(nickname) {
             where : {
                 game_id : g.game_id
             },
-            select : {
-                nickname : true
-            },
+            include:{
+                users: {
+                    select: {
+                        actual_cosmetic : true,
+                        nickname : true
+                    },
+                }
+            }
         })
         .then(players => { return { ...g, players : players.map(p => p.nickname) } })
     ))
