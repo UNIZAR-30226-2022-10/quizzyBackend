@@ -15,6 +15,10 @@ class Controller {
         this.activeGames = {};
     }
 
+    /**
+     * Return number of active games
+     * @returns Active games count
+     */
     getActiveGames() {
         return Object.keys(this.activeGames).length;
     }

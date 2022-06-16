@@ -34,6 +34,10 @@ class PublicController extends Controller {
         this.publicGameFactory = new PublicGameFactory();
     }
 
+    /**
+     * Return how many users are waiting in the queue.
+     * @returns Number of enqueued users
+     */
     getEnqueuedUsers() {
         return this.queue.length();
     }
