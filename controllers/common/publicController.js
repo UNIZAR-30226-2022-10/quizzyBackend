@@ -35,6 +35,14 @@ class PublicController extends Controller {
     }
 
     /**
+     * Return how many users are waiting in the queue.
+     * @returns Number of enqueued users
+     */
+    getEnqueuedUsers() {
+        return this.queue.length();
+    }
+
+    /**
      * Enqueue a user for public matchmaking.
      * 
      * If the user is already in the queue, this function will throw an exception.

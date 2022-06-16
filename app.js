@@ -15,7 +15,7 @@ var PublicController = require('./controllers/common/publicController');
 var PrivateController = require("./controllers/common/privateController");
 
 // Middleware imports
-const { authWsToken } = require("./middleware/auth");
+const { authRestToken, authAdmin, authWsToken } = require("./middleware/auth");
 
 // http server instance to attach Socket.io handlers
 const server = http.createServer(app);
@@ -64,15 +64,20 @@ app.use("/games", gamesRouter);
 // Websocket handling imports
 const registerChatHandlers = require("./controllers/ws/chatHandler");
 const registerPublicHandlers = require("./controllers/ws/publicHandler");
-const registerPrivateHandlers = require("./controllers/ws/privateHandler")
+const registerPrivateHandlers = require("./controllers/ws/privateHandler");
+
+let onlineUsers = 0;
 
 const onConnection = (socket) => {
+
+    onlineUsers++;
     // join common room
     socket.join('main');
     console.log('User with ID ' + socket.id + ' connected');
     socket.to('main').emit("otherConnect", {name : socket.user.name, systemMsg : 'connection'});
 
     socket.on('disconnect', () => {
+        onlineUsers--;
         console.log('User with ID ' + socket.id + ' disconnected');
         socket.to('main').emit("otherDisconnect", {name : socket.user.name, systemMsg : 'disconnection'});
     })
@@ -82,6 +87,16 @@ const onConnection = (socket) => {
     registerPublicHandlers(socket, publicControllerInstance);
     registerPrivateHandlers(socket, privateControllerInstance);
 };
+
+app.get('/admin/stats', authRestToken, authAdmin, (req, res, next) => {
+    res.statusCode = 200;
+    res.send({
+        onlineUsers,
+        activePrivateGames : privateControllerInstance.getActiveGames(),
+        activePublicGames : publicControllerInstance.getActiveGames(),
+        enqueuedUsers : publicControllerInstance.getEnqueuedUsers()
+    })
+})
 
 io.on('connection', onConnection);
 io.use(authWsToken);

@@ -126,10 +126,78 @@ async function getInvites(nickname) {
     })
 }
 
+/**
+ * Get user's public game history
+ * @param {String} nickname 
+ */
+ async function getPublicHistory(nickname) {
+    console.log(nickname)
+    // Validate nickname
+    if (!nickname || !validateNickname(nickname))
+        throw createError(StatusCodes.BAD_REQUEST, "Invalid nickname");
+
+    let games = await prisma.$queryRaw`SELECT PG.GAME_ID, PG.WINNER FROM PUBLIC_GAME PG, USER_PUBLIC_GAMES UPG 
+        WHERE nickname = ${nickname} AND PG.GAME_ID = UPG.GAME_ID;`
+    
+    let result = await Promise.all(games.map(g =>
+        prisma.user_public_games.findMany({
+            where : {
+                game_id : g.game_id
+            },
+            include:{
+                users: {
+                    select: {
+                        actual_cosmetic : true,
+                        nickname : true
+                    },
+                }
+            }
+        })
+        .then(players => { return { ...g, players : players.map(player => player.users) } } )
+    ))
+
+    return result;
+}
+
+
+/**
+ * Get user's private game history
+ * @param {String} nickname 
+ */
+async function getPrivateHistory(nickname) {
+    // Validate nickname
+    if (!nickname || !validateNickname(nickname))
+        throw createError(StatusCodes.BAD_REQUEST, "Invalid nickname");
+
+    let games = await prisma.$queryRaw`SELECT PG.GAME_ID, PG.WILDCARDS_ENABLE, PG.ANSWER_TIME, PG.DIFFICULTY, PG.WINNER  
+        FROM PRIVATE_GAME PG, USER_PRIVATE_GAMES UPG WHERE nickname = ${nickname} AND PG.GAME_ID = UPG.GAME_ID;`
+    
+    let result = await Promise.all(games.map(g =>
+        prisma.user_private_games.findMany({
+            where : {
+                game_id : g.game_id
+            },
+            include:{
+                users: {
+                    select: {
+                        actual_cosmetic : true,
+                        nickname : true
+                    },
+                }
+            }
+        })
+        .then(players => { return { ...g, players : players.map(player => player.users) } } )
+    ))
+
+    return result;
+}
+
 module.exports = {
     getPublicGames,
     getPrivateGames,
     invitePlayer,
     getInvites,
     removeInvite,
+    getPublicHistory,
+    getPrivateHistory,
 }

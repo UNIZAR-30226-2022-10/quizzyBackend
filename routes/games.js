@@ -12,7 +12,9 @@ const {
     getPrivateGames,
     getInvites,
     invitePlayer,
-    removeInvite
+    removeInvite,
+    getPublicHistory,
+    getPrivateHistory
 } = require("../controllers/rest/games");
 
 var gamesRouter = express.Router();
@@ -85,6 +87,46 @@ module.exports = function (privateController, publicController) {
                 res.statusCode = StatusCodes.OK;
                 res.send({
                     ok: true
+                });
+            })
+            .catch((e) => {
+                //console.log(e.message);
+                res.statusCode = e.status || 400;
+                res.send({
+                    msg: e.message,
+                    ok: false
+                });
+            });
+    });
+
+    gamesRouter.get("/history/public", authRestToken, (req, res, next) => {
+
+        getPublicHistory(req.jwtUser)
+            .then(games => {
+                res.statusCode = StatusCodes.OK;
+                res.send({
+                    ok: true,
+                    games
+                });
+            })
+            .catch((e) => {
+                //console.log(e.message);
+                res.statusCode = e.status || 400;
+                res.send({
+                    msg: e.message,
+                    ok: false
+                });
+            });
+    });
+
+    gamesRouter.get("/history/private", authRestToken, (req, res, next) => {
+
+        getPrivateHistory(req.jwtUser)
+            .then(games => {
+                res.statusCode = StatusCodes.OK;
+                res.send({
+                    ok: true,
+                    games
                 });
             })
             .catch((e) => {

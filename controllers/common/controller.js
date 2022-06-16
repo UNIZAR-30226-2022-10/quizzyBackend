@@ -16,6 +16,14 @@ class Controller {
     }
 
     /**
+     * Return number of active games
+     * @returns Active games count
+     */
+    getActiveGames() {
+        return Object.keys(this.activeGames).length;
+    }
+
+    /**
          * Start current player's turn after acknowledgement.
          * In this phase, the player must answer the provided question.
          * The first phase ends when the user answers the question or after timing out.
