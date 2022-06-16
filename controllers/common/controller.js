@@ -15,6 +15,10 @@ class Controller {
         this.activeGames = {};
     }
 
+    getActiveGames() {
+        return Object.keys(this.activeGames).length;
+    }
+
     /**
          * Start current player's turn after acknowledgement.
          * In this phase, the player must answer the provided question.

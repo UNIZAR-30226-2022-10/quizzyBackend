@@ -34,6 +34,10 @@ class PublicController extends Controller {
         this.publicGameFactory = new PublicGameFactory();
     }
 
+    getEnqueuedUsers() {
+        return this.queue.length();
+    }
+
     /**
      * Enqueue a user for public matchmaking.
      * 
